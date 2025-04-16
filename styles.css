@@ -108,6 +108,13 @@ nav ul li a:hover {
   margin-bottom: 2rem;
 }
 
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .cta-button {
   display: inline-block;
   background-color: var(--primary-color);
