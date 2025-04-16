@@ -1,6 +1,6 @@
 # Channel Dungeons Website
 
-This is the official website for Channel Dungeons, an MMORPG played entirely in Discord. The game focuses on exploration and collaboration. Players explore dungeons, fight monsters, get loot and level up.
+This is the official website for Channel Dungeons, an MMORPG played entirely in Discord. The game emphasizes exploration and collaboration. Delve into dungeons, battle fearsome monsters, discover valuable loot, and level up your hero!
 
 ## Play Now
 
