@@ -1,0 +1,4 @@
+When resolving issues in this repository:
+
+1. Focus on maintaining the existing code style and architecture
+2. Files do not contain line numbers. If you see line numbers, it is due to the formatting of the tool reading the file (e.g. `cat -n`). Do not include line numbers in arguments for commands like `str_replace`.
