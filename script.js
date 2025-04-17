@@ -47,12 +47,13 @@ document.addEventListener('DOMContentLoaded', function() {
       
       switch (cleanCommand) {
         case 'help':
-          addBotResponse("Available commands: <code>/about</code>, <code>/how-to-play</code>, <code>/features</code>, <code>/welcome</code>");
+          addBotResponse("Available commands: <code>/about</code>, <code>/how-to-play</code>, <code>/features</code>, <code>/welcome</code>, <code>/live-discord</code>");
           break;
         case 'about':
         case 'how-to-play':
         case 'features':
         case 'welcome':
+        case 'live-discord':
           switchChannel(cleanCommand);
           break;
         default:

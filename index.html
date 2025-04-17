@@ -7,7 +7,27 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=MedievalSharp&display=swap" rel="stylesheet">
+    <!-- Replace with Discord's actual font stack -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Add live-discord channel to the channels list -->
+    <style>
+        /* Attempt to load gg sans if available (Discord's proprietary font) */
+        @font-face {
+            font-family: "gg sans";
+            src: local("gg sans"), url("https://cdn.discordapp.com/attachments/1015131233824538624/1062611697150349372/gg_sans_Bold.woff2") format("woff2");
+            font-weight: 700;
+        }
+        @font-face {
+            font-family: "gg sans";
+            src: local("gg sans"), url("https://cdn.discordapp.com/attachments/1015131233824538624/1062611696533909534/gg_sans_Medium.woff2") format("woff2");
+            font-weight: 500;
+        }
+        @font-face {
+            font-family: "gg sans";
+            src: local("gg sans"), url("https://cdn.discordapp.com/attachments/1015131233824538624/1062611695623340062/gg_sans_Normal.woff2") format("woff2");
+            font-weight: 400;
+        }
+    </style>
 </head>
 <body>
     <div class="discord-app">
