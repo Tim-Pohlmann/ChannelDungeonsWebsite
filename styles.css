@@ -186,27 +186,35 @@ nav ul li a:hover {
 .how-to-play h2 {
   text-align: center;
   font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-intro {
+  text-align: center;
+  font-size: 1.2rem;
   margin-bottom: 3rem;
 }
 
-.steps {
+.steps-container {
   display: flex;
-  justify-content: space-between;
-  gap: 2rem;
+  flex-direction: column;
+  gap: 2.5rem;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .step {
-  flex: 1;
   background-color: var(--secondary-color);
   padding: 2rem;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s;
+  position: relative;
 }
 
 .step:hover {
-  transform: translateY(-10px);
+  transform: translateY(-5px);
 }
 
 .step-number {
@@ -221,6 +229,40 @@ nav ul li a:hover {
   margin: 0 auto 1rem;
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.join-options {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.join-option {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  max-width: 250px;
+}
+
+.join-option h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.join-option p {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.step h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.step p {
+  margin-bottom: 1rem;
 }
 
 /* Features Section */
@@ -310,5 +352,16 @@ footer {
   
   .feature-grid {
     grid-template-columns: 1fr;
+  }
+
+  .join-options {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .join-option {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 1rem;
   }
 }
