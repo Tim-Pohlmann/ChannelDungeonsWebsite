@@ -342,6 +342,21 @@ code {
   transform: translateY(1px);
 }
 
+/* Gameplay Preview Section */
+.gameplay-preview {
+    padding: 2rem 0;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.gameplay-gif {
+    display: block;
+    max-width: 90%;
+    margin: 0 auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
 /* Footer */
 footer {
   background-color: var(--secondary-color);
