@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       switch (cleanCommand) {
         case 'help':
-          addBotResponse("Available commands: <code>/about</code>, <code>/how-to-play</code>, <code>/features</code>, <code>/welcome</code>, <code>/live-discord</code>");
+          addBotResponse("Available commands: <span class='discord-command'>about</span>, <span class='discord-command'>how-to-play</span>, <span class='discord-command'>features</span>, <span class='discord-command'>welcome</span>, <span class='discord-command'>live-discord</span>");
           break;
         case 'about':
         case 'how-to-play':
@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', function() {
           switchChannel(cleanCommand);
           break;
         default:
-          addBotResponse(`Unknown command: ${command}. Type <code>/help</code> for available commands.`);
+          addBotResponse(`Unknown command: ${command}. Type <span class='discord-command'>help</span> for available commands.`);
       }
     } else {
       // Treat non-command messages as general chat
-      addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <code>/help</code> to navigate.`);
+      addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>help</span> to navigate.`);
     }
     
     // Clear input field

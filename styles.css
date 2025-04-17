@@ -388,6 +388,22 @@ code {
   display: inline-block;
 }
 
+/* Discord command styling */
+.discord-command {
+  background-color: rgba(55, 63, 99, 1);
+  color: rgba(202, 210, 249, 1);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.discord-command::before {
+  content: "/";
+}
+
 /* Discord embed styling */
 .discord-embed-container {
   width: 100%;
