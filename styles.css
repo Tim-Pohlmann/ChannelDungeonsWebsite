@@ -1,11 +1,14 @@
 /* Base styles */
 :root {
-  --primary-color: #7289da;
+  --primary-color: #5865F2; /* Discord's brand blue */
+  --primary-color-dark: #4752C4; /* Adding a darker shade for hover states */
   --secondary-color: #2c2f33;
   --accent-color: #99aab5;
   --text-color: #ffffff;
   --background-color: #23272a;
   --container-width: 1200px;
+  --code-bg-color: #363a3f;
+  --code-text-color: #ff9d5c;
 }
 
 * {
@@ -113,21 +116,6 @@ nav ul li a:hover {
   justify-content: center;
   gap: 1rem;
   flex-wrap: wrap;
-}
-
-.cta-button {
-  display: inline-block;
-  background-color: var(--primary-color);
-  color: var(--text-color);
-  padding: 1rem 2rem;
-  border-radius: 5px;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.cta-button:hover {
-  background-color: #5b73c7;
-  text-decoration: none;
 }
 
 /* About Section */
@@ -314,6 +302,44 @@ nav ul li a:hover {
   margin: 0 auto 1rem;
   font-size: 0.9rem;
   font-weight: bold;
+}
+
+/* Code blocks styling */
+code {
+  background-color: var(--code-bg-color);
+  color: var(--code-text-color);
+  font-family: 'Courier New', monospace;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: bold;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: inline-block;
+  margin: 0 0.2rem;
+}
+
+/* Discord button styling */
+.discord-button {
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 0.9em;
+  font-weight: 500;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  display: inline-block;
+  margin: 0 0.2rem;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s, transform 0.1s;
+  cursor: pointer;
+  font-family: 'Roboto', sans-serif;
+}
+
+.discord-button:hover {
+  background-color: var(--primary-color-dark);
+  text-decoration: none;
+  transform: translateY(1px);
 }
 
 /* Footer */
