@@ -132,9 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load channel content
     loadChannelContent(channelId);
-    
-    // Add channel switch message
-    addBotResponse(`You've switched to the <strong>#${channelId}</strong> channel.`);
   }
   
   // Load specific channel content
