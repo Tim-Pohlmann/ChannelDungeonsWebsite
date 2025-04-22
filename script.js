@@ -140,20 +140,23 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentTemplate = document.getElementById(contentTemplateId);
     
     if (contentTemplate) {
-      // Clone template content and append to messages
+      // Clone template content
       const content = contentTemplate.cloneNode(true);
       content.removeAttribute('id');
       
-      // Add each message from the template one by one
-      const messages = content.children;
-      while (messages.length > 0) {
-        messagesContainer.appendChild(messages[0]);
-      }
+      // Get all messages from the template
+      const messages = Array.from(content.children);
+      
+      // Add each message with a delay
+      messages.forEach((message, index) => {
+        setTimeout(() => {
+          messagesContainer.appendChild(message);
+          scrollToBottom();
+        }, index * 500); // 500ms delay between messages
+      });
     } else {
       addBotResponse(`Welcome to the #${channelId} channel. This channel has no content yet.`);
     }
-    
-    scrollToBottom();
   }
   
   // Get the current time in Discord format
