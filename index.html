@@ -3,290 +3,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Channel Dungeons - An MMORPG played entirely in Discord">
     <title>Channel Dungeons - MMORPG in Discord</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Replace with Discord's actual font stack -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Add live-discord channel to the channels list -->
-    <style>
-        /* Attempt to load gg sans if available (Discord's proprietary font) */
-        @font-face {
-            font-family: "gg sans";
-            src: local("gg sans"), url("https://cdn.discordapp.com/attachments/1015131233824538624/1062611697150349372/gg_sans_Bold.woff2") format("woff2");
-            font-weight: 700;
-        }
-        @font-face {
-            font-family: "gg sans";
-            src: local("gg sans"), url("https://cdn.discordapp.com/attachments/1015131233824538624/1062611696533909534/gg_sans_Medium.woff2") format("woff2");
-            font-weight: 500;
-        }
-        @font-face {
-            font-family: "gg sans";
-            src: local("gg sans"), url("https://cdn.discordapp.com/attachments/1015131233824538624/1062611695623340062/gg_sans_Normal.woff2") format("woff2");
-            font-weight: 400;
-        }
-    </style>
 </head>
 <body>
     <div class="discord-app">
         <!-- Discord sidebar with channels -->
-        <div class="sidebar">
-            <div class="server-info">
+        <nav class="sidebar" aria-label="Server channels">
+            <header class="server-info">
                 <h1>Channel Dungeons</h1>
-                <div class="server-icon">CD</div>
-            </div>
+                <div class="server-icon" role="img" aria-label="Channel Dungeons Logo">CD</div>
+            </header>
             
             <div class="channels-container">
                 <div class="channels-category">
-                    <span class="category-name">INFO CHANNELS</span>
+                    <span class="category-name" id="info-category">INFO CHANNELS</span>
                 </div>
-                <ul class="channels-list">
+                <ul class="channels-list" aria-labelledby="info-category">
                     <li class="channel active" data-channel="welcome">
-                        <span class="channel-hash">#</span> welcome
+                        <span class="channel-hash" aria-hidden="true">#</span> welcome
                     </li>
                     <li class="channel" data-channel="about">
-                        <span class="channel-hash">#</span> about
+                        <span class="channel-hash" aria-hidden="true">#</span> about
                     </li>
                     <li class="channel" data-channel="how-to-play">
-                        <span class="channel-hash">#</span> how-to-play
+                        <span class="channel-hash" aria-hidden="true">#</span> how-to-play
                     </li>
                     <li class="channel" data-channel="features">
-                        <span class="channel-hash">#</span> features
+                        <span class="channel-hash" aria-hidden="true">#</span> features
+                    </li>
+                    <li class="channel" data-channel="live-discord">
+                        <span class="channel-hash" aria-hidden="true">#</span> live-discord
                     </li>
                 </ul>
             </div>
-        </div>
+        </nav>
 
         <!-- Main discord content area -->
-        <div class="content-area">
+        <main class="content-area">
             <!-- Channel header -->
-            <div class="channel-header">
+            <header class="channel-header">
                 <div class="channel-name">
-                    <span class="channel-hash">#</span>
+                    <span class="channel-hash" aria-hidden="true">#</span>
                     <span id="current-channel">welcome</span>
                 </div>
                 <div class="channel-description">Welcome to Channel Dungeons!</div>
-            </div>
+            </header>
 
             <!-- Message area -->
-            <div class="message-area">
-                <!-- Messages will be populated here via JavaScript -->
+            <section class="message-area" aria-label="Channel messages">
                 <div class="messages-container" id="messages">
-                    <!-- Initial welcome message will be added by JS -->
+                    <!-- Messages will be populated by JavaScript -->
                 </div>
-            </div>
+            </section>
 
             <!-- Command input area -->
-            <div class="command-input-container">
-                <input type="text" id="command-input" placeholder="Type a command (try /help)">
-                <button id="send-button">Send</button>
-            </div>
-        </div>
+            <footer class="command-input-container">
+                <input type="text" id="command-input" placeholder="Type a command (try /help)" aria-label="Message input">
+                <button id="send-button" aria-label="Send message">Send</button>
+            </footer>
+        </main>
     </div>
 
-    <!-- Channel content templates (hidden) -->
-    <div class="content-templates" style="display: none;">
-        <!-- Welcome channel content -->
-        <div id="welcome-content">
-            <div class="message system-message">
-                <div class="message-content">
-                    <h2>Welcome to Channel Dungeons!</h2>
-                    <p>Explore. Fight. Collaborate.</p>
-                    <p>Dive into an epic MMORPG adventure, all within Discord!</p>
-                    <p>Navigate through channels using commands. Try <span class="discord-command">about</span>, <span class="discord-command">how-to-play</span>, or <span class="discord-command">features</span> to learn more.</p>
-                    <div class="gameplay-preview">
-                        <img src="Gameplay.gif" alt="Channel Dungeons Gameplay" class="gameplay-gif">
-                    </div>
-                    <div class="cta-buttons">
-                        <a href="https://discord.gg/channeldungeons" class="discord-button">Join Official Server</a>
-                        <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS" class="discord-button">Add to Your Server</a>
-                    </div>
+    <!-- Channel content templates -->
+    <template id="welcome-content">
+        <div class="message system-message">
+            <div class="message-content">
+                <h2>Welcome to Channel Dungeons!</h2>
+                <p>Explore. Fight. Collaborate.</p>
+                <p>Dive into an epic MMORPG adventure, all within Discord!</p>
+                <p>Navigate through channels using commands. Try <span class="discord-command">about</span>, <span class="discord-command">how-to-play</span>, or <span class="discord-command">features</span> to learn more.</p>
+                <div class="gameplay-preview">
+                    <img src="Gameplay.gif" alt="Channel Dungeons Gameplay" class="gameplay-gif">
+                </div>
+                <div class="cta-buttons">
+                    <a href="https://discord.gg/channeldungeons" class="discord-button">Join Official Server</a>
+                    <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS" class="discord-button">Add to Your Server</a>
                 </div>
             </div>
         </div>
+    </template>
 
-        <!-- About channel content -->
-        <div id="about-content">
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:00</span>
-                    </div>
-                    <div class="message-text">
-                        <h2>About Channel Dungeons</h2>
-                        <p>Channel Dungeons is an MMORPG played entirely in Discord, emphasizing exploration and collaboration.</p>
-                        <p>Delve into dungeons, battle fearsome monsters, discover valuable loot, and level up your hero!</p>
-                        <p>Experience a shared, persistent world where you can encounter other players from other Discord servers while exploring dungeons solo or with friends.</p>
-                    </div>
+    <template id="about-content">
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:00</span>
+                </div>
+                <div class="message-text">
+                    <h2>About Channel Dungeons</h2>
+                    <p>Channel Dungeons is an MMORPG played entirely in Discord, emphasizing exploration and collaboration.</p>
+                    <p>Delve into dungeons, battle fearsome monsters, discover valuable loot, and level up your hero!</p>
+                    <p>Experience a shared, persistent world where you can encounter other players from other Discord servers while exploring dungeons solo or with friends.</p>
                 </div>
             </div>
         </div>
+    </template>
 
-        <!-- How to Play channel content -->
-        <div id="how-to-play-content">
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:05</span>
-                    </div>
-                    <div class="message-text">
-                        <h2>How to Play</h2>
-                        <p>Get started with Channel Dungeons in a few simple steps!</p>
-                    </div>
+    <template id="how-to-play-content">
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:05</span>
+                </div>
+                <div class="message-text">
+                    <h2>How to Play</h2>
+                    <p>Get started with Channel Dungeons in a few simple steps!</p>
                 </div>
             </div>
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:06</span>
-                    </div>
-                    <div class="message-text">
-                        <h3>Step 1: Join the Game</h3>
-                        <p>Choose one of these two options to start playing:</p>
-                        <div class="join-options">
-                            <div class="join-option">
-                                <h4>Official Server</h4>
-                                <p>Play directly in the official Channel Dungeons server</p>
-                                <a href="https://discord.gg/channeldungeons" class="discord-button">Join Server</a>
-                            </div>
-                            <div class="join-option">
-                                <h4>Your Own Server</h4>
-                                <p>Invite the bot to your Discord server</p>
-                                <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS" class="discord-button">Invite Bot</a>
-                            </div>
+        </div>
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:06</span>
+                </div>
+                <div class="message-text">
+                    <h3>Step 1: Join the Game</h3>
+                    <p>Choose one of these two options to start playing:</p>
+                    <div class="join-options">
+                        <div class="join-option">
+                            <h4>Official Server</h4>
+                            <p>Play directly in the official Channel Dungeons server</p>
+                            <a href="https://discord.gg/channeldungeons" class="discord-button">Join Server</a>
+                        </div>
+                        <div class="join-option">
+                            <h4>Your Own Server</h4>
+                            <p>Invite the bot to your Discord server</p>
+                            <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS" class="discord-button">Invite Bot</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:07</span>
-                    </div>
-                    <div class="message-text">
-                        <h3>Step 2: Create a Hero</h3>
-                        <p>Begin your adventure by creating a hero in your home town! Simply click the <span class="discord-button">Create a Hero</span> button or type <span class="discord-command">create_hero</span> in Discord.</p>
-                    </div>
+        </div>
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:07</span>
                 </div>
-            </div>
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:08</span>
-                    </div>
-                    <div class="message-text">
-                        <h3>Step 3: Explore Dungeons</h3>
-                        <p>Start exploring dungeons by using <span class="discord-command">move</span> or pressing one of the <span class="discord-button">Go [direction]</span> buttons.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:09</span>
-                    </div>
-                    <div class="message-text">
-                        <h3>Step 4: Find Loot & Level Up</h3>
-                        <p>Defeat monsters to discover valuable loot, gain experience, and level up your hero! If you ever get lost, use <span class="discord-command">hero</span> to locate yourself.</p>
-                    </div>
+                <div class="message-text">
+                    <h3>Step 2: Create a Hero</h3>
+                    <p>Begin your adventure by creating a hero in your home town! Simply click the <span class="discord-button">Create a Hero</span> button or type <span class="discord-command">create_hero</span> in Discord.</p>
                 </div>
             </div>
         </div>
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:08</span>
+                </div>
+                <div class="message-text">
+                    <h3>Step 3: Explore Dungeons</h3>
+                    <p>Start exploring dungeons by using <span class="discord-command">move</span> or pressing one of the <span class="discord-button">Go [direction]</span> buttons.</p>
+                </div>
+            </div>
+        </div>
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:09</span>
+                </div>
+                <div class="message-text">
+                    <h3>Step 4: Find Loot & Level Up</h3>
+                    <p>Defeat monsters to discover valuable loot, gain experience, and level up your hero! If you ever get lost, use <span class="discord-command">hero</span> to locate yourself.</p>
+                </div>
+            </div>
+        </div>
+    </template>
 
-        <!-- Features channel content -->
-        <div id="features-content">
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:15</span>
-                    </div>
-                    <div class="message-text">
-                        <h2>Game Features</h2>
-                    </div>
+    <template id="features-content">
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:15</span>
+                </div>
+                <div class="message-text">
+                    <h2>Game Features</h2>
                 </div>
             </div>
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:16</span>
-                    </div>
-                    <div class="message-text feature-message">
-                        <div class="feature">
-                            <div class="feature-icon"><span class="icon">Map</span></div>
-                            <h3>Shared World</h3>
-                            <p>Venture into a persistent world, seamlessly shared across many Discord servers, creating a truly massive multiplayer experience.</p>
-                        </div>
-                    </div>
+        </div>
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:16</span>
                 </div>
-            </div>
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:17</span>
-                    </div>
-                    <div class="message-text feature-message">
-                        <div class="feature">
-                            <div class="feature-icon"><span class="icon">Sword</span></div>
-                            <h3>Combat</h3>
-                            <p>Fight monsters, earn experience, and level up.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:18</span>
-                    </div>
-                    <div class="message-text feature-message">
-                        <div class="feature">
-                            <div class="feature-icon"><span class="icon">Group</span></div>
-                            <h3>Multiplayer</h3>
-                            <p>Forge alliances with other players and embark on thrilling adventures together!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="message">
-                <div class="message-avatar">CD</div>
-                <div class="message-content">
-                    <div class="message-header">
-                        <span class="message-username">ChannelDungeonsBot</span>
-                        <span class="message-timestamp">Today at 12:19</span>
-                    </div>
-                    <div class="message-text feature-message">
-                        <div class="feature">
-                            <div class="feature-icon"><span class="icon">Treasure</span></div>
-                            <h3>Loot</h3>
-                            <p>Defeat monsters to claim valuable treasures and assemble a collection of powerful equipment, enhancing your hero's abilities.</p>
-                        </div>
+                <div class="message-text feature-message">
+                    <div class="feature">
+                        <div class="feature-icon"><span class="icon">Map</span></div>
+                        <h3>Shared World</h3>
+                        <p>Venture into a persistent world, seamlessly shared across many Discord servers, creating a truly massive multiplayer experience.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:17</span>
+                </div>
+                <div class="message-text feature-message">
+                    <div class="feature">
+                        <div class="feature-icon"><span class="icon">Sword</span></div>
+                        <h3>Combat</h3>
+                        <p>Fight monsters, earn experience, and level up.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:18</span>
+                </div>
+                <div class="message-text feature-message">
+                    <div class="feature">
+                        <div class="feature-icon"><span class="icon">Group</span></div>
+                        <h3>Multiplayer</h3>
+                        <p>Forge alliances with other players and embark on thrilling adventures together!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="message">
+            <div class="message-avatar" aria-hidden="true">CD</div>
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-username">ChannelDungeonsBot</span>
+                    <span class="message-timestamp">Today at 12:19</span>
+                </div>
+                <div class="message-text feature-message">
+                    <div class="feature">
+                        <div class="feature-icon"><span class="icon">Treasure</span></div>
+                        <h3>Loot</h3>
+                        <p>Defeat monsters to claim valuable treasures and assemble a collection of powerful equipment, enhancing your hero's abilities.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <template id="live-discord-content">
+        <div class="message system-message">
+            <div class="message-content">
+                <h2>Live Discord Experience</h2>
+                <p>This is a demonstration of the Channel Dungeons experience directly in Discord.</p>
+                <p>To experience the full game:</p>
+                <div class="cta-buttons">
+                    <a href="https://discord.gg/channeldungeons" class="discord-button">Join Our Server</a>
+                </div>
+            </div>
+        </div>
+    </template>
 
     <script src="script.js"></script>
 </body>

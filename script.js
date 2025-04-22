@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
   const messagesContainer = document.getElementById('messages');
-  const commandInput = document.getElementById('commandInput');
   const sendButton = document.getElementById('send-button');
   const channels = document.querySelectorAll('.channel');
   const currentChannelDisplay = document.getElementById('current-channel');
@@ -28,9 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  sendButton.addEventListener('click', function() {
-    processCommand();
-  });
+  sendButton.addEventListener('click', processCommand);
   
   // Command processing function
   function processCommand() {
@@ -43,22 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Process the command
     if (command.startsWith('/')) {
-      const cleanCommand = command.substring(1).toLowerCase();
-      
-      switch (cleanCommand) {
-        case 'help':
-          addBotResponse("Available commands: <span class='discord-command'>about</span>, <span class='discord-command'>how-to-play</span>, <span class='discord-command'>features</span>, <span class='discord-command'>welcome</span>, <span class='discord-command'>live-discord</span>");
-          break;
-        case 'about':
-        case 'how-to-play':
-        case 'features':
-        case 'welcome':
-        case 'live-discord':
-          switchChannel(cleanCommand);
-          break;
-        default:
-          addBotResponse(`Unknown command: ${command}. Type <span class='discord-command'>help</span> for available commands.`);
-      }
+      handleSlashCommand(command.substring(1).toLowerCase());
     } else {
       // Treat non-command messages as general chat
       addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>help</span> to navigate.`);
@@ -66,6 +48,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Clear input field
     commandInputElement.value = '';
+    
+    // Focus back on input for better UX
+    commandInputElement.focus();
+  }
+  
+  // Handle slash commands
+  function handleSlashCommand(cleanCommand) {
+    const availableCommands = ['about', 'how-to-play', 'features', 'welcome', 'live-discord'];
+    
+    if (cleanCommand === 'help') {
+      addBotResponse(`Available commands: ${availableCommands.map(cmd => `<span class='discord-command'>${cmd}</span>`).join(', ')}`);
+    } else if (availableCommands.includes(cleanCommand)) {
+      switchChannel(cleanCommand);
+    } else {
+      addBotResponse(`Unknown command: /${cleanCommand}. Type <span class='discord-command'>help</span> for available commands.`);
+    }
   }
   
   // Add a user message to the chat
@@ -74,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
     messageDiv.className = 'message';
     
     messageDiv.innerHTML = `
-      <div class="message-avatar">U</div>
+      <div class="message-avatar" aria-hidden="true">U</div>
       <div class="message-content">
         <div class="message-header">
           <span class="message-username">User</span>
@@ -96,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
     messageDiv.className = 'message';
     
     messageDiv.innerHTML = `
-      <div class="message-avatar">CD</div>
+      <div class="message-avatar" aria-hidden="true">CD</div>
       <div class="message-content">
         <div class="message-header">
           <span class="message-username">ChannelDungeonsBot</span>
@@ -114,24 +112,28 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Switch to a different channel
   function switchChannel(channelId) {
-    // Update active channel in sidebar
-    channels.forEach(channel => {
-      if (channel.getAttribute('data-channel') === channelId) {
-        channel.classList.add('active');
-      } else {
-        channel.classList.remove('active');
-      }
-    });
-    
-    // Update current channel display
-    currentChannelDisplay.textContent = channelId;
-    currentChannel = channelId;
-    
-    // Clear current messages
-    messagesContainer.innerHTML = '';
-    
-    // Load channel content
-    loadChannelContent(channelId);
+    try {
+      // Update active channel in sidebar
+      channels.forEach(channel => {
+        if (channel.getAttribute('data-channel') === channelId) {
+          channel.classList.add('active');
+        } else {
+          channel.classList.remove('active');
+        }
+      });
+      
+      // Update current channel display
+      currentChannelDisplay.textContent = channelId;
+      currentChannel = channelId;
+      
+      // Clear current messages
+      messagesContainer.innerHTML = '';
+      
+      // Load channel content
+      loadChannelContent(channelId);
+    } catch (error) {
+      console.error('Error switching channels:', error);
+    }
   }
   
   // Load specific channel content
@@ -140,14 +142,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const contentTemplate = document.getElementById(contentTemplateId);
     
     if (contentTemplate) {
-      // Clone template content
-      const content = contentTemplate.cloneNode(true);
-      content.removeAttribute('id');
-      
-      // Get all messages from the template
+      // Get template content
+      const content = document.importNode(contentTemplate.content, true);
       const messages = Array.from(content.children);
       
-      // Add each message with a delay
+      // Add each message with a delay for animation effect
       messages.forEach((message, index) => {
         setTimeout(() => {
           messagesContainer.appendChild(message);
