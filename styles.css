@@ -240,6 +240,30 @@ a:hover {
   align-items: center;
   flex-shrink: 0;
   z-index: 1;
+  position: relative; /* Add position for proper alignment of the toggle button */
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+  display: none; /* Hidden by default on desktop */
+  background: none;
+  border: none;
+  color: var(--discord-text);
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  margin-right: var(--spacing-md);
+  transition: color var(--transition-short);
+}
+
+.sidebar-toggle:hover {
+  color: white;
+}
+
+/* Show the sidebar toggle on mobile or when sidebar is collapsed */
+@media (max-width: 768px) {
+  .sidebar-toggle {
+    display: block;
+  }
 }
 
 .channel-name {
@@ -623,16 +647,22 @@ code {
     border: none;
     cursor: pointer;
   }
+  
+  .channel-header {
+    padding-left: var(--spacing-md); /* Reduce left padding to make room for toggle */
+  }
 }
 
 /* Touch area for swipe detection */
 .touch-area {
   position: fixed;
-  width: 20px;
+  width: 40px; /* Increased width for easier swipe detection */
   height: 100%;
   left: 0;
   top: 0;
   z-index: 5;
+  /* Uncomment the next line for debugging - this makes the touch area visible */
+  /* background-color: rgba(255, 0, 0, 0.2); */
 }
 
 @media (min-width: 769px) {

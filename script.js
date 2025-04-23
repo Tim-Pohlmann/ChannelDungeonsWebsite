@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Flag to track if the URL has a specific channel on load
   const hasChannelInUrl = window.location.hash.length > 1;
   
+  // Flag to track current view mode (mobile or desktop)
+  let isMobileView = window.innerWidth <= 768;
+  
   // Check if URL has a hash to determine initial channel
   function getChannelFromHash() {
     const hash = window.location.hash.substring(1); // Remove the # symbol
@@ -631,30 +634,44 @@ document.addEventListener('DOMContentLoaded', function() {
   const showMobileSidebar = function() {
     createMobileSidebarHeader();
     sidebar.classList.add('visible');
+    // Set sidebarShown to true to track state correctly
+    sidebarShown = true;
   };
 
   // Hide sidebar (mobile)
   const hideSidebar = function() {
     sidebar.classList.remove('visible');
+    // We don't set sidebarShown to false here since it tracks if sidebar has been shown at any point
   };
 
   // Handle touch start
   document.addEventListener('touchstart', function(e) {
     touchStartX = e.changedTouches[0].screenX;
-  }, false);
+  }, { passive: false });
 
   // Handle touch end
   document.addEventListener('touchend', function(e) {
     touchEndX = e.changedTouches[0].screenX;
     handleSwipe();
-  }, false);
+  }, { passive: false });
+
+  // Add touchmove event to prevent default scrolling behavior when swiping from edge
+  document.addEventListener('touchmove', function(e) {
+    if (e.changedTouches[0].screenX - touchStartX > 10 && touchStartX < 30) {
+      // If swiping right from edge, prevent default to avoid page scrolling
+      e.preventDefault();
+    }
+  }, { passive: false });
 
   // Process swipe gesture
   const handleSwipe = function() {
     const swipeDistance = touchEndX - touchStartX;
     
+    // Debug log to see if swipe is detected
+    console.log('Swipe detected:', swipeDistance, 'starting at', touchStartX);
+    
     // Right swipe from left edge (to show sidebar)
-    if (swipeDistance > minSwipeDistance && touchStartX < 30) {
+    if (swipeDistance > minSwipeDistance && touchStartX < 50) {  // Increased edge detection area
       showMobileSidebar();
     }
     
@@ -663,6 +680,18 @@ document.addEventListener('DOMContentLoaded', function() {
       hideSidebar();
     }
   };
+
+  // Specifically handle touch events on the touch area
+  touchArea.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+    e.preventDefault(); // Prevent any default behavior
+  }, { passive: false });
+
+  touchArea.addEventListener('touchend', function(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+    e.preventDefault(); // Prevent any default behavior
+  }, { passive: false });
 
   // Hide sidebar when clicking on a channel on mobile
   channels.forEach(channel => {
@@ -683,6 +712,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  // Window resize handler
+  window.addEventListener('resize', function() {
+    // Check if we're transitioning between view modes
+    const wasInMobileView = isMobileView;
+    isMobileView = window.innerWidth <= 768;
+    
+    // If we're transitioning from mobile to desktop view
+    if (wasInMobileView && !isMobileView) {
+      // Restore desktop sidebar behavior
+      if (sidebarShown) {
+        // Remove mobile-specific header if it exists
+        const mobileHeader = sidebar.querySelector('.mobile-sidebar-header');
+        if (mobileHeader) {
+          mobileHeader.remove();
+        }
+        
+        // Show sidebar properly for desktop view
+        sidebar.classList.add('visible');
+        contentArea.classList.add('sidebar-visible');
+      }
+    } 
+    // If transitioning from desktop to mobile view
+    else if (!wasInMobileView && isMobileView) {
+      // In mobile view, sidebar should be hidden initially
+      sidebar.classList.remove('visible');
+      contentArea.classList.remove('sidebar-visible');
+      
+      // If sidebar should be shown, ensure mobile header exists
+      if (sidebarShown) {
+        createMobileSidebarHeader();
+      }
+    }
+  });
+
   // Modify the existing showSidebar function to handle desktop/mobile differently
   const originalShowSidebar = showSidebar;
   showSidebar = function() {
@@ -694,4 +757,25 @@ document.addEventListener('DOMContentLoaded', function() {
       originalShowSidebar();
     }
   };
+
+  // Get the sidebar toggle button
+  const sidebarToggle = document.querySelector('.sidebar-toggle');
+  
+  // Add event listener for sidebar toggle button
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', function(e) {
+      // Prevent any default action
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (window.innerWidth <= 768) {
+        // For mobile, always show the mobile sidebar
+        showMobileSidebar();
+      } else {
+        // For desktop, use the standard sidebar toggle
+        sidebar.classList.toggle('visible');
+        contentArea.classList.toggle('sidebar-visible');
+      }
+    });
+  }
 });
