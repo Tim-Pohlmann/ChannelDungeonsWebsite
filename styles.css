@@ -650,6 +650,29 @@ code {
   
   .channel-header {
     padding-left: var(--spacing-md); /* Reduce left padding to make room for toggle */
+    position: sticky; /* Make header stick to top on mobile */
+    top: 0;
+    width: 100%;
+    z-index: 10; /* Ensure it's above other content */
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: hidden; /* Hide overflow */
+  }
+  
+  .channel-name {
+    flex-shrink: 0; /* Prevent the channel name from shrinking */
+    max-width: 50%; /* Limit width to make room for description */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .channel-description {
+    flex-shrink: 1; /* Allow description to shrink */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-size-xs); /* Smaller font on mobile */
   }
 }
 
