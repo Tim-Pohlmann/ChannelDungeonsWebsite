@@ -9,6 +9,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // Current active channel
   let currentChannel = 'welcome';
   
+  // Cache to store loaded channel messages
+  const channelMessagesCache = {};
+  
+  // Track which channels are currently loading
+  const channelsLoading = {};
+  
+  // Array to track animation timeouts so they can be cancelled
+  let activeTimeouts = [];
+  
   // Utility function to create message HTML
   function createMessageHTML(options = {}) {
     const {
@@ -112,6 +121,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
     scrollToBottom();
+    
+    // Update cache for the current channel
+    channelMessagesCache[currentChannel] = messagesContainer.innerHTML;
   }
   
   // Add a bot response to the chat
@@ -122,11 +134,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
     scrollToBottom();
+    
+    // Update cache for the current channel
+    channelMessagesCache[currentChannel] = messagesContainer.innerHTML;
+  }
+  
+  // Clear all pending timeouts
+  function clearAllTimeouts() {
+    activeTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    activeTimeouts = [];
   }
   
   // Switch to a different channel
   function switchChannel(channelId) {
     try {
+      // Cancel any pending animation timeouts
+      clearAllTimeouts();
+      
       // Update active channel in sidebar
       channels.forEach(channel => {
         if (channel.getAttribute('data-channel') === channelId) {
@@ -138,20 +162,45 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Update current channel display
       currentChannelDisplay.textContent = channelId;
+      
+      // Store previous channel for reference
+      const previousChannel = currentChannel;
+      
+      // Update current channel
       currentChannel = channelId;
       
       // Clear current messages
       messagesContainer.innerHTML = '';
       
-      // Load channel content
-      loadChannelContent(channelId);
+      // Check if channel content is already cached
+      if (channelMessagesCache[channelId]) {
+        // Display cached messages
+        displayCachedMessages(channelId);
+      } else {
+        // Load and cache channel content
+        loadChannelContent(channelId);
+      }
     } catch (error) {
       console.error('Error switching channels:', error);
     }
   }
   
+  // Display cached messages for a channel
+  function displayCachedMessages(channelId) {
+    const cachedContent = channelMessagesCache[channelId];
+    
+    // Append all cached messages to the container at once
+    messagesContainer.innerHTML = cachedContent;
+    
+    // Scroll to bottom
+    scrollToBottom();
+  }
+  
   // Load specific channel content
   function loadChannelContent(channelId) {
+    // Mark this channel as currently loading
+    channelsLoading[channelId] = true;
+    
     const contentTemplateId = `${channelId}-content`;
     const contentTemplate = document.getElementById(contentTemplateId);
     
@@ -179,17 +228,46 @@ document.addEventListener('DOMContentLoaded', function() {
         timestampElement.textContent = getCurrentTime();
       });
       
-      // Add each message with a delay for animation effect
+      // Create a temporary container for the complete content
+      const tempContainer = document.createElement('div');
       const messages = Array.from(content.children);
+      
+      // Add all messages to the temp container immediately
+      messages.forEach(message => {
+        const messageClone = message.cloneNode(true);
+        tempContainer.appendChild(messageClone);
+      });
+      
+      // Cache the complete content immediately
+      channelMessagesCache[channelId] = tempContainer.innerHTML;
+      
+      // Now animate adding the messages one by one for the current view only
       messages.forEach((message, index) => {
-        setTimeout(() => {
-          messagesContainer.appendChild(message);
-          scrollToBottom();
+        // Create a clone of the message to avoid issues with content being moved
+        const messageClone = message.cloneNode(true);
+        
+        // Set a timeout for the animation
+        const timeoutId = setTimeout(() => {
+          // Only add the message if we're still on the same channel
+          if (currentChannel === channelId) {
+            messagesContainer.appendChild(messageClone);
+            scrollToBottom();
+          }
         }, index * 1000); // 1000ms (1 second) delay between messages
+        
+        // Store the timeout ID so it can be cancelled if needed
+        activeTimeouts.push(timeoutId);
       });
     } else {
-      addBotResponse(`Welcome to the #${channelId} channel. This channel has no content yet.`);
+      const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
+      addBotResponse(botResponse);
+      
+      // Cache the message immediately
+      channelMessagesCache[channelId] = messagesContainer.innerHTML;
     }
+    
+    // Mark this channel as no longer loading
+    channelsLoading[channelId] = false;
   }
   
   // Get the current time in local format
