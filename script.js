@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const channels = document.querySelectorAll('.channel');
   const currentChannelDisplay = document.getElementById('current-channel');
   const commandInputElement = document.getElementById('command-input');
+  const sidebar = document.querySelector('.sidebar');
+  const contentArea = document.querySelector('.content-area');
   
   // Current active channel
   let currentChannel = 'welcome';
@@ -17,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Array to track animation timeouts so they can be cancelled
   let activeTimeouts = [];
+  
+  // Flag to track if the sidebar has been shown
+  let sidebarShown = false;
   
   // Utility function to create message HTML
   function createMessageHTML(options = {}) {
@@ -145,6 +150,15 @@ document.addEventListener('DOMContentLoaded', function() {
     activeTimeouts = [];
   }
   
+  // Show the sidebar with animation
+  function showSidebar() {
+    if (sidebarShown) return; // Prevent showing sidebar multiple times
+    
+    sidebarShown = true;
+    sidebar.classList.add('visible');
+    contentArea.classList.add('sidebar-visible');
+  }
+  
   // Switch to a different channel
   function switchChannel(channelId) {
     try {
@@ -252,6 +266,14 @@ document.addEventListener('DOMContentLoaded', function() {
           if (currentChannel === channelId) {
             messagesContainer.appendChild(messageClone);
             scrollToBottom();
+            
+            // If this is the last message of the welcome channel, show the sidebar
+            if (channelId === 'welcome' && index === messages.length - 1) {
+              // Add a small delay before showing the sidebar to ensure the message is visible
+              setTimeout(() => {
+                showSidebar();
+              }, 500);
+            }
           }
         }, index * 1000); // 1000ms (1 second) delay between messages
         
@@ -264,6 +286,14 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Cache the message immediately
       channelMessagesCache[channelId] = messagesContainer.innerHTML;
+      
+      // If this is the welcome channel (which shouldn't happen with the current code,
+      // but just in case the template is removed), show the sidebar
+      if (channelId === 'welcome') {
+        setTimeout(() => {
+          showSidebar();
+        }, 500);
+      }
     }
     
     // Mark this channel as no longer loading
