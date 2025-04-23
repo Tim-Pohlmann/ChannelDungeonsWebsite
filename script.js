@@ -1,13 +1,25 @@
 document.addEventListener('DOMContentLoaded', function() {
   // DOM Elements
   const messagesContainer = document.getElementById('messages');
-  const sendButton = document.getElementById('send-button');
   const channels = document.querySelectorAll('.channel');
   const currentChannelDisplay = document.getElementById('current-channel');
   const commandInputElement = document.getElementById('command-input');
   const sidebar = document.querySelector('.sidebar');
   const contentArea = document.querySelector('.content-area');
   const typingIndicator = document.getElementById('typing-indicator');
+  const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
+  
+  // Available commands with descriptions
+  const availableCommands = [
+    { name: 'about', description: 'Learn about Channel Dungeons' },
+    { name: 'how-to-play', description: 'Get started with the game' },
+    { name: 'features', description: 'Discover game features' },
+    { name: 'welcome', description: 'Return to welcome channel' },
+    { name: 'live-discord', description: 'See the live Discord experience' }
+  ];
+  
+  // Autocomplete state
+  let selectedAutocompleteIndex = -1;
   
   // Current active channel
   let currentChannel = 'welcome';
@@ -98,7 +110,129 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  sendButton.addEventListener('click', processCommand);
+  // Add input event listener for autocomplete
+  commandInputElement.addEventListener('input', function() {
+    showAutocomplete(commandInputElement.value);
+  });
+  
+  // Add keydown event listener for keyboard navigation in autocomplete
+  commandInputElement.addEventListener('keydown', function(e) {
+    const items = autocompleteDropdown.querySelectorAll('.autocomplete-item');
+    
+    // Only handle navigation keys when dropdown is visible
+    if (!autocompleteDropdown.classList.contains('visible')) {
+      return;
+    }
+    
+    switch(e.key) {
+      case 'ArrowDown':
+        e.preventDefault(); // Prevent cursor movement in input
+        selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, items.length - 1);
+        updateAutocompleteSelection();
+        break;
+        
+      case 'ArrowUp':
+        e.preventDefault(); // Prevent cursor movement in input
+        selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, 0);
+        updateAutocompleteSelection();
+        break;
+        
+      case 'Tab':
+      case 'Enter':
+        // Only process if dropdown is visible and an item is selected
+        if (selectedAutocompleteIndex >= 0 && selectedAutocompleteIndex < items.length) {
+          e.preventDefault(); // Prevent form submission
+          const commandName = items[selectedAutocompleteIndex].querySelector('.command-name').textContent.substring(1);
+          selectCommand(commandName);
+        }
+        break;
+        
+      case 'Escape':
+        hideAutocomplete();
+        break;
+    }
+  });
+  
+  // Function to show autocomplete dropdown
+  function showAutocomplete(inputValue) {
+    // Only show autocomplete for / commands
+    if (!inputValue.startsWith('/')) {
+      hideAutocomplete();
+      return;
+    }
+    
+    // Get search term without the /
+    const searchTerm = inputValue.substring(1).toLowerCase();
+    
+    // Filter commands that match the search term
+    const matchingCommands = availableCommands.filter(cmd => 
+      cmd.name.toLowerCase().startsWith(searchTerm)
+    );
+    
+    // Hide dropdown if no matches or empty search
+    if (matchingCommands.length === 0) {
+      hideAutocomplete();
+      return;
+    }
+    
+    // Clear previous autocomplete items
+    autocompleteDropdown.innerHTML = '';
+    
+    // Create and add autocomplete items
+    matchingCommands.forEach((cmd, index) => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.innerHTML = `<span class="command-name">/${cmd.name}</span><span class="command-description">${cmd.description}</span>`;
+      
+      // Add click handler to select this command
+      item.addEventListener('click', () => {
+        selectCommand(cmd.name);
+      });
+      
+      autocompleteDropdown.appendChild(item);
+    });
+    
+    // Show autocomplete dropdown
+    autocompleteDropdown.classList.add('visible');
+    
+    // Reset selection
+    selectedAutocompleteIndex = 0;
+    updateAutocompleteSelection();
+  }
+  
+  // Function to hide autocomplete dropdown
+  function hideAutocomplete() {
+    autocompleteDropdown.classList.remove('visible');
+    selectedAutocompleteIndex = -1;
+  }
+  
+  // Function to update the selected item in the autocomplete dropdown
+  function updateAutocompleteSelection() {
+    const items = autocompleteDropdown.querySelectorAll('.autocomplete-item');
+    
+    // Remove selected class from all items
+    items.forEach(item => item.classList.remove('selected'));
+    
+    // Add selected class to the current selection if valid
+    if (selectedAutocompleteIndex >= 0 && selectedAutocompleteIndex < items.length) {
+      items[selectedAutocompleteIndex].classList.add('selected');
+      items[selectedAutocompleteIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }
+  
+  // Function to select a command from autocomplete
+  function selectCommand(commandName) {
+    commandInputElement.value = '/' + commandName;
+    hideAutocomplete();
+    commandInputElement.focus();
+  }
+  
+  // Hide autocomplete dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!commandInputElement.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
+      hideAutocomplete();
+    }
+  });
   
   // Command processing function
   function processCommand() {
@@ -106,21 +240,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (command === '') return;
     
-    // Add user message to chat
-    addUserMessage(command);
+    // Hide autocomplete
+    hideAutocomplete();
     
     // Show typing indicator before processing command
     showTypingIndicator();
     
-    // Process the command with a delay to simulate typing
-    setTimeout(() => {
-      if (command.startsWith('/')) {
-        handleSlashCommand(command.substring(1).toLowerCase());
-      } else {
-        // Treat non-command messages as general chat
-        addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>help</span> to navigate.`);
-      }
-    }, 1000); // 1 second delay to simulate typing
+    // Process the command
+    if (command.startsWith('/')) {
+      handleSlashCommand(command.substring(1).toLowerCase());
+    } else {
+      // Treat non-command messages as general chat
+      addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>about</span> to navigate.`);
+    }
     
     // Clear input field
     commandInputElement.value = '';
@@ -133,28 +265,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function handleSlashCommand(cleanCommand) {
     const availableCommands = ['about', 'how-to-play', 'features', 'welcome', 'live-discord'];
     
-    if (cleanCommand === 'help') {
-      addBotResponse(`Available commands: ${availableCommands.map(cmd => `<span class='discord-command'>${cmd}</span>`).join(', ')}`);
-    } else if (availableCommands.includes(cleanCommand)) {
+    if (availableCommands.includes(cleanCommand)) {
       switchChannel(cleanCommand);
     } else {
-      addBotResponse(`Unknown command: /${cleanCommand}. Type <span class='discord-command'>help</span> for available commands.`);
+      addBotResponse(`Unknown command: /${cleanCommand}. Available commands are: ${availableCommands.map(cmd => `<span class='discord-command'>/${cmd}</span>`).join(', ')}`);
     }
-  }
-  
-  // Add a user message to the chat
-  function addUserMessage(text) {
-    const messageHTML = createMessageHTML({
-      avatar: 'H',
-      username: 'Hero',
-      content: text
-    });
-    
-    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-    scrollToBottom();
-    
-    // Update cache for the current channel
-    channelMessagesCache[currentChannel] = messagesContainer.innerHTML;
   }
   
   // Add a bot response to the chat

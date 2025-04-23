@@ -70,9 +70,13 @@
             </section>
 
             <!-- Command input area -->
-            <footer class="command-input-container">
-                <input type="text" id="command-input" placeholder="Type a command (try /help)" aria-label="Message input">
-                <button id="send-button" aria-label="Send message">Send</button>
+            <footer>
+                <div class="autocomplete-container">
+                    <div class="autocomplete-dropdown" id="autocomplete-dropdown"></div>
+                    <div class="command-input-container">
+                        <input type="text" id="command-input" placeholder="Type a command (try /about)" aria-label="Message input">
+                    </div>
+                </div>
             </footer>
         </main>
     </div>
