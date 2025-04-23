@@ -43,6 +43,29 @@ document.addEventListener('DOMContentLoaded', function() {
   // Typing indicator state
   let typingTimeoutId = null;
   
+  // Flag to track if this is initial page load
+  let isInitialPageLoad = true;
+  
+  // Flag to track if the URL has a specific channel on load
+  const hasChannelInUrl = window.location.hash.length > 1;
+  
+  // Check if URL has a hash to determine initial channel
+  function getChannelFromHash() {
+    const hash = window.location.hash.substring(1); // Remove the # symbol
+    // Check if this hash corresponds to a valid channel
+    const validChannels = Array.from(channels).map(channel => 
+      channel.getAttribute('data-channel')
+    );
+    
+    return validChannels.includes(hash) ? hash : 'welcome';
+  }
+  
+  // Initialize with channel from URL or default to welcome
+  currentChannel = getChannelFromHash();
+  
+  // Update the channel name in the header to match the initial channel
+  currentChannelDisplay.textContent = currentChannel;
+  
   // Utility function to create message HTML
   function createMessageHTML(options = {}) {
     const {
@@ -96,8 +119,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Initialize the welcome channel content
+  // Initialize the channel content based on URL hash or default
   loadChannelContent(currentChannel);
+  
+  // Update active channel in sidebar based on current channel
+  updateActiveChannelInSidebar(currentChannel);
+  
+  // For initial direct access via a channel-specific URL, show UI elements immediately
+  if (hasChannelInUrl) {
+    showSidebar();
+    showCommandInput();
+  }
   
   // Handle channel switching by clicking on channel names
   channels.forEach(channel => {
@@ -105,6 +137,15 @@ document.addEventListener('DOMContentLoaded', function() {
       const channelId = this.getAttribute('data-channel');
       switchChannel(channelId);
     });
+  });
+  
+  // Listen for hash changes to handle browser back/forward navigation
+  window.addEventListener('hashchange', function() {
+    const channelFromHash = getChannelFromHash();
+    // Only switch if it's different from current to avoid loops
+    if (channelFromHash !== currentChannel) {
+      switchChannel(channelFromHash, false); // Don't update URL again
+    }
   });
   
   // Command input handling
@@ -330,19 +371,21 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Switch to a different channel
-  function switchChannel(channelId) {
+  function switchChannel(channelId, updateUrl = true) {
     try {
+      // Set isInitialPageLoad to false since we're now navigating between channels
+      isInitialPageLoad = false;
+      
       // Cancel any pending animation timeouts
       clearAllTimeouts();
       
       // Update active channel in sidebar
-      channels.forEach(channel => {
-        if (channel.getAttribute('data-channel') === channelId) {
-          channel.classList.add('active');
-        } else {
-          channel.classList.remove('active');
-        }
-      });
+      updateActiveChannelInSidebar(channelId);
+      
+      // Update URL hash if requested (default is true)
+      if (updateUrl) {
+        window.location.hash = channelId;
+      }
       
       // Update current channel display
       currentChannelDisplay.textContent = channelId;
@@ -434,65 +477,94 @@ document.addEventListener('DOMContentLoaded', function() {
       // Cache the complete content immediately
       channelMessagesCache[channelId] = tempContainer.innerHTML;
       
-      // Now animate adding the messages one by one for the current view only
-      messages.forEach((message, index) => {
-        // Create a clone of the message to avoid issues with content being moved
-        const messageClone = message.cloneNode(true);
+      // If accessing any channel via URL (including welcome), show all messages immediately without animation
+      if (isInitialPageLoad && hasChannelInUrl) {
+        // Add all messages at once without animation
+        messagesContainer.innerHTML = channelMessagesCache[channelId];
+        scrollToBottom();
         
-        // Show the typing indicator before each message
-        const showTypingDuration = 1000; // 1 second of typing
-        const delayBetweenMessages = index * (showTypingDuration + 200); // Total delay for this message
-        
-        // Set a timeout for showing the typing indicator
-        const typingTimeoutId = setTimeout(() => {
-          // Only show typing if we're still on the same channel
-          if (currentChannel === channelId) {
-            showTypingIndicator(showTypingDuration);
-          }
-        }, delayBetweenMessages);
-        activeTimeouts.push(typingTimeoutId);
-        
-        // Set a timeout for the animation
-        const messageTimeoutId = setTimeout(() => {
-          // Only add the message if we're still on the same channel
-          if (currentChannel === channelId) {
-            hideTypingIndicator();
-            messagesContainer.appendChild(messageClone);
-            scrollToBottom();
-            
-            // If this is the last message of the welcome channel, show the sidebar and command input
-            if (channelId === 'welcome' && index === messages.length - 1) {
-              // Add a small delay before showing the sidebar to ensure the message is visible
-              setTimeout(() => {
-                showSidebar();
-                showCommandInput();
-              }, 500);
+        // Show sidebar and command input immediately
+        showSidebar();
+        showCommandInput();
+      }
+      else {
+        // Otherwise use the normal animation sequence
+        // Now animate adding the messages one by one for the current view only
+        messages.forEach((message, index) => {
+          // Create a clone of the message to avoid issues with content being moved
+          const messageClone = message.cloneNode(true);
+          
+          // Show the typing indicator before each message
+          const showTypingDuration = 1000; // 1 second of typing
+          const delayBetweenMessages = index * (showTypingDuration + 200); // Total delay for this message
+          
+          // Set a timeout for showing the typing indicator
+          const typingTimeoutId = setTimeout(() => {
+            // Only show typing if we're still on the same channel
+            if (currentChannel === channelId) {
+              showTypingIndicator(showTypingDuration);
             }
-          }
-        }, delayBetweenMessages + showTypingDuration); // Add the message after the typing duration
-        
-        // Store the timeout ID so it can be cancelled if needed
-        activeTimeouts.push(messageTimeoutId);
-      });
+          }, delayBetweenMessages);
+          activeTimeouts.push(typingTimeoutId);
+          
+          // Set a timeout for the animation
+          const messageTimeoutId = setTimeout(() => {
+            // Only add the message if we're still on the same channel
+            if (currentChannel === channelId) {
+              hideTypingIndicator();
+              messagesContainer.appendChild(messageClone);
+              scrollToBottom();
+              
+              // If this is the last message of the welcome channel without URL hash, show the sidebar and command input
+              if (channelId === 'welcome' && !hasChannelInUrl && index === messages.length - 1) {
+                // Add a small delay before showing the sidebar to ensure the message is visible
+                setTimeout(() => {
+                  showSidebar();
+                  showCommandInput();
+                }, 500);
+              }
+            }
+          }, delayBetweenMessages + showTypingDuration); // Add the message after the typing duration
+          
+          // Store the timeout ID so it can be cancelled if needed
+          activeTimeouts.push(messageTimeoutId);
+        });
+      }
     } else {
-      // Show typing indicator for a short time before displaying the default message
-      showTypingIndicator(1000);
+      // No template exists for this channel
       
-      setTimeout(() => {
+      if (isInitialPageLoad && hasChannelInUrl) {
+        // If direct URL access, show message immediately without typing animation
         const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
-        addBotResponse(botResponse);
+        messagesContainer.innerHTML = createMessageHTML({ content: botResponse });
         
         // Cache the message immediately
         channelMessagesCache[channelId] = messagesContainer.innerHTML;
         
-        // If this is the welcome channel, show the sidebar and command input
-        if (channelId === 'welcome') {
-          setTimeout(() => {
-            showSidebar();
-            showCommandInput();
-          }, 500);
-        }
-      }, 1000);
+        // Show sidebar and input immediately
+        showSidebar();
+        showCommandInput();
+        scrollToBottom();
+      } else {
+        // Show typing indicator for a short time before displaying the default message
+        showTypingIndicator(1000);
+        
+        setTimeout(() => {
+          const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
+          addBotResponse(botResponse);
+          
+          // Cache the message immediately
+          channelMessagesCache[channelId] = messagesContainer.innerHTML;
+          
+          // Show sidebar and command input for welcome channel or initial page load
+          if ((channelId === 'welcome' && !hasChannelInUrl) || isInitialPageLoad) {
+            setTimeout(() => {
+              showSidebar();
+              showCommandInput();
+            }, 500);
+          }
+        }, 1000);
+      }
     }
     
     // Mark this channel as no longer loading
@@ -511,5 +583,16 @@ document.addEventListener('DOMContentLoaded', function() {
   function scrollToBottom() {
     const messageArea = document.querySelector('.message-area');
     messageArea.scrollTop = messageArea.scrollHeight;
+  }
+  
+  // Function to update the active channel in the sidebar
+  function updateActiveChannelInSidebar(channelId) {
+    channels.forEach(channel => {
+      if (channel.getAttribute('data-channel') === channelId) {
+        channel.classList.add('active');
+      } else {
+        channel.classList.remove('active');
+      }
+    });
   }
 });
