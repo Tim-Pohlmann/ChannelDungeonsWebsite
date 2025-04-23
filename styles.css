@@ -650,13 +650,18 @@ code {
   
   .channel-header {
     padding-left: var(--spacing-md); /* Reduce left padding to make room for toggle */
-    position: sticky; /* Make header stick to top on mobile */
+    position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
-    z-index: 10; /* Ensure it's above other content */
     display: flex;
     flex-wrap: nowrap; /* Prevent wrapping */
     overflow-x: hidden; /* Hide overflow */
+    box-shadow: var(--shadow-message); /* Keep the shadow for visual separation */
+  }
+  
+  .message-area {
+    padding-top: calc(var(--spacing-xl) * 2 + 20px); /* Add extra padding at top to account for fixed header */
   }
   
   .channel-name {
