@@ -499,6 +499,61 @@ code {
   content: "/";
 }
 
+/* Typing indicator styles */
+.typing-indicator {
+  display: none; /* Hidden by default */
+  padding: var(--spacing-md) var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+  color: var(--discord-muted-text);
+  font-size: var(--font-size-sm);
+  align-items: center;
+}
+
+.typing-indicator.active {
+  display: flex;
+}
+
+.typing-indicator .text {
+  font-weight: var(--font-weight-medium);
+}
+
+.typing-indicator .username {
+  font-weight: var(--font-weight-bold);
+  color: var(--discord-text);
+}
+
+.typing-dots {
+  display: inline-flex;
+  margin-left: var(--spacing-xs);
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--discord-muted-text);
+  border-radius: var(--radius-round);
+  margin-right: 3px;
+  opacity: 0.5;
+}
+
+.typing-dot:nth-child(1) {
+  animation: typingAnimation 1.4s infinite 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation: typingAnimation 1.4s infinite 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation: typingAnimation 1.4s infinite 0.4s;
+}
+
+@keyframes typingAnimation {
+  0% { opacity: 0.5; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-2px); }
+  100% { opacity: 0.5; transform: translateY(0); }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .discord-app {

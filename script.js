@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const commandInputElement = document.getElementById('command-input');
   const sidebar = document.querySelector('.sidebar');
   const contentArea = document.querySelector('.content-area');
+  const typingIndicator = document.getElementById('typing-indicator');
   
   // Current active channel
   let currentChannel = 'welcome';
@@ -22,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Flag to track if the sidebar has been shown
   let sidebarShown = false;
+  
+  // Typing indicator state
+  let typingTimeoutId = null;
   
   // Utility function to create message HTML
   function createMessageHTML(options = {}) {
@@ -59,6 +63,34 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
   }
   
+  // Show typing indicator for a specific duration
+  function showTypingIndicator(duration = 1200) {
+    // Clear any existing timeout
+    if (typingTimeoutId) {
+      clearTimeout(typingTimeoutId);
+    }
+    
+    // Show typing indicator
+    typingIndicator.classList.add('active');
+    scrollToBottom();
+    
+    // Set timeout to hide typing indicator after duration
+    typingTimeoutId = setTimeout(() => {
+      hideTypingIndicator();
+    }, duration);
+    
+    return typingTimeoutId;
+  }
+  
+  // Hide typing indicator
+  function hideTypingIndicator() {
+    typingIndicator.classList.remove('active');
+    if (typingTimeoutId) {
+      clearTimeout(typingTimeoutId);
+      typingTimeoutId = null;
+    }
+  }
+  
   // Initialize the welcome channel content
   loadChannelContent(currentChannel);
   
@@ -88,13 +120,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add user message to chat
     addUserMessage(command);
     
-    // Process the command
-    if (command.startsWith('/')) {
-      handleSlashCommand(command.substring(1).toLowerCase());
-    } else {
-      // Treat non-command messages as general chat
-      addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>help</span> to navigate.`);
-    }
+    // Show typing indicator before processing command
+    showTypingIndicator();
+    
+    // Process the command with a delay to simulate typing
+    setTimeout(() => {
+      if (command.startsWith('/')) {
+        handleSlashCommand(command.substring(1).toLowerCase());
+      } else {
+        // Treat non-command messages as general chat
+        addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>help</span> to navigate.`);
+      }
+    }, 1000); // 1 second delay to simulate typing
     
     // Clear input field
     commandInputElement.value = '';
@@ -133,6 +170,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Add a bot response to the chat
   function addBotResponse(text) {
+    // Hide typing indicator if it's still showing
+    hideTypingIndicator();
+    
     const messageHTML = createMessageHTML({
       content: text
     });
@@ -148,6 +188,15 @@ document.addEventListener('DOMContentLoaded', function() {
   function clearAllTimeouts() {
     activeTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
     activeTimeouts = [];
+    
+    // Also clear typing indicator timeout
+    if (typingTimeoutId) {
+      clearTimeout(typingTimeoutId);
+      typingTimeoutId = null;
+    }
+    
+    // Hide typing indicator
+    hideTypingIndicator();
   }
   
   // Show the sidebar with animation
@@ -188,9 +237,12 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Check if channel content is already cached
       if (channelMessagesCache[channelId]) {
-        // Display cached messages
+        // Display cached messages immediately without showing typing indicator
         displayCachedMessages(channelId);
       } else {
+        // Show typing indicator only for new content that's being loaded for the first time
+        showTypingIndicator(2000);
+        
         // Load and cache channel content
         loadChannelContent(channelId);
       }
@@ -201,6 +253,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Display cached messages for a channel
   function displayCachedMessages(channelId) {
+    // Hide typing indicator
+    hideTypingIndicator();
+    
     const cachedContent = channelMessagesCache[channelId];
     
     // Append all cached messages to the container at once
@@ -260,10 +315,24 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create a clone of the message to avoid issues with content being moved
         const messageClone = message.cloneNode(true);
         
+        // Show the typing indicator before each message
+        const showTypingDuration = 1000; // 1 second of typing
+        const delayBetweenMessages = index * (showTypingDuration + 200); // Total delay for this message
+        
+        // Set a timeout for showing the typing indicator
+        const typingTimeoutId = setTimeout(() => {
+          // Only show typing if we're still on the same channel
+          if (currentChannel === channelId) {
+            showTypingIndicator(showTypingDuration);
+          }
+        }, delayBetweenMessages);
+        activeTimeouts.push(typingTimeoutId);
+        
         // Set a timeout for the animation
-        const timeoutId = setTimeout(() => {
+        const messageTimeoutId = setTimeout(() => {
           // Only add the message if we're still on the same channel
           if (currentChannel === channelId) {
+            hideTypingIndicator();
             messagesContainer.appendChild(messageClone);
             scrollToBottom();
             
@@ -275,25 +344,30 @@ document.addEventListener('DOMContentLoaded', function() {
               }, 500);
             }
           }
-        }, index * 1000); // 1000ms (1 second) delay between messages
+        }, delayBetweenMessages + showTypingDuration); // Add the message after the typing duration
         
         // Store the timeout ID so it can be cancelled if needed
-        activeTimeouts.push(timeoutId);
+        activeTimeouts.push(messageTimeoutId);
       });
     } else {
-      const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
-      addBotResponse(botResponse);
+      // Show typing indicator for a short time before displaying the default message
+      showTypingIndicator(1000);
       
-      // Cache the message immediately
-      channelMessagesCache[channelId] = messagesContainer.innerHTML;
-      
-      // If this is the welcome channel (which shouldn't happen with the current code,
-      // but just in case the template is removed), show the sidebar
-      if (channelId === 'welcome') {
-        setTimeout(() => {
-          showSidebar();
-        }, 500);
-      }
+      setTimeout(() => {
+        const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
+        addBotResponse(botResponse);
+        
+        // Cache the message immediately
+        channelMessagesCache[channelId] = messagesContainer.innerHTML;
+        
+        // If this is the welcome channel (which shouldn't happen with the current code,
+        // but just in case the template is removed), show the sidebar
+        if (channelId === 'welcome') {
+          setTimeout(() => {
+            showSidebar();
+          }, 500);
+        }
+      }, 1000);
     }
     
     // Mark this channel as no longer loading
