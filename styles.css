@@ -391,6 +391,14 @@ a:hover {
   display: flex;
   gap: var(--spacing-md);
   margin-top: var(--spacing-md);
+  opacity: 0; /* Hide initially */
+  transform: translateY(20px); /* Start slightly below final position */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth animation */
+}
+
+.command-input-container.visible {
+  opacity: 1; /* Show when visible class is added */
+  transform: translateY(0); /* Move to final position */
 }
 
 #command-input {

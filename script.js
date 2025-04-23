@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const channels = document.querySelectorAll('.channel');
   const currentChannelDisplay = document.getElementById('current-channel');
   const commandInputElement = document.getElementById('command-input');
+  const commandInputContainer = document.querySelector('.command-input-container');
   const sidebar = document.querySelector('.sidebar');
   const contentArea = document.querySelector('.content-area');
   const typingIndicator = document.getElementById('typing-indicator');
@@ -35,6 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Flag to track if the sidebar has been shown
   let sidebarShown = false;
+  
+  // Flag to track if the command input has been shown
+  let inputShown = false;
   
   // Typing indicator state
   let typingTimeoutId = null;
@@ -312,6 +316,19 @@ document.addEventListener('DOMContentLoaded', function() {
     contentArea.classList.add('sidebar-visible');
   }
   
+  // Show the command input with animation
+  function showCommandInput() {
+    if (inputShown) return; // Prevent showing input multiple times
+    
+    inputShown = true;
+    commandInputContainer.classList.add('visible');
+    
+    // Set initial focus to command input
+    setTimeout(() => {
+      commandInputElement.focus();
+    }, 300); // Small delay to ensure animation completes
+  }
+  
   // Switch to a different channel
   function switchChannel(channelId) {
     try {
@@ -343,6 +360,9 @@ document.addEventListener('DOMContentLoaded', function() {
       if (channelMessagesCache[channelId]) {
         // Display cached messages immediately without showing typing indicator
         displayCachedMessages(channelId);
+        
+        // Always ensure command input is visible after switching channels
+        showCommandInput();
       } else {
         // Show typing indicator only for new content that's being loaded for the first time
         showTypingIndicator(2000);
@@ -440,11 +460,12 @@ document.addEventListener('DOMContentLoaded', function() {
             messagesContainer.appendChild(messageClone);
             scrollToBottom();
             
-            // If this is the last message of the welcome channel, show the sidebar
+            // If this is the last message of the welcome channel, show the sidebar and command input
             if (channelId === 'welcome' && index === messages.length - 1) {
               // Add a small delay before showing the sidebar to ensure the message is visible
               setTimeout(() => {
                 showSidebar();
+                showCommandInput();
               }, 500);
             }
           }
@@ -464,11 +485,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Cache the message immediately
         channelMessagesCache[channelId] = messagesContainer.innerHTML;
         
-        // If this is the welcome channel (which shouldn't happen with the current code,
-        // but just in case the template is removed), show the sidebar
+        // If this is the welcome channel, show the sidebar and command input
         if (channelId === 'welcome') {
           setTimeout(() => {
             showSidebar();
+            showCommandInput();
           }, 500);
         }
       }, 1000);
@@ -491,7 +512,4 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageArea = document.querySelector('.message-area');
     messageArea.scrollTop = messageArea.scrollHeight;
   }
-  
-  // Set initial focus to command input
-  commandInputElement.focus();
 });
