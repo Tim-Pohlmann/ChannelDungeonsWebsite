@@ -31,25 +31,14 @@ document.addEventListener('DOMContentLoaded', function() {
   function createMessageHTML(options = {}) {
     const {
       avatar = '',
-      username = 'ChannelDungeonsBot',
+      username = 'Channel Dungeons',
       timestamp = getCurrentTime(),
       content = '',
-      isSystem = false
     } = options;
-    
-    if (isSystem) {
-      return `
-        <div class="message system-message">
-          <div class="message-content">
-            ${content}
-          </div>
-        </div>
-      `;
-    }
     
     return `
       <div class="message">
-        <div class="message-avatar" aria-hidden="true">${avatar}</div>
+        <div class="message-avatar ${avatar !== '' ? 'no-background-image' : ''}" aria-hidden="true">${avatar}</div>
         <div class="message-content">
           <div class="message-header">
             <span class="message-username">${username}</span>
@@ -156,8 +145,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Add a user message to the chat
   function addUserMessage(text) {
     const messageHTML = createMessageHTML({
-      avatar: 'U',
-      username: 'User',
+      avatar: 'H',
+      username: 'Hero',
       content: text
     });
     
@@ -387,4 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageArea = document.querySelector('.message-area');
     messageArea.scrollTop = messageArea.scrollHeight;
   }
+  
+  // Set initial focus to command input
+  commandInputElement.focus();
 });

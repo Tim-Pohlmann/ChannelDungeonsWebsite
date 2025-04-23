@@ -315,6 +315,10 @@ a:hover {
   background-size: cover;
 }
 
+.message-avatar.no-background-image {
+  background-image: none;
+}
+
 .message-content {
   flex-grow: 1;
 }
