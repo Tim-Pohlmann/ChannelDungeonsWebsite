@@ -9,6 +9,42 @@ document.addEventListener('DOMContentLoaded', function() {
   // Current active channel
   let currentChannel = 'welcome';
   
+  // Utility function to create message HTML
+  function createMessageHTML(options = {}) {
+    const {
+      avatar = '',
+      username = 'ChannelDungeonsBot',
+      timestamp = getCurrentTime(),
+      content = '',
+      isSystem = false
+    } = options;
+    
+    if (isSystem) {
+      return `
+        <div class="message system-message">
+          <div class="message-content">
+            ${content}
+          </div>
+        </div>
+      `;
+    }
+    
+    return `
+      <div class="message">
+        <div class="message-avatar" aria-hidden="true">${avatar}</div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-username">${username}</span>
+            <span class="message-timestamp">${timestamp}</span>
+          </div>
+          <div class="message-text">
+            ${content}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
   // Initialize the welcome channel content
   loadChannelContent(currentChannel);
   
@@ -68,45 +104,23 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Add a user message to the chat
   function addUserMessage(text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'message';
+    const messageHTML = createMessageHTML({
+      avatar: 'U',
+      username: 'User',
+      content: text
+    });
     
-    messageDiv.innerHTML = `
-      <div class="message-avatar" aria-hidden="true">U</div>
-      <div class="message-content">
-        <div class="message-header">
-          <span class="message-username">User</span>
-          <span class="message-timestamp">${getCurrentTime()}</span>
-        </div>
-        <div class="message-text">
-          ${text}
-        </div>
-      </div>
-    `;
-    
-    messagesContainer.appendChild(messageDiv);
+    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
     scrollToBottom();
   }
   
   // Add a bot response to the chat
   function addBotResponse(text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'message';
+    const messageHTML = createMessageHTML({
+      content: text
+    });
     
-    messageDiv.innerHTML = `
-      <div class="message-avatar" aria-hidden="true">CD</div>
-      <div class="message-content">
-        <div class="message-header">
-          <span class="message-username">ChannelDungeonsBot</span>
-          <span class="message-timestamp">${getCurrentTime()}</span>
-        </div>
-        <div class="message-text">
-          ${text}
-        </div>
-      </div>
-    `;
-    
-    messagesContainer.appendChild(messageDiv);
+    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
     scrollToBottom();
   }
   
@@ -144,24 +158,46 @@ document.addEventListener('DOMContentLoaded', function() {
     if (contentTemplate) {
       // Get template content
       const content = document.importNode(contentTemplate.content, true);
-      const messages = Array.from(content.children);
+      
+      // Process simple-message elements if any exist
+      const simpleMessages = content.querySelectorAll('.simple-message');
+      simpleMessages.forEach(simpleMsg => {
+        const messageOptions = {
+          username: simpleMsg.getAttribute('data-username') || 'Channel Dungeons',
+          timestamp: getCurrentTime(), // Always use current time
+          content: simpleMsg.innerHTML,
+          isSystem: simpleMsg.hasAttribute('data-system')
+        };
+        
+        const messageHTML = createMessageHTML(messageOptions);
+        simpleMsg.outerHTML = messageHTML;
+      });
+      
+      // For older message format, update timestamps to current time
+      const oldFormatMessages = content.querySelectorAll('.message .message-timestamp');
+      oldFormatMessages.forEach(timestampElement => {
+        timestampElement.textContent = getCurrentTime();
+      });
       
       // Add each message with a delay for animation effect
+      const messages = Array.from(content.children);
       messages.forEach((message, index) => {
         setTimeout(() => {
           messagesContainer.appendChild(message);
           scrollToBottom();
-        }, index * 500); // 500ms delay between messages
+        }, index * 1000); // 1000ms (1 second) delay between messages
       });
     } else {
       addBotResponse(`Welcome to the #${channelId} channel. This channel has no content yet.`);
     }
   }
   
-  // Get the current time in Discord format
+  // Get the current time in local format
   function getCurrentTime() {
     const now = new Date();
-    return `Today at ${now.getHours()}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    // Convert am/pm to uppercase
+    return timeStr.replace(/am|pm/i, match => match.toUpperCase());
   }
   
   // Scroll to the bottom of the messages
