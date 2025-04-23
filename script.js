@@ -595,4 +595,103 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // Mobile touch handling for sidebar
+  let touchStartX = 0;
+  let touchEndX = 0;
+  const minSwipeDistance = 50; // Minimum distance to detect a swipe
+
+  // Create and add touch area for edge swipe detection
+  const touchArea = document.createElement('div');
+  touchArea.className = 'touch-area';
+  document.body.appendChild(touchArea);
+
+  // Create close button for mobile sidebar
+  const createMobileSidebarHeader = function() {
+    // Check if header already exists
+    if (sidebar.querySelector('.mobile-sidebar-header')) return;
+    
+    const header = document.createElement('div');
+    header.className = 'mobile-sidebar-header';
+    
+    const closeButton = document.createElement('button');
+    closeButton.className = 'close-sidebar';
+    closeButton.innerHTML = '×';
+    closeButton.setAttribute('aria-label', 'Close sidebar');
+    
+    closeButton.addEventListener('click', function() {
+      hideSidebar();
+    });
+    
+    header.appendChild(closeButton);
+    sidebar.insertBefore(header, sidebar.firstChild);
+  };
+
+  // Show sidebar (mobile)
+  const showMobileSidebar = function() {
+    createMobileSidebarHeader();
+    sidebar.classList.add('visible');
+  };
+
+  // Hide sidebar (mobile)
+  const hideSidebar = function() {
+    sidebar.classList.remove('visible');
+  };
+
+  // Handle touch start
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+  }, false);
+
+  // Handle touch end
+  document.addEventListener('touchend', function(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, false);
+
+  // Process swipe gesture
+  const handleSwipe = function() {
+    const swipeDistance = touchEndX - touchStartX;
+    
+    // Right swipe from left edge (to show sidebar)
+    if (swipeDistance > minSwipeDistance && touchStartX < 30) {
+      showMobileSidebar();
+    }
+    
+    // Left swipe (to hide sidebar when visible)
+    if (swipeDistance < -minSwipeDistance && sidebar.classList.contains('visible')) {
+      hideSidebar();
+    }
+  };
+
+  // Hide sidebar when clicking on a channel on mobile
+  channels.forEach(channel => {
+    channel.addEventListener('click', function() {
+      if (window.innerWidth <= 768) {
+        hideSidebar();
+      }
+    });
+  });
+
+  // Hide sidebar when clicking outside on mobile
+  document.addEventListener('click', function(e) {
+    if (window.innerWidth <= 768 && 
+        sidebar.classList.contains('visible') && 
+        !sidebar.contains(e.target) && 
+        !e.target.classList.contains('touch-area')) {
+      hideSidebar();
+    }
+  });
+
+  // Modify the existing showSidebar function to handle desktop/mobile differently
+  const originalShowSidebar = showSidebar;
+  showSidebar = function() {
+    if (window.innerWidth <= 768) {
+      // Don't automatically show sidebar on mobile, wait for swipe
+      sidebarShown = true;
+    } else {
+      // Use original behavior for desktop
+      originalShowSidebar();
+    }
+  };
 });

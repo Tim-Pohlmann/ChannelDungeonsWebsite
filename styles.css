@@ -213,7 +213,7 @@ a:hover {
 
 .channel.active {
   background-color: var(--discord-active-channel);
-  color: var(--discord-text);
+  color: var (--discord-text);
 }
 
 .channel-hash {
@@ -582,12 +582,62 @@ code {
   }
   
   .sidebar {
+    position: fixed;
     width: 100%;
-    height: auto;
-    max-height: var(--mobile-sidebar-max-height);
+    height: 100%;
+    z-index: 20;
+    left: -100%; /* Start off-screen */
+  }
+  
+  .sidebar.visible {
+    left: 0;
+  }
+  
+  .content-area {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .content-area.sidebar-visible {
+    margin-left: 0;
+    width: 100%;
   }
   
   .join-options {
     flex-direction: column;
+  }
+  
+  /* Mobile sidebar header with close button */
+  .mobile-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    background-color: var(--discord-header);
+  }
+  
+  .close-sidebar {
+    font-size: 24px;
+    color: var(--discord-text);
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+}
+
+/* Touch area for swipe detection */
+.touch-area {
+  position: fixed;
+  width: 20px;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 5;
+}
+
+@media (min-width: 769px) {
+  .touch-area,
+  .mobile-sidebar-header {
+    display: none;
   }
 }
