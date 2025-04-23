@@ -650,19 +650,15 @@ code {
   
   .channel-header {
     padding-left: var(--spacing-md); /* Reduce left padding to make room for toggle */
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     width: 100%;
     display: flex;
-    flex-wrap: nowrap; /* Prevent wrapping */
-    overflow-x: hidden; /* Hide overflow */
-    box-shadow: var(--shadow-message); /* Keep the shadow for visual separation */
-    height: auto; /* Allow height to adjust based on content */
-  }
-  
-  .message-area {
-    padding-top: calc(var(--spacing-lg) * 2 + var(--font-size-base) + 30px); /* Add padding to account for fixed header height */
+    flex-wrap: nowrap;
+    overflow-x: hidden;
+    box-shadow: var(--shadow-message);
+    height: auto;
   }
   
   .channel-name {
