@@ -28,9 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Cache to store loaded channel messages
   const channelMessagesCache = {};
   
-  // Track which channels are currently loading
-  const channelsLoading = {};
-  
   // Array to track animation timeouts so they can be cancelled
   let activeTimeouts = [];
   
@@ -351,17 +348,21 @@ document.addEventListener('DOMContentLoaded', function() {
     hideTypingIndicator();
   }
   
-  // Show the sidebar with animation
-  function showSidebar() {
+  // Function to show the sidebar with animation
+  const showSidebar = () => {
     if (sidebarShown) return; // Prevent showing sidebar multiple times
     
-    sidebarShown = true;
-    sidebar.classList.add('visible');
-    contentArea.classList.add('sidebar-visible');
-  }
-  
+    if (window.innerWidth <= 768) {
+      // Don't automatically show sidebar on mobile, wait for swipe or toggle button click
+    } else {
+      sidebarShown = true;
+      // Add visible class for desktop view
+      sidebar.classList.add('visible');
+    }
+  };
+
   // Show the command input with animation
-  function showCommandInput() {
+  const showCommandInput = () => {
     if (inputShown) return; // Prevent showing input multiple times
     
     inputShown = true;
@@ -371,8 +372,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
       commandInputElement.focus();
     }, 300); // Small delay to ensure animation completes
-  }
-  
+  };
+
   // Switch to a different channel
   function switchChannel(channelId, updateUrl = true) {
     try {
@@ -392,9 +393,6 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Update current channel display
       currentChannelDisplay.textContent = channelId;
-      
-      // Store previous channel for reference
-      const previousChannel = currentChannel;
       
       // Update current channel
       currentChannel = channelId;
@@ -434,9 +432,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Load specific channel content
   function loadChannelContent(channelId) {
-    // Mark this channel as currently loading
-    channelsLoading[channelId] = true;
-    
     const contentTemplateId = `${channelId}-content`;
     const contentTemplate = document.getElementById(contentTemplateId);
     
@@ -548,14 +543,9 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // Cache the message immediately
           channelMessagesCache[channelId] = messagesContainer.innerHTML;
-          
-          // Show sidebar and command input for welcome channel or initial page load
         }, 1000);
       }
     }
-    
-    // Mark this channel as no longer loading
-    channelsLoading[channelId] = false;
   }
   
   // Get the current time in local format
@@ -589,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const minSwipeDistance = 50; // Minimum distance to detect a swipe
 
   // Create close button for mobile sidebar
-  const createMobileSidebarHeader = function() {
+  const createMobileSidebarHeader = () => {
     // Check if header already exists
     if (sidebar.querySelector('.mobile-sidebar-header')) return;
     
@@ -601,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeButton.innerHTML = '×';
     closeButton.setAttribute('aria-label', 'Close sidebar');
     
-    closeButton.addEventListener('click', function() {
+    closeButton.addEventListener('click', () => {
       hideSidebar();
     });
     
@@ -610,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Show sidebar (mobile)
-  const showMobileSidebar = function() {
+  const showMobileSidebar = () => {
     createMobileSidebarHeader();
     sidebar.classList.add('visible');
     // Set sidebarShown to true to track state correctly
@@ -618,28 +608,25 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // Hide sidebar (mobile)
-  const hideSidebar = function() {
+  const hideSidebar = () => {
     sidebar.classList.remove('visible');
     // We don't set sidebarShown to false here since it tracks if sidebar has been shown at any point
   };
 
   // Handle touch start
-  document.addEventListener('touchstart', function(e) {
+  document.addEventListener('touchstart', (e) => {
     touchStartX = e.changedTouches[0].screenX;
   }, { passive: true });
 
   // Handle touch end
-  document.addEventListener('touchend', function(e) {
+  document.addEventListener('touchend', (e) => {
     touchEndX = e.changedTouches[0].screenX;
     handleSwipe();
   }, { passive: true });
 
   // Process swipe gesture
-  const handleSwipe = function() {
+  const handleSwipe = () => {
     const swipeDistance = touchEndX - touchStartX;
-    
-    // Debug log to see if swipe is detected
-    console.log('Swipe detected:', swipeDistance);
     
     // Right swipe (to show sidebar) - works from anywhere on screen
     if (swipeDistance > minSwipeDistance && !sidebar.classList.contains('visible')) {
@@ -671,7 +658,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Window resize handler
-  window.addEventListener('resize', function() {
+  window.addEventListener('resize', () => {
     // Check if we're transitioning between view modes
     const wasInMobileView = isMobileView;
     isMobileView = window.innerWidth <= 768;
@@ -704,24 +691,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Modify the existing showSidebar function to handle desktop/mobile differently
-  const originalShowSidebar = showSidebar;
-  showSidebar = function() {
-    if (window.innerWidth <= 768) {
-      // Don't automatically show sidebar on mobile, wait for swipe
-      sidebarShown = true;
-    } else {
-      // Use original behavior for desktop
-      originalShowSidebar();
-    }
-  };
-
   // Get the sidebar toggle button
   const sidebarToggle = document.querySelector('.sidebar-toggle');
   
   // Add event listener for sidebar toggle button
   if (sidebarToggle) {
-    sidebarToggle.addEventListener('click', function(e) {
+    sidebarToggle.addEventListener('click', (e) => {
       // Prevent any default action
       e.preventDefault();
       e.stopPropagation();
@@ -732,7 +707,6 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         // For desktop, use the standard sidebar toggle
         sidebar.classList.toggle('visible');
-        contentArea.classList.toggle('sidebar-visible');
       }
     });
   }

@@ -5,7 +5,6 @@
   --primary-color-dark: #4752C4; /* Darker shade for hover states */
   --discord-bg: #36393f; /* Main Discord background */
   --discord-sidebar: #2f3136; /* Sidebar background */
-  --discord-channels: #2f3136; /* Channel list background */
   --discord-active-channel: #42464d; /* Active channel background */
   --discord-hover: #393c43; /* Hover state for items */
   --discord-text: #dcddde; /* Primary text color */
@@ -63,7 +62,6 @@
   --sidebar-width: 240px;
   --server-icon-size: 32px;
   --avatar-size: 40px;
-  --mobile-sidebar-max-height: 30vh;
 }
 
 * {
@@ -142,14 +140,8 @@ a:hover {
   display: flex;
   flex-direction: column;
   height: 100%;
-  margin-left: var(--sidebar-width); /* Start with margin equal to sidebar width */
-  width: calc(100% - var(--sidebar-width)); /* Take width minus sidebar width */
-  transition: margin-left 0.3s ease, width 0.3s ease; /* Smooth transition when sidebar appears */
-}
-
-.content-area.sidebar-visible {
-  margin-left: var(--sidebar-width); /* Add margin equal to sidebar width when sidebar is visible */
-  width: calc(100% - var(--sidebar-width)); /* Reduce width by sidebar width */
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
 }
 
 .server-info {
@@ -213,7 +205,7 @@ a:hover {
 
 .channel.active {
   background-color: var(--discord-active-channel);
-  color: var (--discord-text);
+  color: var(--discord-text);
 }
 
 .channel-hash {
@@ -512,7 +504,7 @@ a:hover {
 .join-option {
   flex: 1;
   padding: var(--spacing-lg);
-  background-color: var (--discord-embed);
+  background-color: var(--discord-embed);
   border-radius: var(--radius-md);
 }
 
