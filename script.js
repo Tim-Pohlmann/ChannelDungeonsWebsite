@@ -604,11 +604,6 @@ document.addEventListener('DOMContentLoaded', function() {
   let touchEndX = 0;
   const minSwipeDistance = 50; // Minimum distance to detect a swipe
 
-  // Create and add touch area for edge swipe detection
-  const touchArea = document.createElement('div');
-  touchArea.className = 'touch-area';
-  document.body.appendChild(touchArea);
-
   // Create close button for mobile sidebar
   const createMobileSidebarHeader = function() {
     // Check if header already exists
@@ -647,51 +642,31 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle touch start
   document.addEventListener('touchstart', function(e) {
     touchStartX = e.changedTouches[0].screenX;
-  }, { passive: false });
+  }, { passive: true });
 
   // Handle touch end
   document.addEventListener('touchend', function(e) {
     touchEndX = e.changedTouches[0].screenX;
     handleSwipe();
-  }, { passive: false });
-
-  // Add touchmove event to prevent default scrolling behavior when swiping from edge
-  document.addEventListener('touchmove', function(e) {
-    if (e.changedTouches[0].screenX - touchStartX > 10 && touchStartX < 30) {
-      // If swiping right from edge, prevent default to avoid page scrolling
-      e.preventDefault();
-    }
-  }, { passive: false });
+  }, { passive: true });
 
   // Process swipe gesture
   const handleSwipe = function() {
     const swipeDistance = touchEndX - touchStartX;
     
     // Debug log to see if swipe is detected
-    console.log('Swipe detected:', swipeDistance, 'starting at', touchStartX);
+    console.log('Swipe detected:', swipeDistance);
     
-    // Right swipe from left edge (to show sidebar)
-    if (swipeDistance > minSwipeDistance && touchStartX < 50) {  // Increased edge detection area
+    // Right swipe (to show sidebar) - works from anywhere on screen
+    if (swipeDistance > minSwipeDistance && !sidebar.classList.contains('visible')) {
       showMobileSidebar();
     }
     
-    // Left swipe (to hide sidebar when visible)
+    // Left swipe (to hide sidebar when visible) - works from anywhere on screen
     if (swipeDistance < -minSwipeDistance && sidebar.classList.contains('visible')) {
       hideSidebar();
     }
   };
-
-  // Specifically handle touch events on the touch area
-  touchArea.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-    e.preventDefault(); // Prevent any default behavior
-  }, { passive: false });
-
-  touchArea.addEventListener('touchend', function(e) {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-    e.preventDefault(); // Prevent any default behavior
-  }, { passive: false });
 
   // Hide sidebar when clicking on a channel on mobile
   channels.forEach(channel => {
@@ -706,8 +681,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', function(e) {
     if (window.innerWidth <= 768 && 
         sidebar.classList.contains('visible') && 
-        !sidebar.contains(e.target) && 
-        !e.target.classList.contains('touch-area')) {
+        !sidebar.contains(e.target)) {
       hideSidebar();
     }
   });

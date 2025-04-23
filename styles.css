@@ -658,10 +658,11 @@ code {
     flex-wrap: nowrap; /* Prevent wrapping */
     overflow-x: hidden; /* Hide overflow */
     box-shadow: var(--shadow-message); /* Keep the shadow for visual separation */
+    height: auto; /* Allow height to adjust based on content */
   }
   
   .message-area {
-    padding-top: calc(var(--spacing-xl) * 2 + 20px); /* Add extra padding at top to account for fixed header */
+    padding-top: calc(var(--spacing-lg) * 2 + var(--font-size-base) + 30px); /* Add padding to account for fixed header height */
   }
   
   .channel-name {
@@ -681,20 +682,7 @@ code {
   }
 }
 
-/* Touch area for swipe detection */
-.touch-area {
-  position: fixed;
-  width: 40px; /* Increased width for easier swipe detection */
-  height: 100%;
-  left: 0;
-  top: 0;
-  z-index: 5;
-  /* Uncomment the next line for debugging - this makes the touch area visible */
-  /* background-color: rgba(255, 0, 0, 0.2); */
-}
-
 @media (min-width: 769px) {
-  .touch-area,
   .mobile-sidebar-header {
     display: none;
   }
