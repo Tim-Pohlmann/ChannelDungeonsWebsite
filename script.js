@@ -406,9 +406,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (channelMessagesCache[channelId]) {
         // Display cached messages immediately without showing typing indicator
         displayCachedMessages(channelId);
-        
-        // Always ensure command input is visible after switching channels
-        showCommandInput();
       } else {
         // Show typing indicator only for new content that's being loaded for the first time
         showTypingIndicator(2000);
@@ -485,10 +482,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add all messages at once without animation
         messagesContainer.innerHTML = channelMessagesCache[channelId];
         scrollToBottom();
-        
-        // Show sidebar and command input immediately
-        showSidebar();
-        showCommandInput();
       }
       else {
         // Otherwise use the normal animation sequence
@@ -544,9 +537,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Cache the message immediately
         channelMessagesCache[channelId] = messagesContainer.innerHTML;
         
-        // Show sidebar and input immediately
-        showSidebar();
-        showCommandInput();
         scrollToBottom();
       } else {
         // Show typing indicator for a short time before displaying the default message
@@ -560,12 +550,6 @@ document.addEventListener('DOMContentLoaded', function() {
           channelMessagesCache[channelId] = messagesContainer.innerHTML;
           
           // Show sidebar and command input for welcome channel or initial page load
-          if ((channelId === 'welcome' && !hasChannelInUrl) || isInitialPageLoad) {
-            setTimeout(() => {
-              showSidebar();
-              showCommandInput();
-            }, 500);
-          }
         }, 1000);
       }
     }
