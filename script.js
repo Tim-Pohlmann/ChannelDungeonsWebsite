@@ -128,6 +128,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show typing indicator
     typingIndicator.classList.add('active');
+    
+    // Move typing indicator to appear after the last message
+    const lastMessage = messagesContainer.lastElementChild;
+    if (lastMessage) {
+      // Position it after the last message
+      lastMessage.insertAdjacentElement('afterend', typingIndicator);
+    } else {
+      // If no messages yet, add it to the beginning of messages container
+      messagesContainer.appendChild(typingIndicator);
+    }
+    
     scrollToBottom();
     
     // Set timeout to hide typing indicator after duration
