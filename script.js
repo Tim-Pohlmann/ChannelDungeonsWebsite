@@ -1,17 +1,41 @@
+/**
+ * Channel Dungeons Website - Discord-like interface
+ * Main application script
+ */
 document.addEventListener('DOMContentLoaded', function() {
-  // DOM Elements
-  const messagesContainer = document.getElementById('messages');
-  const channels = document.querySelectorAll('.channel');
-  const currentChannelDisplay = document.getElementById('current-channel');
-  const commandInputElement = document.getElementById('command-input');
-  const commandInputContainer = document.querySelector('.command-input-container');
-  const sidebar = document.querySelector('.sidebar');
-  const contentArea = document.querySelector('.content-area');
-  const typingIndicator = document.getElementById('typing-indicator');
-  const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
-  const sidebarToggle = document.querySelector('.sidebar-toggle');
-  
-  // Available commands with descriptions
+  /**
+   * App Configuration
+   */
+  const config = {
+    transitionDurations: {
+      typing: 1000,
+      messageBetweenDelay: 200,
+      uiShowDelay: 500
+    },
+    breakpoints: {
+      mobile: 768
+    }
+  };
+
+  /**
+   * Application State
+   */
+  const state = {
+    currentChannel: 'welcome',
+    selectedAutocompleteIndex: -1,
+    channelMessagesCache: {},
+    activeTimeouts: [],
+    sidebarShown: false,
+    inputShown: false,
+    isMobileView: window.innerWidth <= config.breakpoints.mobile,
+    typingTimeoutId: null,
+    isInitialPageLoad: true,
+    hasChannelInUrl: window.location.hash.length > 1
+  };
+
+  /**
+   * Available Commands
+   */
   const availableCommands = [
     { name: 'about', description: 'Learn about Channel Dungeons' },
     { name: 'how-to-play', description: 'Get started with the game' },
@@ -19,417 +43,137 @@ document.addEventListener('DOMContentLoaded', function() {
     { name: 'welcome', description: 'Return to welcome channel' },
     { name: 'live-discord', description: 'See the live Discord experience' }
   ];
-  
-  // Autocomplete state
-  let selectedAutocompleteIndex = -1;
-  
-  // Current active channel
-  let currentChannel = 'welcome';
-  
-  // Cache to store loaded channel messages
-  const channelMessagesCache = {};
-  
-  // Array to track animation timeouts so they can be cancelled
-  let activeTimeouts = [];
-  
-  // UI state tracking
-  let sidebarShown = false;
-  let inputShown = false;
-  let isMobileView = window.innerWidth <= 768;
-  
-  // Typing indicator state
-  let typingTimeoutId = null;
-  
-  // Load state flags
-  let isInitialPageLoad = true;
-  const hasChannelInUrl = window.location.hash.length > 1;
-  
-  // Sidebar management functions - simplified
-  function toggleSidebar(show = null) {
-    // If show is null, toggle current state. Otherwise use provided state
-    const shouldShow = show !== null ? show : !sidebar.classList.contains('visible');
+
+  /**
+   * DOM Elements
+   */
+  const elements = {
+    messagesContainer: document.getElementById('messages'),
+    channels: document.querySelectorAll('.channel'),
+    currentChannelDisplay: document.getElementById('current-channel'),
+    commandInputElement: document.getElementById('command-input'),
+    commandInputContainer: document.querySelector('.command-input-container'),
+    sidebar: document.querySelector('.sidebar'),
+    contentArea: document.querySelector('.content-area'),
+    typingIndicator: document.getElementById('typing-indicator'),
+    autocompleteDropdown: document.getElementById('autocomplete-dropdown'),
+    sidebarToggle: document.querySelector('.sidebar-toggle'),
+    messageArea: document.querySelector('.message-area')
+  };
+
+  /**
+   * Initialize the application
+   */
+  function init() {
+    // Initialize channel from URL hash
+    state.currentChannel = getChannelFromHash();
+    elements.currentChannelDisplay.textContent = state.currentChannel;
     
-    if (shouldShow) {
-      sidebar.classList.add('visible');
-      if (!isMobileView) {
-        contentArea.classList.add('sidebar-visible');
+    // Load initial content and update UI
+    loadChannelContent(state.currentChannel);
+    updateActiveChannelInSidebar(state.currentChannel);
+    
+    // Show UI elements for direct channel access
+    if (state.hasChannelInUrl) {
+      if (!state.isMobileView) toggleSidebar(true);
+      showCommandInput();
+    }
+    
+    bindEvents();
+    handleHeightCalculation();
+  }
+
+  /**
+   * Bind all event listeners
+   */
+  function bindEvents() {
+    // Channel switching via sidebar using event delegation
+    document.querySelector('.channels-list').addEventListener('click', function(e) {
+      const channel = e.target.closest('.channel');
+      if (channel) {
+        const channelId = channel.getAttribute('data-channel');
+        switchChannel(channelId);
+        if (state.isMobileView) toggleSidebar(false);
       }
-      sidebarShown = true;
-    } else {
-      sidebar.classList.remove('visible');
-      if (!isMobileView) {
-        contentArea.classList.remove('sidebar-visible');
+    });
+    
+    // Handle browser navigation
+    window.addEventListener('hashchange', function() {
+      const channelFromHash = getChannelFromHash();
+      if (channelFromHash !== state.currentChannel) {
+        switchChannel(channelFromHash, false);
       }
-      // We keep sidebarShown as true once it's been shown initially
+    });
+    
+    // Command input handling
+    elements.commandInputElement.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') processCommand();
+    });
+    
+    // Autocomplete
+    elements.commandInputElement.addEventListener('input', function() {
+      showAutocomplete(elements.commandInputElement.value);
+    });
+    
+    // Keyboard navigation in autocomplete
+    elements.commandInputElement.addEventListener('keydown', handleAutocompleteKeydown);
+    
+    // Hide autocomplete on click outside
+    document.addEventListener('click', function(e) {
+      if (!elements.commandInputElement.contains(e.target) && 
+          !elements.autocompleteDropdown.contains(e.target)) {
+        hideAutocomplete();
+      }
+    });
+    
+    // Mobile touch handling for sidebar
+    setupMobileTouchHandling();
+    
+    // Window resize handler
+    window.addEventListener('resize', handleWindowResize);
+    
+    // Sidebar toggle button handler
+    if (elements.sidebarToggle) {
+      elements.sidebarToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSidebar();
+      });
     }
   }
 
-  // Show the command input with animation
-  function showCommandInput() {
-    if (inputShown) return; // Prevent showing input multiple times
-    
-    inputShown = true;
-    commandInputContainer.classList.add('visible');
-    
-    // Set initial focus to command input
-    setTimeout(() => {
-      commandInputElement.focus();
-    }, 300); // Small delay to ensure animation completes
-  }
+  /**
+   * Channel Management Functions
+   */
   
-  // Check if URL has a hash to determine initial channel
+  // Get channel from URL hash
   function getChannelFromHash() {
-    const hash = window.location.hash.substring(1); // Remove the # symbol
-    // Check if this hash corresponds to a valid channel
-    const validChannels = Array.from(channels).map(channel => 
+    const hash = window.location.hash.substring(1);
+    const validChannels = Array.from(elements.channels).map(channel => 
       channel.getAttribute('data-channel')
     );
-    
     return validChannels.includes(hash) ? hash : 'welcome';
   }
-
-  // Initialize with channel from URL or default to welcome
-  currentChannel = getChannelFromHash();
   
-  // Update the channel name in the header to match the initial channel
-  currentChannelDisplay.textContent = currentChannel;
-  
-  // Utility function to create message HTML
-  function createMessageHTML(options = {}) {
-    const {
-      avatar = '',
-      username = 'Channel Dungeons',
-      timestamp = getCurrentTime(),
-      content = '',
-    } = options;
-    
-    return `
-      <div class="message">
-        <div class="message-avatar ${avatar !== '' ? 'no-background-image' : ''}" aria-hidden="true">${avatar}</div>
-        <div class="message-content">
-          <div class="message-header">
-            <span class="message-username">${username}</span>
-            <span class="message-timestamp">${timestamp}</span>
-          </div>
-          <div class="message-text">
-            ${content}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-  
-  // Show typing indicator for a specific duration
-  function showTypingIndicator(duration = 1200) {
-    // Clear any existing timeout
-    if (typingTimeoutId) {
-      clearTimeout(typingTimeoutId);
-    }
-    
-    // Show typing indicator
-    typingIndicator.classList.add('active');
-    
-    // Move typing indicator to appear after the last message
-    const lastMessage = messagesContainer.lastElementChild;
-    if (lastMessage) {
-      // Position it after the last message
-      lastMessage.insertAdjacentElement('afterend', typingIndicator);
-    } else {
-      // If no messages yet, add it to the beginning of messages container
-      messagesContainer.appendChild(typingIndicator);
-    }
-    
-    scrollToBottom();
-    
-    // Set timeout to hide typing indicator after duration
-    typingTimeoutId = setTimeout(() => {
-      hideTypingIndicator();
-    }, duration);
-    
-    return typingTimeoutId;
-  }
-  
-  // Hide typing indicator
-  function hideTypingIndicator() {
-    typingIndicator.classList.remove('active');
-    if (typingTimeoutId) {
-      clearTimeout(typingTimeoutId);
-      typingTimeoutId = null;
-    }
-  }
-  
-  // Initialize the channel content based on URL hash or default
-  loadChannelContent(currentChannel);
-  
-  // Update active channel in sidebar based on current channel
-  updateActiveChannelInSidebar(currentChannel);
-  
-  // For initial direct access via a channel-specific URL, show UI elements immediately
-  if (hasChannelInUrl) {
-    // Show sidebar only in desktop view on initial load with URL
-    if (!isMobileView) {
-      toggleSidebar(true);
-    }
-    showCommandInput();
-  }
-  
-  // Handle channel switching by clicking on channel names
-  channels.forEach(channel => {
-    channel.addEventListener('click', function() {
-      const channelId = this.getAttribute('data-channel');
-      switchChannel(channelId);
-      
-      // Hide sidebar automatically on mobile when selecting a channel
-      if (isMobileView) {
-        toggleSidebar(false);
-      }
-    });
-  });
-  
-  // Listen for hash changes to handle browser back/forward navigation
-  window.addEventListener('hashchange', function() {
-    const channelFromHash = getChannelFromHash();
-    // Only switch if it's different from current to avoid loops
-    if (channelFromHash !== currentChannel) {
-      switchChannel(channelFromHash, false); // Don't update URL again
-    }
-  });
-  
-  // Command input handling
-  commandInputElement.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-      processCommand();
-    }
-  });
-  
-  // Add input event listener for autocomplete
-  commandInputElement.addEventListener('input', function() {
-    showAutocomplete(commandInputElement.value);
-  });
-  
-  // Add keydown event listener for keyboard navigation in autocomplete
-  commandInputElement.addEventListener('keydown', function(e) {
-    const items = autocompleteDropdown.querySelectorAll('.autocomplete-item');
-    
-    // Only handle navigation keys when dropdown is visible
-    if (!autocompleteDropdown.classList.contains('visible')) {
-      return;
-    }
-    
-    switch(e.key) {
-      case 'ArrowDown':
-        e.preventDefault(); // Prevent cursor movement in input
-        selectedAutocompleteIndex = Math.min(selectedAutocompleteIndex + 1, items.length - 1);
-        updateAutocompleteSelection();
-        break;
-        
-      case 'ArrowUp':
-        e.preventDefault(); // Prevent cursor movement in input
-        selectedAutocompleteIndex = Math.max(selectedAutocompleteIndex - 1, 0);
-        updateAutocompleteSelection();
-        break;
-        
-      case 'Tab':
-      case 'Enter':
-        // Only process if dropdown is visible and an item is selected
-        if (selectedAutocompleteIndex >= 0 && selectedAutocompleteIndex < items.length) {
-          e.preventDefault(); // Prevent form submission
-          const commandName = items[selectedAutocompleteIndex].querySelector('.command-name').textContent.substring(1);
-          selectCommand(commandName);
-        }
-        break;
-        
-      case 'Escape':
-        hideAutocomplete();
-        break;
-    }
-  });
-  
-  // Function to show autocomplete dropdown
-  function showAutocomplete(inputValue) {
-    // Only show autocomplete for / commands
-    if (!inputValue.startsWith('/')) {
-      hideAutocomplete();
-      return;
-    }
-    
-    // Get search term without the /
-    const searchTerm = inputValue.substring(1).toLowerCase();
-    
-    // Filter commands that match the search term
-    const matchingCommands = availableCommands.filter(cmd => 
-      cmd.name.toLowerCase().startsWith(searchTerm)
-    );
-    
-    // Hide dropdown if no matches or empty search
-    if (matchingCommands.length === 0) {
-      hideAutocomplete();
-      return;
-    }
-    
-    // Clear previous autocomplete items
-    autocompleteDropdown.innerHTML = '';
-    
-    // Create and add autocomplete items
-    matchingCommands.forEach((cmd, index) => {
-      const item = document.createElement('div');
-      item.className = 'autocomplete-item';
-      item.innerHTML = `<span class="command-name">/${cmd.name}</span><span class="command-description">${cmd.description}</span>`;
-      
-      // Add click handler to select this command
-      item.addEventListener('click', () => {
-        selectCommand(cmd.name);
-      });
-      
-      autocompleteDropdown.appendChild(item);
-    });
-    
-    // Show autocomplete dropdown
-    autocompleteDropdown.classList.add('visible');
-    
-    // Reset selection
-    selectedAutocompleteIndex = 0;
-    updateAutocompleteSelection();
-  }
-  
-  // Function to hide autocomplete dropdown
-  function hideAutocomplete() {
-    autocompleteDropdown.classList.remove('visible');
-    selectedAutocompleteIndex = -1;
-  }
-  
-  // Function to update the selected item in the autocomplete dropdown
-  function updateAutocompleteSelection() {
-    const items = autocompleteDropdown.querySelectorAll('.autocomplete-item');
-    
-    // Remove selected class from all items
-    items.forEach(item => item.classList.remove('selected'));
-    
-    // Add selected class to the current selection if valid
-    if (selectedAutocompleteIndex >= 0 && selectedAutocompleteIndex < items.length) {
-      items[selectedAutocompleteIndex].classList.add('selected');
-      items[selectedAutocompleteIndex].scrollIntoView({ block: 'nearest' });
-    }
-  }
-  
-  // Function to select a command from autocomplete
-  function selectCommand(commandName) {
-    commandInputElement.value = '/' + commandName;
-    hideAutocomplete();
-    commandInputElement.focus();
-  }
-  
-  // Hide autocomplete dropdown when clicking outside
-  document.addEventListener('click', function(e) {
-    if (!commandInputElement.contains(e.target) && !autocompleteDropdown.contains(e.target)) {
-      hideAutocomplete();
-    }
-  });
-  
-  // Command processing function
-  function processCommand() {
-    const command = commandInputElement.value.trim();
-    
-    if (command === '') return;
-    
-    // Hide autocomplete
-    hideAutocomplete();
-    
-    // Show typing indicator before processing command
-    showTypingIndicator();
-    
-    // Process the command
-    if (command.startsWith('/')) {
-      handleSlashCommand(command.substring(1).toLowerCase());
-    } else {
-      // Treat non-command messages as general chat
-      addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>about</span> to navigate.`);
-    }
-    
-    // Clear input field
-    commandInputElement.value = '';
-    
-    // Focus back on input for better UX
-    commandInputElement.focus();
-  }
-  
-  // Handle slash commands
-  function handleSlashCommand(cleanCommand) {
-    const availableCommands = ['about', 'how-to-play', 'features', 'welcome', 'live-discord'];
-    
-    if (availableCommands.includes(cleanCommand)) {
-      switchChannel(cleanCommand);
-    } else {
-      addBotResponse(`Unknown command: /${cleanCommand}. Available commands are: ${availableCommands.map(cmd => `<span class='discord-command'>/${cmd}</span>`).join(', ')}`);
-    }
-  }
-  
-  // Add a bot response to the chat
-  function addBotResponse(text) {
-    // Hide typing indicator if it's still showing
-    hideTypingIndicator();
-    
-    const messageHTML = createMessageHTML({
-      content: text
-    });
-    
-    messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
-    scrollToBottom();
-    
-    // Update cache for the current channel
-    channelMessagesCache[currentChannel] = messagesContainer.innerHTML;
-  }
-  
-  // Clear all pending timeouts
-  function clearAllTimeouts() {
-    activeTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
-    activeTimeouts = [];
-    
-    // Also clear typing indicator timeout
-    if (typingTimeoutId) {
-      clearTimeout(typingTimeoutId);
-      typingTimeoutId = null;
-    }
-    
-    // Hide typing indicator
-    hideTypingIndicator();
-  }
-  
-  // Switch to a different channel
+  // Switch channel
   function switchChannel(channelId, updateUrl = true) {
     try {
-      // Set isInitialPageLoad to false since we're now navigating between channels
-      isInitialPageLoad = false;
-      
-      // Cancel any pending animation timeouts
+      state.isInitialPageLoad = false;
       clearAllTimeouts();
-      
-      // Update active channel in sidebar
       updateActiveChannelInSidebar(channelId);
       
-      // Update URL hash if requested (default is true)
       if (updateUrl) {
         window.location.hash = channelId;
       }
       
-      // Update current channel display
-      currentChannelDisplay.textContent = channelId;
+      elements.currentChannelDisplay.textContent = channelId;
+      state.currentChannel = channelId;
+      elements.messagesContainer.innerHTML = '';
       
-      // Update current channel
-      currentChannel = channelId;
-      
-      // Clear current messages
-      messagesContainer.innerHTML = '';
-      
-      // Check if channel content is already cached
-      if (channelMessagesCache[channelId]) {
-        // Display cached messages immediately without showing typing indicator
+      if (state.channelMessagesCache[channelId]) {
         displayCachedMessages(channelId);
       } else {
-        // Show typing indicator only for new content that's being loaded for the first time
         showTypingIndicator(2000);
-        
-        // Load and cache channel content
         loadChannelContent(channelId);
       }
     } catch (error) {
@@ -437,165 +181,135 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Display cached messages for a channel
-  function displayCachedMessages(channelId) {
-    // Hide typing indicator
-    hideTypingIndicator();
-    
-    const cachedContent = channelMessagesCache[channelId];
-    
-    // Append all cached messages to the container at once
-    messagesContainer.innerHTML = cachedContent;
-    
-    // Scroll to bottom
-    scrollToBottom();
-  }
-  
-  // Load specific channel content
+  // Load channel content
   function loadChannelContent(channelId) {
     const contentTemplateId = `${channelId}-content`;
     const contentTemplate = document.getElementById(contentTemplateId);
     
     if (contentTemplate) {
-      // Get template content
-      const content = document.importNode(contentTemplate.content, true);
-      
-      // Create an array to store processed message HTML
-      const processedMessages = [];
-      
-      // Process simple-message elements if any exist
-      const simpleMessages = content.querySelectorAll('.simple-message');
-      simpleMessages.forEach(simpleMsg => {
-        const messageOptions = {
-          username: simpleMsg.getAttribute('data-username') || 'Channel Dungeons',
-          timestamp: getCurrentTime(), // Always use current time
-          content: simpleMsg.innerHTML,
-          isSystem: simpleMsg.hasAttribute('data-system')
-        };
-        
-        // Create HTML for the message and add to array instead of modifying DOM
-        processedMessages.push(createMessageHTML(messageOptions));
-      });
-      
-      // For older message format, update timestamps to current time
-      const oldFormatMessages = content.querySelectorAll('.message');
-      oldFormatMessages.forEach(message => {
-        const timestampElement = message.querySelector('.message-timestamp');
-        if (timestampElement) {
-          timestampElement.textContent = getCurrentTime();
-        }
-        processedMessages.push(message.outerHTML);
-      });
-      
-      // Create a temporary container for the complete content
-      const tempContainer = document.createElement('div');
-      tempContainer.innerHTML = processedMessages.join('');
-      
-      // Cache the complete content immediately
-      channelMessagesCache[channelId] = tempContainer.innerHTML;
-      
-      // If accessing any channel via URL (including welcome), show all messages immediately without animation
-      if (isInitialPageLoad && hasChannelInUrl) {
-        // Add all messages at once without animation
-        messagesContainer.innerHTML = channelMessagesCache[channelId];
-        scrollToBottom();
-      }
-      else {
-        // Otherwise use the normal animation sequence
-        // Now animate adding the messages one by one for the current view only
-        const messages = Array.from(tempContainer.children);
-        
-        messages.forEach((message, index) => {
-          // Create a clone of the message to avoid issues with content being moved
-          const messageClone = message.cloneNode(true);
-          
-          // Show the typing indicator before each message
-          const showTypingDuration = 1000; // 1 second of typing
-          const delayBetweenMessages = index * (showTypingDuration + 200); // Total delay for this message
-          
-          // Set a timeout for showing the typing indicator
-          const typingTimeoutId = setTimeout(() => {
-            // Only show typing if we're still on the same channel
-            if (currentChannel === channelId) {
-              showTypingIndicator(showTypingDuration);
-            }
-          }, delayBetweenMessages);
-          activeTimeouts.push(typingTimeoutId);
-          
-          // Set a timeout for the animation
-          const messageTimeoutId = setTimeout(() => {
-            // Only add the message if we're still on the same channel
-            if (currentChannel === channelId) {
-              hideTypingIndicator();
-              messagesContainer.appendChild(messageClone);
-              scrollToBottom();
-              
-              // If this is the last message of the welcome channel without URL hash, show the sidebar and command input
-              if (channelId === 'welcome' && !hasChannelInUrl && index === messages.length - 1) {
-                // Add a small delay before showing the sidebar to ensure the message is visible
-                setTimeout(() => {
-                  if (!isMobileView) {
-                    toggleSidebar(true);
-                  }
-                  showCommandInput();
-                }, 500);
-              }
-            }
-          }, delayBetweenMessages + showTypingDuration); // Add the message after the typing duration
-          
-          // Store the timeout ID so it can be cancelled if needed
-          activeTimeouts.push(messageTimeoutId);
-        });
-      }
+      processContentTemplate(contentTemplate, channelId);
     } else {
-      // No template exists for this channel
+      handleEmptyChannel(channelId);
+    }
+  }
+  
+  // Process content template
+  function processContentTemplate(template, channelId) {
+    // Process template content
+    const content = document.importNode(template.content, true);
+    const processedMessages = [];
+    
+    // Process simple messages
+    const simpleMessages = content.querySelectorAll('.simple-message');
+    simpleMessages.forEach(simpleMsg => {
+      const messageOptions = {
+        username: simpleMsg.getAttribute('data-username') || 'Channel Dungeons',
+        timestamp: getCurrentTime(),
+        content: simpleMsg.innerHTML
+      };
       
-      if (isInitialPageLoad && hasChannelInUrl) {
-        // If direct URL access, show message immediately without typing animation
-        const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
-        messagesContainer.innerHTML = createMessageHTML({ content: botResponse });
-        
-        // Cache the message immediately
-        channelMessagesCache[channelId] = messagesContainer.innerHTML;
-        
-        scrollToBottom();
-      } else {
-        // Show typing indicator for a short time before displaying the default message
-        showTypingIndicator(1000);
-        
-        setTimeout(() => {
-          const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
-          addBotResponse(botResponse);
-          
-          // Cache the message immediately
-          channelMessagesCache[channelId] = messagesContainer.innerHTML;
-        }, 1000);
+      processedMessages.push(createMessageHTML(messageOptions));
+    });
+    
+    // Process old format messages
+    const oldFormatMessages = content.querySelectorAll('.message');
+    oldFormatMessages.forEach(message => {
+      const timestampElement = message.querySelector('.message-timestamp');
+      if (timestampElement) {
+        timestampElement.textContent = getCurrentTime();
       }
+      processedMessages.push(message.outerHTML);
+    });
+    
+    // Create temporary container
+    const tempContainer = document.createElement('div');
+    tempContainer.innerHTML = processedMessages.join('');
+    
+    // Cache content
+    state.channelMessagesCache[channelId] = tempContainer.innerHTML;
+    
+    // Display messages
+    if (state.isInitialPageLoad && state.hasChannelInUrl) {
+      displayMessagesImmediately(channelId);
+    } else {
+      animateMessages(tempContainer, channelId);
     }
   }
   
-  // Get the current time in local format
-  function getCurrentTime() {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-    // Convert am/pm to uppercase
-    return timeStr.replace(/am|pm/i, match => match.toUpperCase());
+  // Display messages immediately (no animation)
+  function displayMessagesImmediately(channelId) {
+    elements.messagesContainer.innerHTML = state.channelMessagesCache[channelId];
+    scrollToBottom();
   }
   
-  // Ensure scrolling works correctly
-  function scrollToBottom() {
-    const messageArea = document.querySelector('.message-area');
-    if (messageArea) {
-      // Use a small timeout to ensure DOM has updated
+  // Animate messages appearance
+  function animateMessages(container, channelId) {
+    const messages = Array.from(container.children);
+    const showTypingDuration = config.transitionDurations.typing;
+    
+    messages.forEach((message, index) => {
+      const messageClone = message.cloneNode(true);
+      const delayBetweenMessages = index * (showTypingDuration + config.transitionDurations.messageBetweenDelay);
+      
+      // Set typing indicator timeout
+      const typingTimeoutId = setTimeout(() => {
+        if (state.currentChannel === channelId) {
+          showTypingIndicator(showTypingDuration);
+        }
+      }, delayBetweenMessages);
+      state.activeTimeouts.push(typingTimeoutId);
+      
+      // Set message display timeout
+      const messageTimeoutId = setTimeout(() => {
+        if (state.currentChannel === channelId) {
+          hideTypingIndicator();
+          elements.messagesContainer.appendChild(messageClone);
+          scrollToBottom();
+          
+          // Show UI for last welcome message
+          if (channelId === 'welcome' && !state.hasChannelInUrl && index === messages.length - 1) {
+            setTimeout(() => {
+              if (!state.isMobileView) toggleSidebar(true);
+              showCommandInput();
+            }, config.transitionDurations.uiShowDelay);
+          }
+        }
+      }, delayBetweenMessages + showTypingDuration);
+      
+      state.activeTimeouts.push(messageTimeoutId);
+    });
+  }
+  
+  // Handle empty channel
+  function handleEmptyChannel(channelId) {
+    if (state.isInitialPageLoad && state.hasChannelInUrl) {
+      // Direct URL access
+      const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
+      elements.messagesContainer.innerHTML = createMessageHTML({ content: botResponse });
+      state.channelMessagesCache[channelId] = elements.messagesContainer.innerHTML;
+      scrollToBottom();
+    } else {
+      // Normal navigation
+      showTypingIndicator(config.transitionDurations.typing);
+      
       setTimeout(() => {
-        messageArea.scrollTop = messageArea.scrollHeight;
-      }, 10);
+        const botResponse = `Welcome to the #${channelId} channel. This channel has no content yet.`;
+        addBotResponse(botResponse);
+        state.channelMessagesCache[channelId] = elements.messagesContainer.innerHTML;
+      }, config.transitionDurations.typing);
     }
   }
   
-  // Function to update the active channel in the sidebar
+  // Display cached messages
+  function displayCachedMessages(channelId) {
+    hideTypingIndicator();
+    elements.messagesContainer.innerHTML = state.channelMessagesCache[channelId];
+    scrollToBottom();
+  }
+  
+  // Update active channel in sidebar
   function updateActiveChannelInSidebar(channelId) {
-    channels.forEach(channel => {
+    elements.channels.forEach(channel => {
       if (channel.getAttribute('data-channel') === channelId) {
         channel.classList.add('active');
       } else {
@@ -604,86 +318,331 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Mobile touch handling for sidebar
-  let touchStartX = 0;
-  let touchEndX = 0;
-  const minSwipeDistance = 50; // Minimum distance to detect a swipe
-
-  // Handle touch start
-  document.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-
-  // Handle touch end
-  document.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  }, { passive: true });
-
-  // Process swipe gesture
-  const handleSwipe = () => {
-    const swipeDistance = touchEndX - touchStartX;
+  /**
+   * UI Manipulation Functions
+   */
+  
+  // Sidebar management
+  function toggleSidebar(show = null) {
+    const shouldShow = show !== null ? show : !elements.sidebar.classList.contains('visible');
     
-    // Right swipe (to show sidebar)
-    if (swipeDistance > minSwipeDistance && !sidebar.classList.contains('visible')) {
-      toggleSidebar(true);
+    if (shouldShow) {
+      elements.sidebar.classList.add('visible');
+      if (!state.isMobileView) elements.contentArea.classList.add('sidebar-visible');
+      state.sidebarShown = true;
+      if (elements.sidebarToggle) elements.sidebarToggle.setAttribute('aria-expanded', 'true');
+    } else {
+      elements.sidebar.classList.remove('visible');
+      if (!state.isMobileView) elements.contentArea.classList.remove('sidebar-visible');
+      state.sidebarShown = false;
+      if (elements.sidebarToggle) elements.sidebarToggle.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  // Show command input with animation
+  function showCommandInput() {
+    if (state.inputShown) return;
+    state.inputShown = true;
+    elements.commandInputContainer.classList.add('visible');
+    setTimeout(() => elements.commandInputElement.focus(), 300);
+  }
+  
+  // Show typing indicator
+  function showTypingIndicator(duration = config.transitionDurations.typing) {
+    if (state.typingTimeoutId) clearTimeout(state.typingTimeoutId);
+    
+    elements.typingIndicator.classList.add('active');
+    
+    // Move typing indicator after the last message
+    const lastMessage = elements.messagesContainer.lastElementChild;
+    if (lastMessage) {
+      lastMessage.insertAdjacentElement('afterend', elements.typingIndicator);
+    } else {
+      elements.messagesContainer.appendChild(elements.typingIndicator);
     }
     
-    // Left swipe (to hide sidebar)
-    if (swipeDistance < -minSwipeDistance && sidebar.classList.contains('visible')) {
-      toggleSidebar(false);
-    }
-  };
-
-  // Window resize handler
-  window.addEventListener('resize', () => {
-    // Check if we're transitioning between view modes
-    const wasInMobileView = isMobileView;
-    isMobileView = window.innerWidth <= 768;
+    scrollToBottom();
     
-    // If we're transitioning from mobile to desktop view
-    if (wasInMobileView && !isMobileView) {
-      // Restore desktop sidebar behavior if it should be shown
-      if (sidebarShown) {
-        toggleSidebar(true);
-      }
-    } 
-    // If transitioning from desktop to mobile view
-    else if (!wasInMobileView && isMobileView) {
-      // In mobile view, sidebar should be hidden initially
-      toggleSidebar(false);
+    state.typingTimeoutId = setTimeout(() => {
+      hideTypingIndicator();
+    }, duration);
+    
+    return state.typingTimeoutId;
+  }
+  
+  // Hide typing indicator
+  function hideTypingIndicator() {
+    elements.typingIndicator.classList.remove('active');
+    if (state.typingTimeoutId) {
+      clearTimeout(state.typingTimeoutId);
+      state.typingTimeoutId = null;
     }
-    // Recalculate content area heights
-    handleHeightCalculation();
-  });
-
-  // Function to handle height calculation to ensure all content is visible
+  }
+  
+  // Clear all timeouts
+  function clearAllTimeouts() {
+    state.activeTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    state.activeTimeouts = [];
+    
+    if (state.typingTimeoutId) {
+      clearTimeout(state.typingTimeoutId);
+      state.typingTimeoutId = null;
+    }
+    
+    hideTypingIndicator();
+  }
+  
+  // Add bot response
+  function addBotResponse(text) {
+    hideTypingIndicator();
+    
+    const messageHTML = createMessageHTML({
+      content: text
+    });
+    
+    elements.messagesContainer.insertAdjacentHTML('beforeend', messageHTML);
+    scrollToBottom();
+    
+    // Update cache
+    state.channelMessagesCache[state.currentChannel] = elements.messagesContainer.innerHTML;
+  }
+  
+  // Create message HTML
+  function createMessageHTML(options = {}) {
+    const {
+      username = 'Channel Dungeons',
+      timestamp = getCurrentTime(),
+      content = '',
+    } = options;
+    
+    return `
+      <div class="message">
+        <div class="message-avatar" aria-hidden="true"></div>
+        <div class="message-content">
+          <div class="message-header">
+            <span class="message-username">${username}</span>
+            <span class="message-timestamp">${timestamp}</span>
+          </div>
+          <div class="message-text">${content}</div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Scroll to bottom of message area
+  function scrollToBottom() {
+    if (elements.messageArea) {
+      setTimeout(() => {
+        elements.messageArea.scrollTop = elements.messageArea.scrollHeight;
+      }, 10);
+    }
+  }
+  
+  // Handle height calculation for mobile
   function handleHeightCalculation() {
     const header = document.querySelector('.channel-header');
     const messageArea = document.querySelector('.message-area');
     const footerArea = document.querySelector('footer');
     
-    if (header && messageArea && footerArea && window.innerWidth <= 768) {
-      // Only apply additional fixes for mobile viewports
+    if (header && messageArea && footerArea && window.innerWidth <= config.breakpoints.mobile) {
       const headerHeight = header.offsetHeight;
       const footerHeight = footerArea.offsetHeight;
-      
-      // Ensure message area doesn't overlap with header or footer
       messageArea.style.height = `calc(100% - ${headerHeight + footerHeight}px)`;
     }
   }
-  
-  // Call this function on initial load
-  handleHeightCalculation();
 
-  // Add event listener for sidebar toggle button
-  if (sidebarToggle) {
-    sidebarToggle.addEventListener('click', (e) => {
-      // Prevent any default action
-      e.preventDefault();
-      e.stopPropagation();
-      
-      toggleSidebar();
-    });
+  // Handle window resize
+  function handleWindowResize() {
+    const wasInMobileView = state.isMobileView;
+    state.isMobileView = window.innerWidth <= config.breakpoints.mobile;
+    
+    // Transition between mobile and desktop view
+    if (wasInMobileView && !state.isMobileView) {
+      if (state.sidebarShown) toggleSidebar(true);
+    } else if (!wasInMobileView && state.isMobileView) {
+      toggleSidebar(false);
+    }
+    
+    // Recalculate heights
+    handleHeightCalculation();
   }
+
+  /**
+   * Command and Autocomplete Functions
+   */
+  
+  // Process command
+  function processCommand() {
+    const command = elements.commandInputElement.value.trim();
+    if (command === '') return;
+    
+    hideAutocomplete();
+    showTypingIndicator();
+    
+    if (command.startsWith('/')) {
+      handleSlashCommand(command.substring(1).toLowerCase());
+    } else {
+      addBotResponse(`This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>about</span> to navigate.`);
+    }
+    
+    elements.commandInputElement.value = '';
+    elements.commandInputElement.focus();
+  }
+  
+  // Handle slash commands
+  function handleSlashCommand(cleanCommand) {
+    const commandNames = availableCommands.map(cmd => cmd.name);
+    
+    if (commandNames.includes(cleanCommand)) {
+      switchChannel(cleanCommand);
+    } else {
+      addBotResponse(`Unknown command: /${cleanCommand}. Available commands are: ${commandNames.map(cmd => `<span class='discord-command'>/${cmd}</span>`).join(', ')}`);
+    }
+  }
+  
+  // Show autocomplete dropdown
+  function showAutocomplete(inputValue) {
+    if (!inputValue.startsWith('/')) {
+      hideAutocomplete();
+      return;
+    }
+    
+    const searchTerm = inputValue.substring(1).toLowerCase();
+    const matchingCommands = availableCommands.filter(cmd => 
+      cmd.name.toLowerCase().startsWith(searchTerm)
+    );
+    
+    if (matchingCommands.length === 0) {
+      hideAutocomplete();
+      return;
+    }
+    
+    elements.autocompleteDropdown.innerHTML = '';
+    
+    matchingCommands.forEach((cmd, index) => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.dataset.commandName = cmd.name;
+      item.innerHTML = `<span class="command-name">/${cmd.name}</span><span class="command-description">${cmd.description}</span>`;
+      elements.autocompleteDropdown.appendChild(item);
+    });
+    
+    // Add a single event listener using event delegation
+    if (!elements.autocompleteDropdown._hasClickListener) {
+      elements.autocompleteDropdown.addEventListener('click', (e) => {
+        const item = e.target.closest('.autocomplete-item');
+        if (item) {
+          const commandName = item.dataset.commandName;
+          selectCommand(commandName);
+        }
+      });
+      elements.autocompleteDropdown._hasClickListener = true;
+    }
+    
+    elements.autocompleteDropdown.classList.add('visible');
+    state.selectedAutocompleteIndex = 0;
+    updateAutocompleteSelection();
+  }
+  
+  // Handle autocomplete keyboard navigation
+  function handleAutocompleteKeydown(e) {
+    const items = elements.autocompleteDropdown.querySelectorAll('.autocomplete-item');
+    if (!elements.autocompleteDropdown.classList.contains('visible')) return;
+    
+    switch(e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        state.selectedAutocompleteIndex = Math.min(state.selectedAutocompleteIndex + 1, items.length - 1);
+        updateAutocompleteSelection();
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        state.selectedAutocompleteIndex = Math.max(state.selectedAutocompleteIndex - 1, 0);
+        updateAutocompleteSelection();
+        break;
+      case 'Tab':
+      case 'Enter':
+        if (state.selectedAutocompleteIndex >= 0 && state.selectedAutocompleteIndex < items.length) {
+          e.preventDefault();
+          const commandName = items[state.selectedAutocompleteIndex].querySelector('.command-name').textContent.substring(1);
+          selectCommand(commandName);
+        }
+        break;
+      case 'Escape':
+        hideAutocomplete();
+        break;
+    }
+  }
+  
+  // Hide autocomplete dropdown
+  function hideAutocomplete() {
+    elements.autocompleteDropdown.classList.remove('visible');
+    state.selectedAutocompleteIndex = -1;
+  }
+  
+  // Update autocomplete selection
+  function updateAutocompleteSelection() {
+    const items = elements.autocompleteDropdown.querySelectorAll('.autocomplete-item');
+    
+    items.forEach(item => item.classList.remove('selected'));
+    
+    if (state.selectedAutocompleteIndex >= 0 && state.selectedAutocompleteIndex < items.length) {
+      items[state.selectedAutocompleteIndex].classList.add('selected');
+      items[state.selectedAutocompleteIndex].scrollIntoView({ block: 'nearest' });
+    }
+  }
+  
+  // Select command from autocomplete
+  function selectCommand(commandName) {
+    elements.commandInputElement.value = '/' + commandName;
+    hideAutocomplete();
+    elements.commandInputElement.focus();
+  }
+
+  /**
+   * Mobile Touch Handling
+   */
+  function setupMobileTouchHandling() {
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const minSwipeDistance = 50;
+
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe(touchStartX, touchEndX);
+    }, { passive: true });
+  }
+  
+  // Handle swipe gesture
+  function handleSwipe(startX, endX) {
+    const swipeDistance = endX - startX;
+    
+    // Right swipe to show sidebar
+    if (swipeDistance > minSwipeDistance && !elements.sidebar.classList.contains('visible')) {
+      toggleSidebar(true);
+    }
+    
+    // Left swipe to hide sidebar
+    if (swipeDistance < -minSwipeDistance && elements.sidebar.classList.contains('visible')) {
+      toggleSidebar(false);
+    }
+  }
+
+  /**
+   * Utility Functions
+   */
+  
+  // Get current time
+  function getCurrentTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    return timeStr.replace(/am|pm/i, match => match.toUpperCase());
+  }
+
+  // Initialize the application
+  init();
 });

@@ -6,8 +6,11 @@
     <meta name="description" content="Channel Dungeons - An MMORPG played entirely in Discord">
     <title>Channel Dungeons - MMORPG in Discord</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Favicon -->
+    <link rel="icon" href="dungeon-gate.svg" type="image/svg+xml">
 </head>
 <body>
+    <!-- Main Discord-like application wrapper -->
     <div class="discord-app">
         <!-- Discord sidebar with channels -->
         <nav class="sidebar" aria-label="Server channels">
@@ -43,7 +46,7 @@
         <main class="content-area">
             <!-- Channel header -->
             <header class="channel-header">
-                <button class="sidebar-toggle" aria-label="Toggle sidebar">
+                <button class="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M 15.41 16.59 L 10.83 12 L 15.41 7.41 L 14 6 L 8 12 L 14 18 L 15.41 16.59 Z M 10 13 H 21 V 11 H 10" fill="currentColor"/>
                     </svg>
@@ -57,26 +60,37 @@
 
             <!-- Message area -->
             <section class="message-area" aria-label="Channel messages">
-                <div class="messages-container" id="messages">
+                <!-- Messages container -->
+                <div class="messages-container" id="messages" aria-live="polite">
                     <!-- Messages will be populated by JavaScript -->
                 </div>
                 
                 <!-- Typing indicator -->
-                <div class="typing-indicator" id="typing-indicator">
-                    <div class="text"><span class="typing-dots">
-                        <span class="typing-dot"></span>
-                        <span class="typing-dot"></span>
-                        <span class="typing-dot"></span>
-                    </span><span class="username">Channel Dungeons</span> is typing...</div>
+                <div class="typing-indicator" id="typing-indicator" aria-hidden="true">
+                    <div class="text">
+                        <span class="typing-dots">
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                        </span>
+                        <span class="username">Channel Dungeons</span> is typing...
+                    </div>
                 </div>
             </section>
 
             <!-- Command input area -->
             <footer>
                 <div class="autocomplete-container">
-                    <div class="autocomplete-dropdown" id="autocomplete-dropdown"></div>
+                    <div class="autocomplete-dropdown" id="autocomplete-dropdown" role="listbox" aria-label="Command suggestions"></div>
                     <div class="command-input-container">
-                        <input type="text" id="command-input" placeholder="Type a command (try /about)" aria-label="Message input">
+                        <input 
+                            type="text" 
+                            id="command-input" 
+                            placeholder="Type a command (try /about)" 
+                            aria-label="Command input"
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
                     </div>
                 </div>
             </footer>
@@ -84,6 +98,7 @@
     </div>
 
     <!-- Channel content templates -->
+    <!-- Welcome channel template -->
     <template id="welcome-content">
         <div class="simple-message">
             <h1>Welcome to Channel Dungeons!</h1>
@@ -107,6 +122,7 @@
         </div>
     </template>
 
+    <!-- About channel template -->
     <template id="about-content">
         <div class="simple-message">
             <h2>About Channel Dungeons</h2>
@@ -116,6 +132,7 @@
         </div>
     </template>
 
+    <!-- How to play channel template -->
     <template id="how-to-play-content">
         <div class="simple-message">
             <h2>How to Play</h2>
@@ -155,6 +172,7 @@
         </div>
     </template>
 
+    <!-- Features channel template -->
     <template id="features-content">
         <div class="simple-message">
             <h2>Game Features</h2>
@@ -193,6 +211,7 @@
         </div>
     </template>
     
+    <!-- Live Discord channel template -->
     <template id="live-discord-content">
         <div class="simple-message" data-system="true">
             <h2>Live Discord Experience</h2>
@@ -204,6 +223,7 @@
         </div>
     </template>
 
+    <!-- Main JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
