@@ -31,6 +31,11 @@
        url('fonts/Noto\ Sans/NotoSans-Bold.ttf') format('truetype');
 }
 
+/* Set proper viewport handling for mobile */
+html {
+  height: -webkit-fill-available;
+}
+
 /* Discord-accurate color scheme */
 :root {
   /* Colors */
@@ -109,9 +114,13 @@ body {
   line-height: var(--line-height-base);
   color: var(--discord-text);
   background-color: var(--discord-bg);
-  height: 100vh;
+  height: 100vh; /* Fallback for browsers that do not support the fill-available value */
+  height: -webkit-fill-available;
+  min-height: -webkit-fill-available;
   overflow: hidden;
   font-size: var(--font-size-base);
+  position: fixed; /* Prevent mobile address bar from affecting height */
+  width: 100%;
 }
 
 /* Update all other font-family references */
@@ -148,6 +157,7 @@ a:hover {
 .discord-app {
   display: flex;
   height: 100vh;
+  height: -webkit-fill-available;
   overflow: hidden;
   position: relative; /* Add position relative for proper child positioning */
 }
@@ -316,6 +326,7 @@ a:hover {
   overflow-y: auto;
   padding: var(--spacing-xl);
   background-color: var(--discord-bg);
+  -webkit-overflow-scrolling: touch; /* Add momentum scrolling for iOS */
 }
 
 .messages-container {
@@ -633,6 +644,8 @@ code {
 @media (max-width: 768px) {
   .discord-app {
     flex-direction: column;
+    overflow: hidden;
+    height: 100%;
   }
   
   .sidebar {
@@ -642,6 +655,8 @@ code {
     z-index: 20;
     transform: translateX(-100%); /* Start off-screen */
     transition: transform 0.3s ease;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
   }
   
   .sidebar.visible {
@@ -651,10 +666,17 @@ code {
   .content-area {
     margin-left: 0;
     width: 100%;
+    height: -webkit-fill-available;
+    overflow-y: hidden; /* Prevent content area from scrolling */
+    display: flex;
+    flex-direction: column;
   }
   
-  .join-options {
-    flex-direction: column;
+  .message-area {
+    flex: 1;
+    overflow-y: auto;
+    height: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   /* Mobile sidebar header with close button */
