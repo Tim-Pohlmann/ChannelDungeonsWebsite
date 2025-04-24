@@ -439,6 +439,9 @@ document.addEventListener('DOMContentLoaded', function() {
       // Get template content
       const content = document.importNode(contentTemplate.content, true);
       
+      // Create an array to store processed message HTML
+      const processedMessages = [];
+      
       // Process simple-message elements if any exist
       const simpleMessages = content.querySelectorAll('.simple-message');
       simpleMessages.forEach(simpleMsg => {
@@ -449,25 +452,23 @@ document.addEventListener('DOMContentLoaded', function() {
           isSystem: simpleMsg.hasAttribute('data-system')
         };
         
-        const messageHTML = createMessageHTML(messageOptions);
-        simpleMsg.outerHTML = messageHTML;
+        // Create HTML for the message and add to array instead of modifying DOM
+        processedMessages.push(createMessageHTML(messageOptions));
       });
       
       // For older message format, update timestamps to current time
-      const oldFormatMessages = content.querySelectorAll('.message .message-timestamp');
-      oldFormatMessages.forEach(timestampElement => {
-        timestampElement.textContent = getCurrentTime();
+      const oldFormatMessages = content.querySelectorAll('.message');
+      oldFormatMessages.forEach(message => {
+        const timestampElement = message.querySelector('.message-timestamp');
+        if (timestampElement) {
+          timestampElement.textContent = getCurrentTime();
+        }
+        processedMessages.push(message.outerHTML);
       });
       
       // Create a temporary container for the complete content
       const tempContainer = document.createElement('div');
-      const messages = Array.from(content.children);
-      
-      // Add all messages to the temp container immediately
-      messages.forEach(message => {
-        const messageClone = message.cloneNode(true);
-        tempContainer.appendChild(messageClone);
-      });
+      tempContainer.innerHTML = processedMessages.join('');
       
       // Cache the complete content immediately
       channelMessagesCache[channelId] = tempContainer.innerHTML;
@@ -481,6 +482,8 @@ document.addEventListener('DOMContentLoaded', function() {
       else {
         // Otherwise use the normal animation sequence
         // Now animate adding the messages one by one for the current view only
+        const messages = Array.from(tempContainer.children);
+        
         messages.forEach((message, index) => {
           // Create a clone of the message to avoid issues with content being moved
           const messageClone = message.cloneNode(true);
