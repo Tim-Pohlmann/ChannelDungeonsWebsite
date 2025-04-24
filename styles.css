@@ -729,85 +729,77 @@ code {
       min-height: -moz-available;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
     
-    .command-input-container {
-      padding-bottom: var(--spacing-lg);
-      margin-bottom: 8px; /* Small consistent margin to account for Firefox mobile UI */
-    }
-
     /* Fixes for channel header in Firefox mobile */
     .channel-header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 45px; /* Set explicit height to ensure consistent spacing */
-      overflow: hidden; /* Hide all scrollbars */
+      z-index: 30;
+      height: 45px;
+      overflow: hidden;
+      background-color: var(--discord-bg);
       display: flex;
       align-items: center;
     }
     
-    /* Create new structure for Firefox mobile to handle content properly */
+    /* Create proper content area structure */
     .content-area {
       display: flex;
       flex-direction: column;
-      padding-top: 45px; /* Exact header height */
-      height: 100vh; /* Use viewport height */
-      height: -moz-available; /* Firefox-specific height property */
+      height: 100%;
       width: 100%;
-      position: relative;
-      overflow-y: hidden; /* Prevent double scrolling */
+      margin-left: 0;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding-top: 45px; /* Space for header */
+      padding-bottom: 60px; /* Space for footer */
     }
     
-    /* Adjust message area to account for fixed header and footer */
+    /* Message area takes all available space */
     .message-area {
-      flex: 1;
       position: relative;
-      margin-top: 0; /* Remove any margin */
-      padding-top: var(--spacing-xl); /* Keep standard padding */
       overflow-y: auto;
-      -moz-overflow-scrolling: touch; /* Firefox-specific scrolling property */
-      height: auto; /* Let it take available space */
-      /* Reduce footer padding to minimize dead space */
-      padding-bottom: 60px;
+      -moz-overflow-scrolling: touch;
+      flex: 1;
+      padding-top: var(--spacing-xl);
+      padding-bottom: 0; /* No padding needed here */
+      height: auto;
     }
     
-    /* Footer positioning with better spacing */
+    /* Footer with command input fixed at bottom */
     footer {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      z-index: 25;
+      z-index: 30;
       background-color: var(--discord-bg);
-    }
-
-    /* Ensure first message is fully visible */
-    .messages-container > :first-child {
-      margin-top: 5px;
+      padding-top: 4px; /* Small padding to separate from content */
+      box-shadow: 0 -1px 5px rgba(0,0,0,0.2); /* Add shadow to highlight the division */
     }
     
-    /* Reduce margin on last message to minimize dead space */
-    .messages-container > :last-child {
-      margin-bottom: 10px;
+    /* Command input container spacing */
+    .command-input-container {
+      padding-bottom: 12px;
+      margin-bottom: 0; 
     }
     
-    /* Handle long channel names better */
-    .channel-name {
-      max-width: 40%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    /* Add extra padding at the end of messages container */
+    .messages-container {
+      padding-bottom: 20px; /* Add extra padding at the bottom of all messages */
     }
-
-    /* Fix channel description overflow */
-    .channel-description {
-      margin-left: var(--spacing-lg);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1;
+    
+    /* Add a spacer div at the end of messages container via JavaScript */
+    .firefox-scroll-spacer {
+      height: 60px; /* Match footer height */
+      width: 100%;
     }
   }
 }
