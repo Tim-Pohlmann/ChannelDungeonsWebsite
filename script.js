@@ -75,7 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show UI elements for direct channel access
     if (state.hasChannelInUrl) {
-      if (!state.isMobileView) toggleSidebar(true);
+      if (!state.isMobileView) {
+        toggleSidebar(true);
+      }
+      state.sidebarShown = true;
       showCommandInput();
     }
     
