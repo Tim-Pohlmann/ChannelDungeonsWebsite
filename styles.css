@@ -733,5 +733,22 @@ code {
       padding-bottom: var(--spacing-lg);
       margin-bottom: 8px; /* Small consistent margin to account for Firefox mobile UI */
     }
+
+    /* Fixes for channel header in Firefox mobile */
+    .channel-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+    }
+    
+    /* Adjust message area to account for fixed header */
+    .message-area {
+      padding-top: calc(var(--spacing-xxl) * 2 + 8px); /* Add extra padding to account for fixed header */
+      height: calc(100% - 60px); /* Subtract approximate header height */
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      -moz-overflow-scrolling: touch; /* Add Firefox-specific scrolling property */
+    }
   }
 }
