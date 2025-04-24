@@ -760,7 +760,7 @@ code {
       overflow-y: hidden; /* Prevent double scrolling */
     }
     
-    /* Adjust message area to account for fixed header */
+    /* Adjust message area to account for fixed header and footer */
     .message-area {
       flex: 1;
       position: relative;
@@ -769,11 +769,11 @@ code {
       overflow-y: auto;
       -moz-overflow-scrolling: touch; /* Firefox-specific scrolling property */
       height: auto; /* Let it take available space */
-      /* Subtract footer height to prevent overlap */
-      padding-bottom: calc(var(--spacing-xl) + 60px);
+      /* Reduce footer padding to minimize dead space */
+      padding-bottom: 60px;
     }
     
-    /* Footer positioning */
+    /* Footer positioning with better spacing */
     footer {
       position: fixed;
       bottom: 0;
@@ -786,6 +786,11 @@ code {
     /* Ensure first message is fully visible */
     .messages-container > :first-child {
       margin-top: 5px;
+    }
+    
+    /* Reduce margin on last message to minimize dead space */
+    .messages-container > :last-child {
+      margin-bottom: 10px;
     }
     
     /* Handle long channel names better */
