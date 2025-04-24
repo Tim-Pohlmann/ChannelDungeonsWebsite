@@ -84,6 +84,27 @@ document.addEventListener('DOMContentLoaded', function() {
     
     bindEvents();
     handleHeightCalculation();
+    
+    // Show swipe hint on mobile
+    if (state.isMobileView) {
+      showSwipeHint();
+    }
+  }
+
+  // Show swipe hint for mobile users
+  function showSwipeHint() {
+    const swipeHint = document.getElementById('swipe-hint');
+    if (swipeHint) {
+      // Show the swipe hint
+      setTimeout(() => {
+        swipeHint.classList.add('visible');
+      }, 1500);
+      
+      // Hide it after a few seconds
+      setTimeout(() => {
+        swipeHint.classList.remove('visible');
+      }, 5000);
+    }
   }
 
   /**
@@ -607,32 +628,85 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   function setupMobileTouchHandling() {
     let touchStartX = 0;
+    let touchStartY = 0;
     let touchEndX = 0;
-    const minSwipeDistance = 50;
+    let isScrolling = false;
+    let startTime = 0;
+    const maxSwipeTime = 300; // Maximum time in ms for a swipe to be registered
 
+    // Add touch handlers specifically to the message area for better targeting
+    if (elements.messageArea) {
+      elements.messageArea.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+        startTime = new Date().getTime();
+        isScrolling = false; // Reset scrolling state
+        console.log('Message area touch start:', touchStartX);
+      }, { passive: false });
+
+      elements.messageArea.addEventListener('touchmove', (e) => {
+        // Detect vertical scrolling by comparing with stored initial position
+        if (Math.abs(e.changedTouches[0].screenY - touchStartY) > 10) {
+          isScrolling = true;
+        }
+      }, { passive: true });
+
+      elements.messageArea.addEventListener('touchend', (e) => {
+        const endTime = new Date().getTime();
+        const timeTaken = endTime - startTime;
+        touchEndX = e.changedTouches[0].screenX;
+        console.log('Message area touch end:', touchEndX, 'Time taken:', timeTaken);
+        
+        // Only trigger swipe if it wasn't a scroll action and was fast enough
+        if (!isScrolling && timeTaken < maxSwipeTime) {
+          handleSwipe(touchStartX, touchEndX);
+        }
+      }, { passive: false });
+    }
+
+    // Fallback touch handlers on document for broader coverage
     document.addEventListener('touchstart', (e) => {
       touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+      startTime = new Date().getTime();
+      console.log('Document touch start:', touchStartX);
     }, { passive: true });
 
     document.addEventListener('touchend', (e) => {
+      const endTime = new Date().getTime();
+      const timeTaken = endTime - startTime;
       touchEndX = e.changedTouches[0].screenX;
-      handleSwipe(touchStartX, touchEndX);
+      console.log('Document touch end:', touchEndX, 'Time taken:', timeTaken);
+      
+      // Only process quick gestures as swipes
+      if (timeTaken < maxSwipeTime) {
+        handleSwipe(touchStartX, touchEndX);
+      }
     }, { passive: true });
   }
   
   // Handle swipe gesture
   function handleSwipe(startX, endX) {
     const swipeDistance = endX - startX;
+    const swipeThreshold = window.innerWidth * 0.15; // 15% of screen width
     
-    // Right swipe to show sidebar
-    if (swipeDistance > minSwipeDistance && !elements.sidebar.classList.contains('visible')) {
+    console.log('Swipe distance:', swipeDistance, 'Threshold:', swipeThreshold);
+    
+    // Right swipe to show sidebar (when hidden)
+    if (swipeDistance > swipeThreshold && !elements.sidebar.classList.contains('visible')) {
+      console.log('Right swipe detected, showing sidebar');
       toggleSidebar(true);
+      return true;
     }
     
-    // Left swipe to hide sidebar
-    if (swipeDistance < -minSwipeDistance && elements.sidebar.classList.contains('visible')) {
+    // Left swipe to hide sidebar (when visible)
+    if (swipeDistance < -swipeThreshold && elements.sidebar.classList.contains('visible')) {
+      console.log('Left swipe detected, hiding sidebar');
       toggleSidebar(false);
+      return true;
     }
+    
+    return false;
   }
 
   /**

@@ -798,3 +798,50 @@ code {
     }
   }
 }
+
+/* Swipe hint for mobile */
+.swipe-hint {
+  display: none;
+  position: absolute;
+  top: 60px;
+  left: 8px;
+  background-color: var(--discord-embed);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  z-index: var(--z-index-dropdown);
+  box-shadow: var(--shadow-embed);
+  align-items: center;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: none;
+}
+
+.swipe-hint.visible {
+  opacity: 0.9;
+  transform: translateX(0);
+}
+
+.swipe-hint-text {
+  font-size: var(--font-size-sm);
+  color: var(--discord-text);
+  margin-right: var(--spacing-md);
+}
+
+.swipe-hint-animation {
+  animation: pulseRight 1.5s infinite;
+  color: var(--primary-color);
+}
+
+@keyframes pulseRight {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+/* Show swipe hint only on mobile */
+@media (max-width: 768px) {
+  .swipe-hint {
+    display: flex;
+  }
+}
