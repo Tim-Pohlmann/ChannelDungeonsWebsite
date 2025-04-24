@@ -109,16 +109,19 @@ html {
   box-sizing: border-box;
 }
 
-/* Alternative font configuration using Google Fonts */
+/* Base layout structure - fixed with flexbox for reliability */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
 body {
   font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: var(--line-height-base);
   color: var(--discord-text);
   background-color: var(--discord-bg);
-  height: 100%;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
-  overflow: hidden;
   font-size: var(--font-size-base);
   position: relative;
   width: 100%;
@@ -154,16 +157,16 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Discord app layout */
+/* Core app layout - flexbox with proper height handling */
 .discord-app {
   display: flex;
-  height: 100vh;
-  height: -webkit-fill-available;
+  height: 100vh; /* Use viewport height */
+  max-height: 100vh;
   overflow: hidden;
-  position: relative; /* Add position relative for proper child positioning */
+  position: relative;
 }
 
-/* Sidebar styles */
+/* Sidebar styles - clean implementation */
 .sidebar {
   width: var(--sidebar-width);
   background-color: var(--discord-sidebar);
@@ -176,21 +179,23 @@ a:hover {
   top: 0;
   bottom: 0;
   z-index: 10;
-  transition: left 0.3s ease; /* Smooth animation when showing the sidebar */
+  transition: left 0.3s ease; /* Use left transition instead of transform */
 }
 
 .sidebar.visible {
-  left: 0; /* When visible class is added, move sidebar into view */
+  left: 0; /* Simply move to left: 0 when visible */
 }
 
-/* Content area styles */
+/* Content area - core layout element */
 .content-area {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  margin-left: var(--sidebar-width);
   width: calc(100% - var(--sidebar-width));
+  margin-left: var(--sidebar-width);
+  height: 100vh;
+  max-height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 .server-info {
@@ -273,15 +278,17 @@ a:hover {
   height: 100%;
 }
 
+/* Fixed header */
 .channel-header {
+  flex: 0 0 auto;
   padding: var(--spacing-lg) var(--spacing-xl);
   background-color: var(--discord-bg);
   box-shadow: var(--shadow-message);
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-  z-index: 1;
-  position: relative; /* Add position for proper alignment of the toggle button */
+  z-index: 5;
+  position: sticky;
+  top: 0;
 }
 
 /* Sidebar toggle button */
@@ -321,13 +328,15 @@ a:hover {
   font-weight: var(--font-weight-normal);
 }
 
-/* Message area styles */
+/* Scrollable message area */
 .message-area {
-  flex-grow: 1;
-  overflow-y: auto;
+  flex: 1 1 auto;
+  overflow-y: auto; /* Allow vertical scrolling */
   padding: var(--spacing-xl);
   background-color: var(--discord-bg);
-  -webkit-overflow-scrolling: touch; /* Add momentum scrolling for iOS */
+  -webkit-overflow-scrolling: touch; /* For iOS */
+  min-height: 0; /* Critical for Firefox to respect flex-grow/shrink */
+  position: relative; /* For proper stacking */
 }
 
 .messages-container {
@@ -450,7 +459,17 @@ a:hover {
   border-left: 4px solid var(--primary-color);
 }
 
-/* Command input styles */
+/* Fixed footer with command input */
+footer {
+  flex: 0 0 auto;
+  background-color: var(--discord-bg);
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  width: 100%;
+}
+
+/* Command input container styling */
 .command-input-container {
   padding: 0 var(--spacing-xl) var(--spacing-xxl);
   background-color: var(--discord-bg);
@@ -643,7 +662,7 @@ code {
   100% { opacity: 0.5; transform: translateY(0); }
 }
 
-/* Responsive design */
+/* Responsive design - single consistent approach */
 @media (max-width: 768px) {
   .discord-app {
     flex-direction: column;
@@ -656,14 +675,14 @@ code {
     width: 100%;
     height: 100%;
     z-index: 20;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    left: -100%; /* Use left positioning for consistency with desktop */
+    transition: left 0.3s ease;
     -webkit-overflow-scrolling: touch;
     overflow-y: auto;
   }
   
   .sidebar.visible {
-    transform: translateX(0); /* Move into view */
+    left: 0; /* Simply move to left: 0 when visible */
   }
   
   .content-area {
@@ -712,7 +731,7 @@ code {
   }
   
   .command-input-container {
-    padding: 0 var(--spacing-xl) calc(var(--spacing-xxl) + env(safe-area-inset-bottom, 8px));
+    padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom, 0px));
   }
   
   footer {
@@ -725,55 +744,34 @@ code {
 @supports (-moz-appearance:none) {
   /* Firefox-specific fixes */
   @media (max-width: 768px) {
+    /* Root container */
     .discord-app {
       min-height: -moz-available;
-      display: flex;
-      flex-direction: column;
-      position: relative;
     }
     
-    /* Fixes for channel header in Firefox mobile */
+    /* Header */
     .channel-header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       z-index: 30;
-      height: 45px;
-      overflow: hidden;
       background-color: var(--discord-bg);
-      display: flex;
-      align-items: center;
     }
     
-    /* Create proper content area structure */
+    /* Content area */
     .content-area {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      width: 100%;
-      margin-left: 0;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding-top: 45px; /* Space for header */
-      padding-bottom: 60px; /* Space for footer */
+      margin-top: 45px; /* Match header height */
+      padding-bottom: 50px; /* Space for input */
     }
     
-    /* Message area takes all available space */
+    /* Message area */
     .message-area {
-      position: relative;
-      overflow-y: auto;
-      -moz-overflow-scrolling: touch;
-      flex: 1;
-      padding-top: var(--spacing-xl);
-      padding-bottom: 0; /* No padding needed here */
       height: auto;
+      max-height: calc(100vh - 95px); /* Viewport height minus header and footer */
     }
     
-    /* Footer with command input fixed at bottom */
+    /* Footer */
     footer {
       position: fixed;
       bottom: 0;
@@ -781,25 +779,80 @@ code {
       right: 0;
       z-index: 30;
       background-color: var(--discord-bg);
-      padding-top: 4px; /* Small padding to separate from content */
-      box-shadow: 0 -1px 5px rgba(0,0,0,0.2); /* Add shadow to highlight the division */
+    }
+  }
+}
+
+/* Mobile layout adjustments */
+@media (max-width: 768px) {
+  .discord-app {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    left: -100%;
+  }
+  
+  .sidebar.visible {
+    left: 0;
+  }
+  
+  .content-area {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .channel-header {
+    padding-left: var(--spacing-md);
+  }
+  
+  .sidebar-toggle {
+    display: block;
+  }
+  
+  /* Always show toggle button on mobile */
+  .sidebar-toggle {
+    display: block;
+  }
+  
+  .command-input-container {
+    padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Firefox-specific mobile fixes */
+@supports (-moz-appearance:none) {
+  @media (max-width: 768px) {
+    .discord-app {
+      height: -moz-available;
+      min-height: -moz-available;
     }
     
-    /* Command input container spacing */
-    .command-input-container {
-      padding-bottom: 12px;
-      margin-bottom: 0; 
+    /* We need to duplicate some styles for Firefox mobile */
+    .channel-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
     }
     
-    /* Add extra padding at the end of messages container */
-    .messages-container {
-      padding-bottom: 20px; /* Add extra padding at the bottom of all messages */
+    .message-area {
+      margin-top: 55px; /* Adjust based on header height */
+      margin-bottom: 60px; /* Adjust based on footer height */
+      max-height: calc(100vh - 115px); /* Viewport minus header and footer */
+      overflow-y: auto;
     }
     
-    /* Add a spacer div at the end of messages container via JavaScript */
-    .firefox-scroll-spacer {
-      height: 60px; /* Match footer height */
-      width: 100%;
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
     }
   }
 }

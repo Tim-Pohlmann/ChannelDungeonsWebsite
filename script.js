@@ -11,51 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
   const sidebarToggle = document.querySelector('.sidebar-toggle');
   
-  // Firefox-specific handling
-  const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-  const isMobile = window.innerWidth <= 768;
-  
-  // Add scroll spacer for Firefox mobile
-  if (isFirefox && isMobile) {
-    // Create a spacer element that ensures content can be scrolled past the fixed footer
-    function addScrollSpacer() {
-      // Remove any existing spacers first
-      const existingSpacers = document.querySelectorAll('.firefox-scroll-spacer');
-      existingSpacers.forEach(spacer => spacer.remove());
-      
-      // Create and append the new spacer
-      const scrollSpacer = document.createElement('div');
-      scrollSpacer.className = 'firefox-scroll-spacer';
-      messagesContainer.appendChild(scrollSpacer);
-    }
-    
-    // Add the spacer initially and whenever channel content changes
-    addScrollSpacer();
-    
-    // Override the loadChannelContent function to always add the spacer
-    const originalLoadChannelContent = window.loadChannelContent || loadChannelContent;
-    window.loadChannelContent = function(channelId) {
-      originalLoadChannelContent(channelId);
-      // Add small delay to ensure content is loaded
-      setTimeout(addScrollSpacer, 100);
-    };
-    
-    // Override the switchChannel function to ensure spacer is added
-    const originalSwitchChannel = window.switchChannel || switchChannel;
-    window.switchChannel = function(channelId, updateUrl = true) {
-      originalSwitchChannel(channelId, updateUrl);
-      // Add small delay to ensure content is loaded
-      setTimeout(addScrollSpacer, 100);
-    };
-    
-    // Ensure proper scrolling when new messages are added
-    const originalAddBotResponse = window.addBotResponse || addBotResponse;
-    window.addBotResponse = function(text) {
-      originalAddBotResponse(text);
-      addScrollSpacer();
-    };
-  }
-  
   // Available commands with descriptions
   const availableCommands = [
     { name: 'about', description: 'Learn about Channel Dungeons' },
@@ -616,10 +571,15 @@ document.addEventListener('DOMContentLoaded', function() {
     return timeStr.replace(/am|pm/i, match => match.toUpperCase());
   }
   
-  // Scroll to the bottom of the messages
+  // Ensure scrolling works correctly
   function scrollToBottom() {
     const messageArea = document.querySelector('.message-area');
-    messageArea.scrollTop = messageArea.scrollHeight;
+    if (messageArea) {
+      // Use a small timeout to ensure DOM has updated
+      setTimeout(() => {
+        messageArea.scrollTop = messageArea.scrollHeight;
+      }, 10);
+    }
   }
   
   // Function to update the active channel in the sidebar
@@ -682,7 +642,28 @@ document.addEventListener('DOMContentLoaded', function() {
       // In mobile view, sidebar should be hidden initially
       toggleSidebar(false);
     }
+    // Recalculate content area heights
+    handleHeightCalculation();
   });
+
+  // Function to handle height calculation to ensure all content is visible
+  function handleHeightCalculation() {
+    const header = document.querySelector('.channel-header');
+    const messageArea = document.querySelector('.message-area');
+    const footerArea = document.querySelector('footer');
+    
+    if (header && messageArea && footerArea && window.innerWidth <= 768) {
+      // Only apply additional fixes for mobile viewports
+      const headerHeight = header.offsetHeight;
+      const footerHeight = footerArea.offsetHeight;
+      
+      // Ensure message area doesn't overlap with header or footer
+      messageArea.style.height = `calc(100% - ${headerHeight + footerHeight}px)`;
+    }
+  }
+  
+  // Call this function on initial load
+  handleHeightCalculation();
 
   // Add event listener for sidebar toggle button
   if (sidebarToggle) {
