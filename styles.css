@@ -740,15 +740,20 @@ code {
       top: 0;
       left: 0;
       right: 0;
+      height: 45px; /* Set explicit height to ensure consistent spacing */
+      overflow-x: hidden; /* Hide horizontal scrollbar */
+      overflow-y: hidden; /* Hide vertical scrollbar */
     }
     
     /* Adjust message area to account for fixed header */
     .message-area {
-      padding-top: calc(var(--spacing-xxl) * 2 + 8px); /* Add extra padding to account for fixed header */
-      height: calc(100% - 60px); /* Subtract approximate header height */
+      margin-top: 45px; /* Add exact header height as margin */
+      padding-top: 0; /* Remove extra padding */
+      height: calc(100% - 95px); /* Adjust height to account for header and footer */
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       -moz-overflow-scrolling: touch; /* Add Firefox-specific scrolling property */
+      position: relative;
     }
   }
 }
