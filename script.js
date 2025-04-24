@@ -48,6 +48,32 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Flag to track current view mode (mobile or desktop)
   let isMobileView = window.innerWidth <= 768;
+
+  // Function to show the sidebar with animation
+  function showSidebar() {
+    if (sidebarShown) return; // Prevent showing sidebar multiple times
+    
+    if (window.innerWidth <= 768) {
+      // Don't automatically show sidebar on mobile, wait for swipe or toggle button click
+    } else {
+      sidebarShown = true;
+      // Add visible class for desktop view
+      sidebar.classList.add('visible');
+    }
+  }
+
+  // Show the command input with animation
+  function showCommandInput() {
+    if (inputShown) return; // Prevent showing input multiple times
+    
+    inputShown = true;
+    commandInputContainer.classList.add('visible');
+    
+    // Set initial focus to command input
+    setTimeout(() => {
+      commandInputElement.focus();
+    }, 300); // Small delay to ensure animation completes
+  }
   
   // Check if URL has a hash to determine initial channel
   function getChannelFromHash() {
@@ -348,32 +374,6 @@ document.addEventListener('DOMContentLoaded', function() {
     hideTypingIndicator();
   }
   
-  // Function to show the sidebar with animation
-  const showSidebar = () => {
-    if (sidebarShown) return; // Prevent showing sidebar multiple times
-    
-    if (window.innerWidth <= 768) {
-      // Don't automatically show sidebar on mobile, wait for swipe or toggle button click
-    } else {
-      sidebarShown = true;
-      // Add visible class for desktop view
-      sidebar.classList.add('visible');
-    }
-  };
-
-  // Show the command input with animation
-  const showCommandInput = () => {
-    if (inputShown) return; // Prevent showing input multiple times
-    
-    inputShown = true;
-    commandInputContainer.classList.add('visible');
-    
-    // Set initial focus to command input
-    setTimeout(() => {
-      commandInputElement.focus();
-    }, 300); // Small delay to ensure animation completes
-  };
-
   // Switch to a different channel
   function switchChannel(channelId, updateUrl = true) {
     try {
