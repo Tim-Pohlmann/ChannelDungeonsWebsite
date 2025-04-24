@@ -273,6 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
           if (channelId === 'welcome' && !state.hasChannelInUrl && index === messages.length - 1) {
             setTimeout(() => {
               if (!state.isMobileView) toggleSidebar(true);
+              state.sidebarShown = true;
               showCommandInput();
             }, config.transitionDurations.uiShowDelay);
           }
