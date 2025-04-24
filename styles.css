@@ -747,7 +747,6 @@ code {
   /* Message area adjusted for fixed header and footer */
   .message-area {
     flex: 1;
-    padding-top: var(--header-height-mobile);
     padding-bottom: var(--footer-height-mobile);
     overflow-y: auto;
     height: calc(100vh - var(--header-height-mobile) - var(--footer-height-mobile));
