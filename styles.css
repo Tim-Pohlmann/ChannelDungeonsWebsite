@@ -4,7 +4,7 @@
   font-style: normal;
   font-weight: 400;
   src: local('Noto Sans Regular'), local('NotoSans-Regular'), 
-       url('fonts/Noto\ Sans/notosans-regular.ttf') format('truetype');
+       url('fonts/Noto\ Sans/NotoSans-Regular.ttf') format('truetype');
 }
 
 @font-face {
@@ -12,7 +12,7 @@
   font-style: normal;
   font-weight: 500;
   src: local('Noto Sans Medium'), local('NotoSans-Medium'), 
-       url('fonts/Noto\ Sans/notosans-medium.ttf') format('truetype');
+       url('fonts/Noto\ Sans/NotoSans-Medium.ttf') format('truetype');
 }
 
 @font-face {
@@ -20,7 +20,7 @@
   font-style: normal;
   font-weight: 600;
   src: local('Noto Sans SemiBold'), local('NotoSans-SemiBold'), 
-       url('fonts/Noto\ Sans/notosans-semibold.ttf') format('truetype');
+       url('fonts/Noto\ Sans/NotoSans-SemiBold.ttf') format('truetype');
 }
 
 @font-face {
@@ -28,7 +28,7 @@
   font-style: normal;
   font-weight: 700;
   src: local('Noto Sans Bold'), local('NotoSans-Bold'), 
-       url('fonts/Noto\ Sans/notosans-bold.ttf') format('truetype');
+       url('fonts/Noto\ Sans/NotoSans-Bold.ttf') format('truetype');
 }
 
 /* Discord-accurate color scheme */
