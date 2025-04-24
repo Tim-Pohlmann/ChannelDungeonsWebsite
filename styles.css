@@ -1,3 +1,36 @@
+/* Define font faces for local fonts */
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Sans Regular'), local('NotoSans-Regular'), 
+       url('fonts/Noto\ Sans/notosans-regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Noto Sans Medium'), local('NotoSans-Medium'), 
+       url('fonts/Noto\ Sans/notosans-medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Noto Sans SemiBold'), local('NotoSans-SemiBold'), 
+       url('fonts/Noto\ Sans/notosans-semibold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Noto Sans Bold'), local('NotoSans-Bold'), 
+       url('fonts/Noto\ Sans/notosans-bold.ttf') format('truetype');
+}
+
 /* Discord-accurate color scheme */
 :root {
   /* Colors */
