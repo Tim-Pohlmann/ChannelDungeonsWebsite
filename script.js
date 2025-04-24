@@ -11,6 +11,51 @@ document.addEventListener('DOMContentLoaded', function() {
   const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
   const sidebarToggle = document.querySelector('.sidebar-toggle');
   
+  // Firefox-specific handling
+  const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+  const isMobile = window.innerWidth <= 768;
+  
+  // Add scroll spacer for Firefox mobile
+  if (isFirefox && isMobile) {
+    // Create a spacer element that ensures content can be scrolled past the fixed footer
+    function addScrollSpacer() {
+      // Remove any existing spacers first
+      const existingSpacers = document.querySelectorAll('.firefox-scroll-spacer');
+      existingSpacers.forEach(spacer => spacer.remove());
+      
+      // Create and append the new spacer
+      const scrollSpacer = document.createElement('div');
+      scrollSpacer.className = 'firefox-scroll-spacer';
+      messagesContainer.appendChild(scrollSpacer);
+    }
+    
+    // Add the spacer initially and whenever channel content changes
+    addScrollSpacer();
+    
+    // Override the loadChannelContent function to always add the spacer
+    const originalLoadChannelContent = window.loadChannelContent || loadChannelContent;
+    window.loadChannelContent = function(channelId) {
+      originalLoadChannelContent(channelId);
+      // Add small delay to ensure content is loaded
+      setTimeout(addScrollSpacer, 100);
+    };
+    
+    // Override the switchChannel function to ensure spacer is added
+    const originalSwitchChannel = window.switchChannel || switchChannel;
+    window.switchChannel = function(channelId, updateUrl = true) {
+      originalSwitchChannel(channelId, updateUrl);
+      // Add small delay to ensure content is loaded
+      setTimeout(addScrollSpacer, 100);
+    };
+    
+    // Ensure proper scrolling when new messages are added
+    const originalAddBotResponse = window.addBotResponse || addBotResponse;
+    window.addBotResponse = function(text) {
+      originalAddBotResponse(text);
+      addScrollSpacer();
+    };
+  }
+  
   // Available commands with descriptions
   const availableCommands = [
     { name: 'about', description: 'Learn about Channel Dungeons' },
