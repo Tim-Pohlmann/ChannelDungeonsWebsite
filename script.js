@@ -581,30 +581,8 @@ document.addEventListener('DOMContentLoaded', function() {
   let touchEndX = 0;
   const minSwipeDistance = 50; // Minimum distance to detect a swipe
 
-  // Create close button for mobile sidebar
-  const createMobileSidebarHeader = () => {
-    // Check if header already exists
-    if (sidebar.querySelector('.mobile-sidebar-header')) return;
-    
-    const header = document.createElement('div');
-    header.className = 'mobile-sidebar-header';
-    
-    const closeButton = document.createElement('button');
-    closeButton.className = 'close-sidebar';
-    closeButton.innerHTML = '×';
-    closeButton.setAttribute('aria-label', 'Close sidebar');
-    
-    closeButton.addEventListener('click', () => {
-      hideSidebar();
-    });
-    
-    header.appendChild(closeButton);
-    sidebar.insertBefore(header, sidebar.firstChild);
-  };
-
   // Show sidebar (mobile)
   const showMobileSidebar = () => {
-    createMobileSidebarHeader();
     sidebar.classList.add('visible');
     // Set sidebarShown to true to track state correctly
     sidebarShown = true;
@@ -670,12 +648,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (wasInMobileView && !isMobileView) {
       // Restore desktop sidebar behavior
       if (sidebarShown) {
-        // Remove mobile-specific header if it exists
-        const mobileHeader = sidebar.querySelector('.mobile-sidebar-header');
-        if (mobileHeader) {
-          mobileHeader.remove();
-        }
-        
         // Show sidebar properly for desktop view
         sidebar.classList.add('visible');
         contentArea.classList.add('sidebar-visible');
@@ -686,11 +658,6 @@ document.addEventListener('DOMContentLoaded', function() {
       // In mobile view, sidebar should be hidden initially
       sidebar.classList.remove('visible');
       contentArea.classList.remove('sidebar-visible');
-      
-      // If sidebar should be shown, ensure mobile header exists
-      if (sidebarShown) {
-        createMobileSidebarHeader();
-      }
     }
   });
 
@@ -704,12 +671,10 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
       e.stopPropagation();
       
-      if (window.innerWidth <= 768) {
-        // For mobile, always show the mobile sidebar
-        showMobileSidebar();
+      if (sidebar.classList.contains('visible')) {
+        hideSidebar();
       } else {
-        // For desktop, use the standard sidebar toggle
-        sidebar.classList.toggle('visible');
+        showMobileSidebar();
       }
     });
   }
