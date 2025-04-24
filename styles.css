@@ -727,6 +727,8 @@ code {
   @media (max-width: 768px) {
     .discord-app {
       min-height: -moz-available;
+      display: flex;
+      flex-direction: column;
     }
     
     .command-input-container {
@@ -741,19 +743,66 @@ code {
       left: 0;
       right: 0;
       height: 45px; /* Set explicit height to ensure consistent spacing */
-      overflow-x: hidden; /* Hide horizontal scrollbar */
-      overflow-y: hidden; /* Hide vertical scrollbar */
+      overflow: hidden; /* Hide all scrollbars */
+      display: flex;
+      align-items: center;
+    }
+    
+    /* Create new structure for Firefox mobile to handle content properly */
+    .content-area {
+      display: flex;
+      flex-direction: column;
+      padding-top: 45px; /* Exact header height */
+      height: 100vh; /* Use viewport height */
+      height: -moz-available; /* Firefox-specific height property */
+      width: 100%;
+      position: relative;
+      overflow-y: hidden; /* Prevent double scrolling */
     }
     
     /* Adjust message area to account for fixed header */
     .message-area {
-      margin-top: 45px; /* Add exact header height as margin */
-      padding-top: 0; /* Remove extra padding */
-      height: calc(100% - 95px); /* Adjust height to account for header and footer */
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      -moz-overflow-scrolling: touch; /* Add Firefox-specific scrolling property */
+      flex: 1;
       position: relative;
+      margin-top: 0; /* Remove any margin */
+      padding-top: var(--spacing-xl); /* Keep standard padding */
+      overflow-y: auto;
+      -moz-overflow-scrolling: touch; /* Firefox-specific scrolling property */
+      height: auto; /* Let it take available space */
+      /* Subtract footer height to prevent overlap */
+      padding-bottom: calc(var(--spacing-xl) + 60px);
+    }
+    
+    /* Footer positioning */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 25;
+      background-color: var(--discord-bg);
+    }
+
+    /* Ensure first message is fully visible */
+    .messages-container > :first-child {
+      margin-top: 5px;
+    }
+    
+    /* Handle long channel names better */
+    .channel-name {
+      max-width: 40%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Fix channel description overflow */
+    .channel-description {
+      margin-left: var(--spacing-lg);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
     }
   }
 }
