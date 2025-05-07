@@ -78,6 +78,9 @@ document.addEventListener('DOMContentLoaded', function() {
    * Initialize the application
    */
   function init() {
+    // Populate channels list dynamically from templates
+    populateChannelsList();
+    
     // Initialize channel from URL hash
     state.currentChannel = getChannelFromHash();
     elements.currentChannelDisplay.textContent = state.currentChannel;
@@ -98,6 +101,47 @@ document.addEventListener('DOMContentLoaded', function() {
     
     bindEvents();
     handleHeightCalculation();
+  }
+
+  /**
+   * Populates the channels list in sidebar from the channel templates
+   */
+  function populateChannelsList() {
+    const channelsList = document.getElementById('dynamic-channels-list');
+    if (!channelsList) return;
+    
+    // Clear any existing channels
+    channelsList.innerHTML = '';
+    
+    // Sort channels alphabetically, but put "welcome" first
+    const sortedChannels = [...channelTemplates].sort((a, b) => {
+      const nameA = a.getAttribute('data-name');
+      const nameB = b.getAttribute('data-name');
+      
+      if (nameA === 'welcome') return -1;
+      if (nameB === 'welcome') return 1;
+      return nameA.localeCompare(nameB);
+    });
+    
+    // Create channel list items
+    sortedChannels.forEach(template => {
+      const channelId = template.getAttribute('data-name');
+      const isActive = channelId === state.currentChannel || 
+                      (state.currentChannel === 'welcome' && channelId === 'welcome');
+      
+      const channelItem = document.createElement('li');
+      channelItem.className = `channel${isActive ? ' active' : ''}`;
+      channelItem.setAttribute('data-channel', channelId);
+      
+      channelItem.innerHTML = `
+        <span class="channel-hash" aria-hidden="true">#</span> ${channelId}
+      `;
+      
+      channelsList.appendChild(channelItem);
+    });
+    
+    // Update elements reference to include the new channels
+    elements.channels = document.querySelectorAll('.channel');
   }
 
   /**

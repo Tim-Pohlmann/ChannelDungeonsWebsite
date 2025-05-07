@@ -19,25 +19,8 @@
             </header>
             
             <div class="channels-container">
-                <ul class="channels-list" aria-labelledby="info-category">
-                    <li class="channel active" data-channel="welcome">
-                        <span class="channel-hash" aria-hidden="true">#</span> welcome
-                    </li>
-                    <li class="channel" data-channel="about">
-                        <span class="channel-hash" aria-hidden="true">#</span> about
-                    </li>
-                    <li class="channel" data-channel="how-to-play">
-                        <span class="channel-hash" aria-hidden="true">#</span> how-to-play
-                    </li>
-                    <li class="channel" data-channel="features">
-                        <span class="channel-hash" aria-hidden="true">#</span> features
-                    </li>
-                    <li class="channel" data-channel="gameplay-demo">
-                        <span class="channel-hash" aria-hidden="true">#</span> gameplay demo
-                    </li>
-                    <li class="channel" data-channel="live-discord">
-                        <span class="channel-hash" aria-hidden="true">#</span> live-discord
-                    </li>
+                <ul class="channels-list" aria-labelledby="info-category" id="dynamic-channels-list">
+                    <!-- Channels will be populated dynamically from templates -->
                 </ul>
             </div>
         </nav>
@@ -230,20 +213,6 @@
             <h2>Gameplay Demo</h2>
             <p>This channel will show you what gameplay looks like in Channel Dungeons.</p>
             <p>Coming soon!</p>
-        </div>
-    </template>
-    
-    <!-- Live Discord channel -->
-    <template id="channel-live-discord" 
-            data-name="live-discord" 
-            data-description="Experience Channel Dungeons in Discord">
-        <div class="simple-message" data-system="true" data-typing-duration="1500">
-            <h2>Live Discord Experience</h2>
-            <p>This is a demonstration of the Channel Dungeons experience directly in Discord.</p>
-            <p>To experience the full game:</p>
-            <div class="cta-buttons">
-                <a href="https://discord.gg/channeldungeons" class="discord-button">Join Our Server</a>
-            </div>
         </div>
     </template>
 
