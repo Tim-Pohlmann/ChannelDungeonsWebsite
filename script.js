@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
    */
   const config = {
     transitionDurations: {
-      typing: 1000,
-      messageBetweenDelay: 200,
+      typing: 1000,           // Default typing duration if not specified on message
+      messageBetweenDelay: 200, // Default delay between messages if not specified
       uiShowDelay: 500
     },
     breakpoints: {
@@ -34,15 +34,27 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   /**
-   * Available Commands
+   * Channel Information
+   * Read all channel data from HTML templates - names, descriptions, and content
    */
-  const availableCommands = [
-    { name: 'about', description: 'Learn about Channel Dungeons' },
-    { name: 'how-to-play', description: 'Get started with the game' },
-    { name: 'features', description: 'Discover game features' },
-    { name: 'welcome', description: 'Return to welcome channel' },
-    { name: 'live-discord', description: 'See the live Discord experience' }
-  ];
+  const channelTemplates = document.querySelectorAll('template[id^="channel-"]');
+  const availableCommands = [];
+  const channelDescriptions = {};
+
+  // Initialize channel data from templates
+  channelTemplates.forEach(template => {
+    const channelId = template.getAttribute('data-name');
+    const description = template.getAttribute('data-description');
+    
+    // Add to available commands
+    availableCommands.push({
+      name: channelId,
+      description: description
+    });
+    
+    // Add to channel descriptions
+    channelDescriptions[channelId] = description;
+  });
 
   /**
    * DOM Elements
@@ -51,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     messagesContainer: document.getElementById('messages'),
     channels: document.querySelectorAll('.channel'),
     currentChannelDisplay: document.getElementById('current-channel'),
+    channelDescription: document.querySelector('.channel-description'),
     commandInputElement: document.getElementById('command-input'),
     commandInputContainer: document.querySelector('.command-input-container'),
     sidebar: document.querySelector('.sidebar'),
@@ -68,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize channel from URL hash
     state.currentChannel = getChannelFromHash();
     elements.currentChannelDisplay.textContent = state.currentChannel;
+    elements.channelDescription.textContent = channelDescriptions[state.currentChannel] || `Information about #${state.currentChannel}`;
     
     // Load initial content and update UI
     loadChannelContent(state.currentChannel);
@@ -170,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       elements.currentChannelDisplay.textContent = channelId;
+      elements.channelDescription.textContent = channelDescriptions[channelId] || `Information about #${channelId}`;
       state.currentChannel = channelId;
       elements.messagesContainer.innerHTML = '';
       
@@ -186,7 +201,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Load channel content
   function loadChannelContent(channelId) {
-    const contentTemplateId = `${channelId}-content`;
+    // Find the channel template with the right data-name attribute
+    const contentTemplateId = `channel-${channelId}`;
     const contentTemplate = document.getElementById(contentTemplateId);
     
     if (contentTemplate) {
@@ -205,10 +221,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Process simple messages
     const simpleMessages = content.querySelectorAll('.simple-message');
     simpleMessages.forEach(simpleMsg => {
+      // Get custom timing attributes if available
+      const typingDuration = simpleMsg.getAttribute('data-typing-duration');
+      const messageDelay = simpleMsg.getAttribute('data-delay');
+      
       const messageOptions = {
         username: simpleMsg.getAttribute('data-username') || 'Channel Dungeons',
         timestamp: getCurrentTime(),
-        content: simpleMsg.innerHTML
+        content: simpleMsg.innerHTML,
+        typingDuration: typingDuration ? parseInt(typingDuration) : null,
+        delay: messageDelay ? parseInt(messageDelay) : null
       };
       
       processedMessages.push(createMessageHTML(messageOptions));
@@ -221,6 +243,17 @@ document.addEventListener('DOMContentLoaded', function() {
       if (timestampElement) {
         timestampElement.textContent = getCurrentTime();
       }
+      
+      // Get custom timing attributes if available
+      const typingDuration = message.getAttribute('data-typing-duration');
+      const messageDelay = message.getAttribute('data-delay');
+      if (typingDuration) {
+        message.dataset.typingDuration = typingDuration;
+      }
+      if (messageDelay) {
+        message.dataset.delay = messageDelay;
+      }
+      
       processedMessages.push(message.outerHTML);
     });
     
@@ -248,18 +281,27 @@ document.addEventListener('DOMContentLoaded', function() {
   // Animate messages appearance
   function animateMessages(container, channelId) {
     const messages = Array.from(container.children);
-    const showTypingDuration = config.transitionDurations.typing;
+    let cumulativeDelay = 0;
     
     messages.forEach((message, index) => {
       const messageClone = message.cloneNode(true);
-      const delayBetweenMessages = index * (showTypingDuration + config.transitionDurations.messageBetweenDelay);
+      
+      // Get custom timing values or use defaults
+      const typingDuration = parseInt(message.dataset.typingDuration || config.transitionDurations.typing);
+      const additionalDelay = parseInt(message.dataset.delay || 0); 
+      
+      // Calculate delay for this message - include custom delay between messages
+      const messageDelay = cumulativeDelay + additionalDelay;
+      
+      // Update cumulative delay for the next message
+      cumulativeDelay = messageDelay + typingDuration + config.transitionDurations.messageBetweenDelay;
       
       // Set typing indicator timeout
       const typingTimeoutId = setTimeout(() => {
         if (state.currentChannel === channelId) {
-          showTypingIndicator(showTypingDuration);
+          showTypingIndicator(typingDuration);
         }
-      }, delayBetweenMessages);
+      }, messageDelay);
       state.activeTimeouts.push(typingTimeoutId);
       
       // Set message display timeout
@@ -278,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, config.transitionDurations.uiShowDelay);
           }
         }
-      }, delayBetweenMessages + showTypingDuration);
+      }, messageDelay + typingDuration);
       
       state.activeTimeouts.push(messageTimeoutId);
     });
@@ -417,10 +459,20 @@ document.addEventListener('DOMContentLoaded', function() {
       username = 'Channel Dungeons',
       timestamp = getCurrentTime(),
       content = '',
+      typingDuration = null,
+      delay = null
     } = options;
     
+    let dataAttributes = '';
+    if (typingDuration !== null) {
+      dataAttributes += ` data-typing-duration="${typingDuration}"`;
+    }
+    if (delay !== null) {
+      dataAttributes += ` data-delay="${delay}"`;
+    }
+    
     return `
-      <div class="message">
+      <div class="message"${dataAttributes}>
         <div class="message-avatar" aria-hidden="true"></div>
         <div class="message-content">
           <div class="message-header">

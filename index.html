@@ -19,9 +19,6 @@
             </header>
             
             <div class="channels-container">
-                <div class="channels-category">
-                    <span class="category-name" id="info-category">INFO CHANNELS</span>
-                </div>
                 <ul class="channels-list" aria-labelledby="info-category">
                     <li class="channel active" data-channel="welcome">
                         <span class="channel-hash" aria-hidden="true">#</span> welcome
@@ -34,6 +31,9 @@
                     </li>
                     <li class="channel" data-channel="features">
                         <span class="channel-hash" aria-hidden="true">#</span> features
+                    </li>
+                    <li class="channel" data-channel="gameplay-demo">
+                        <span class="channel-hash" aria-hidden="true">#</span> gameplay demo
                     </li>
                     <li class="channel" data-channel="live-discord">
                         <span class="channel-hash" aria-hidden="true">#</span> live-discord
@@ -97,22 +97,27 @@
         </main>
     </div>
 
-    <!-- Channel content templates -->
-    <!-- Welcome channel template -->
-    <template id="welcome-content">
-        <div class="simple-message">
+    <!-- Channel data: All channel information defined in one place -->
+    <!-- Each channel template contains: name, description, and content -->
+    <!-- Messages can use data-typing-duration and data-delay attributes to control timing -->
+    
+    <!-- Welcome channel -->
+    <template id="channel-welcome" 
+            data-name="welcome" 
+            data-description="Welcome to Channel Dungeons!">
+        <div class="simple-message" data-typing-duration="1000">
             <h1>Welcome to Channel Dungeons!</h1>
         </div>
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="1500" data-delay="500">
             <p>Dive into a fantastic MMORPG adventure with deep dungeons, dangerous monsters and epic loot...</p>
         </div>
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="800" data-delay="1000">
             <p>...and all of it inside Discord!</p>
         </div>
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="1500" data-delay="300">
             <p>Each server is a town and all towns are connected via a sprawling network of dungeons.</p>
         </div>
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="2000" data-delay="400">
             <p>Explore, fight, level up and meet other players!</p>
             <p>No download required. Simply start playing in Discord now:</p>
             <div class="cta-buttons">
@@ -122,9 +127,11 @@
         </div>
     </template>
 
-    <!-- About channel template -->
-    <template id="about-content">
-        <div class="simple-message">
+    <!-- About channel -->
+    <template id="channel-about" 
+            data-name="about" 
+            data-description="Learn about Channel Dungeons">
+        <div class="simple-message" data-typing-duration="1200">
             <h2>About Channel Dungeons</h2>
             <p>Channel Dungeons is an MMORPG played entirely in Discord, emphasizing exploration and collaboration.</p>
             <p>Delve into dungeons, battle fearsome monsters, discover valuable loot, and level up your hero!</p>
@@ -132,14 +139,16 @@
         </div>
     </template>
 
-    <!-- How to play channel template -->
-    <template id="how-to-play-content">
-        <div class="simple-message">
+    <!-- How to play channel -->
+    <template id="channel-how-to-play" 
+            data-name="how-to-play" 
+            data-description="Getting started with Channel Dungeons">
+        <div class="simple-message" data-typing-duration="800">
             <h2>How to Play</h2>
             <p>Get started with Channel Dungeons in a few simple steps!</p>
         </div>
         
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="1500" data-delay="700">
             <h3>Step 1: Join the Game</h3>
             <p>Choose one of these two options to start playing:</p>
             <div class="join-options">
@@ -156,29 +165,31 @@
             </div>
         </div>
         
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="900" data-delay="500">
             <h3>Step 2: Create a Hero</h3>
             <p>Begin your adventure by creating a hero in your home town! Simply click the <span class="discord-button">Create a Hero</span> button or type <span class="discord-command">create_hero</span> in Discord.</p>
         </div>
         
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="900" data-delay="400">
             <h3>Step 3: Explore Dungeons</h3>
             <p>Start exploring dungeons by using <span class="discord-command">move</span> or pressing one of the <span class="discord-button">Go [direction]</span> buttons.</p>
         </div>
         
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="1200" data-delay="400">
             <h3>Step 4: Find Loot & Level Up</h3>
             <p>Defeat monsters to discover valuable loot, gain experience, and level up your hero! If you ever get lost, use <span class="discord-command">hero</span> to locate yourself.</p>
         </div>
     </template>
 
-    <!-- Features channel template -->
-    <template id="features-content">
-        <div class="simple-message">
+    <!-- Features channel -->
+    <template id="channel-features" 
+            data-name="features" 
+            data-description="Discover game features">
+        <div class="simple-message" data-typing-duration="600">
             <h2>Game Features</h2>
         </div>
         
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="1200" data-delay="300">
             <div class="feature">
                 <div class="feature-icon"><span class="icon">Map</span></div>
                 <h3>Shared World</h3>
@@ -186,7 +197,7 @@
             </div>
         </div>
         
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="900" data-delay="400">
             <div class="feature">
                 <div class="feature-icon"><span class="icon">Sword</span></div>
                 <h3>Combat</h3>
@@ -194,7 +205,7 @@
             </div>
         </div>
         
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="800" data-delay="300">
             <div class="feature">
                 <div class="feature-icon"><span class="icon">Group</span></div>
                 <h3>Multiplayer</h3>
@@ -202,7 +213,7 @@
             </div>
         </div>
         
-        <div class="simple-message">
+        <div class="simple-message" data-typing-duration="1100" data-delay="300">
             <div class="feature">
                 <div class="feature-icon"><span class="icon">Treasure</span></div>
                 <h3>Loot</h3>
@@ -211,9 +222,22 @@
         </div>
     </template>
     
-    <!-- Live Discord channel template -->
-    <template id="live-discord-content">
-        <div class="simple-message" data-system="true">
+    <!-- Gameplay Demo channel -->
+    <template id="channel-gameplay-demo" 
+            data-name="gameplay demo" 
+            data-description="See the game in action">
+        <div class="simple-message" data-typing-duration="1200">
+            <h2>Gameplay Demo</h2>
+            <p>This channel will show you what gameplay looks like in Channel Dungeons.</p>
+            <p>Coming soon!</p>
+        </div>
+    </template>
+    
+    <!-- Live Discord channel -->
+    <template id="channel-live-discord" 
+            data-name="live-discord" 
+            data-description="Experience Channel Dungeons in Discord">
+        <div class="simple-message" data-system="true" data-typing-duration="1500">
             <h2>Live Discord Experience</h2>
             <p>This is a demonstration of the Channel Dungeons experience directly in Discord.</p>
             <p>To experience the full game:</p>
