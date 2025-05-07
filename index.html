@@ -88,24 +88,22 @@
     <template id="channel-welcome" 
             data-name="welcome" 
             data-description="Welcome to Channel Dungeons!">
-        <div class="simple-message" data-typing-duration="1000">
+        <div class="simple-message" data-typing-duration="800" data-delay="300">
             <h1>Welcome to Channel Dungeons!</h1>
-        </div>
-        <div class="simple-message" data-typing-duration="1500" data-delay="500">
             <p>Dive into a fantastic MMORPG adventure with deep dungeons, dangerous monsters and epic loot...</p>
         </div>
-        <div class="simple-message" data-typing-duration="800" data-delay="1000">
+        <div class="simple-message" data-typing-duration="700" data-delay="1200">
             <p>...and all of it inside Discord!</p>
         </div>
-        <div class="simple-message" data-typing-duration="1500" data-delay="300">
+        <div class="simple-message" data-typing-duration="1800" data-delay="900">
             <p>Each server is a town and all towns are connected via a sprawling network of dungeons.</p>
         </div>
-        <div class="simple-message" data-typing-duration="2000" data-delay="400">
+        <div class="simple-message" data-typing-duration="2500" data-delay="1100">
             <p>Explore, fight, level up and meet other players!</p>
             <p>No download required. Simply start playing in Discord now:</p>
             <div class="cta-buttons">
                 <a href="https://discord.gg/channeldungeons" class="discord-button">Join the official server</a>
-                <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS" class="discord-button">Add ChannelDungeons to your own server</a>
+                <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS" class="discord-button">Add Channel Dungeons to your own server</a>
             </div>
         </div>
     </template>
@@ -113,103 +111,69 @@
     <!-- About channel -->
     <template id="channel-about" 
             data-name="about" 
-            data-description="Learn about Channel Dungeons">
-        <div class="simple-message" data-typing-duration="1200">
-            <h2>About Channel Dungeons</h2>
+            data-description="More about Channel Dungeons">
+        <div class="simple-message" data-typing-duration="800" data-delay="300">
             <p>Channel Dungeons is an MMORPG played entirely in Discord, emphasizing exploration and collaboration.</p>
             <p>Delve into dungeons, battle fearsome monsters, discover valuable loot, and level up your hero!</p>
             <p>Experience a shared, persistent world where you can encounter other players from other Discord servers while exploring dungeons solo or with friends.</p>
         </div>
-    </template>
-
-    <!-- How to play channel -->
-    <template id="channel-how-to-play" 
-            data-name="how-to-play" 
-            data-description="Getting started with Channel Dungeons">
-        <div class="simple-message" data-typing-duration="800">
-            <h2>How to Play</h2>
-            <p>Get started with Channel Dungeons in a few simple steps!</p>
-        </div>
-        
-        <div class="simple-message" data-typing-duration="1500" data-delay="700">
-            <h3>Step 1: Join the Game</h3>
-            <p>Choose one of these two options to start playing:</p>
-            <div class="join-options">
-                <div class="join-option">
-                    <h4>Official Server</h4>
-                    <p>Play directly in the official Channel Dungeons server</p>
-                    <a href="https://discord.gg/channeldungeons" class="discord-button">Join Server</a>
-                </div>
-                <div class="join-option">
-                    <h4>Your Own Server</h4>
-                    <p>Invite the bot to your Discord server</p>
-                    <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS" class="discord-button">Invite Bot</a>
-                </div>
+        <div class="simple-message" data-typing-duration="1500" data-delay="900">
+            <p>Each server that wants to participate needs to add the Channel Dungeons application.</p>
+            <div class="cta-buttons">
+                <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS" class="discord-button">Add Channel Dungeons to your Discord server</a>
             </div>
         </div>
-        
-        <div class="simple-message" data-typing-duration="900" data-delay="500">
-            <h3>Step 2: Create a Hero</h3>
-            <p>Begin your adventure by creating a hero in your home town! Simply click the <span class="discord-button">Create a Hero</span> button or type <span class="discord-command">create_hero</span> in Discord.</p>
+        <div class="simple-message" data-typing-duration="1800" data-delay="850">
+            <p>For each server, a town is created in an interconnected world.</p>
+            <p>Each member of the server can create a hero and use the town as their starting point for exploring the world of Channel Dungeons.</p>
         </div>
-        
-        <div class="simple-message" data-typing-duration="900" data-delay="400">
-            <h3>Step 3: Explore Dungeons</h3>
-            <p>Start exploring dungeons by using <span class="discord-command">move</span> or pressing one of the <span class="discord-button">Go [direction]</span> buttons.</p>
-        </div>
-        
-        <div class="simple-message" data-typing-duration="1200" data-delay="400">
-            <h3>Step 4: Find Loot & Level Up</h3>
-            <p>Defeat monsters to discover valuable loot, gain experience, and level up your hero! If you ever get lost, use <span class="discord-command">hero</span> to locate yourself.</p>
+        <div class="simple-message" data-typing-duration="1200" data-delay="800">
+            <p>Join the adventure and start your journey today!</p>
+            <div class="cta-buttons">
+                <a href="https://discord.gg/channeldungeons" class="discord-button">Join the official Cahnnel Dungeons server</a>
+            </div>
         </div>
     </template>
 
     <!-- Features channel -->
     <template id="channel-features" 
             data-name="features" 
-            data-description="Discover game features">
-        <div class="simple-message" data-typing-duration="600">
-            <h2>Game Features</h2>
-        </div>
-        
-        <div class="simple-message" data-typing-duration="1200" data-delay="300">
+            data-description="Gameplay Features">
+        <div class="simple-message" data-typing-duration="800" data-delay="300">
             <div class="feature">
-                <div class="feature-icon"><span class="icon">Map</span></div>
                 <h3>Shared World</h3>
                 <p>Venture into a persistent world, seamlessly shared across many Discord servers, creating a truly massive multiplayer experience.</p>
             </div>
         </div>
         
-        <div class="simple-message" data-typing-duration="900" data-delay="400">
+        <div class="simple-message" data-typing-duration="800" data-delay="600">
             <div class="feature">
-                <div class="feature-icon"><span class="icon">Sword</span></div>
-                <h3>Combat</h3>
-                <p>Fight monsters, earn experience, and level up.</p>
+                <h3>Dungeon Crawl</h3>
+                <p>Fight monsters, earn experience, and level up!</p>
             </div>
         </div>
         
-        <div class="simple-message" data-typing-duration="800" data-delay="300">
+        <div class="simple-message" data-typing-duration="1000" data-delay="650">
             <div class="feature">
-                <div class="feature-icon"><span class="icon">Group</span></div>
                 <h3>Multiplayer</h3>
                 <p>Forge alliances with other players and embark on thrilling adventures together!</p>
             </div>
         </div>
         
-        <div class="simple-message" data-typing-duration="1100" data-delay="300">
+        <div class="simple-message" data-typing-duration="1400" data-delay="700">
             <div class="feature">
-                <div class="feature-icon"><span class="icon">Treasure</span></div>
                 <h3>Loot</h3>
-                <p>Defeat monsters to claim valuable treasures and assemble a collection of powerful equipment, enhancing your hero's abilities.</p>
+                <p>Loot, loot loot! So much loot!</p>
+                <p>Find powerful equipment to fight tougher foes who drop even better loot!</p>
             </div>
         </div>
     </template>
     
     <!-- Gameplay Demo channel -->
     <template id="channel-gameplay-demo" 
-            data-name="gameplay demo" 
-            data-description="See the game in action">
-        <div class="simple-message" data-typing-duration="1200">
+            data-name="gameplay-demo" 
+            data-description="A brief demonstration of how Channel Dungeons plays">
+        <div class="simple-message" data-typing-duration="800" data-delay="300">
             <h2>Gameplay Demo</h2>
             <p>This channel will show you what gameplay looks like in Channel Dungeons.</p>
             <p>Coming soon!</p>
