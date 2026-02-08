@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Channel Dungeons - An MMORPG played entirely in Discord">
+    <title>Channel Dungeons - MMORPG in Discord</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" href="images/dungeon-gate.svg" type="image/svg+xml" />
+    <link href="ChannelDungeons.BlazorWasm.styles.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="app" style="min-height: 100vh; background-color: #1e1f22; display: flex; align-items: center; justify-content: center;">
+        <div style="text-align: center; color: #dbdee1;">
+            <svg style="width: 64px; height: 64px; animation: spin 1s linear infinite; margin: 0 auto; margin-bottom: 16px;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"/>
+                <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="4" opacity="0.75"/>
+            </svg>
+            <p style="margin: 16px 0 0 0; font-family: 'Noto Sans', sans-serif; font-size: 16px;">Loading Channel Dungeons...</p>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" style="display: none; padding: 20px; background-color: #f03c15; color: white; text-align: center; font-family: 'Noto Sans', sans-serif;">
+        An unhandled error has occurred.
+        <a href="." style="color: white; text-decoration: underline;">Reload</a>
+        <span style="cursor: pointer; margin-left: 10px;">✕</span>
+    </div>
+
+    <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,799 @@
+/* ==========================================================================
+   TABLE OF CONTENTS
+   
+   1. Font Definitions
+   2. Basic Styles & Variables
+   3. Layout & Structure
+   4. Sidebar Components
+   5. Content Area Components
+   6. Message Components
+   7. Command Input Components
+   8. UI Elements & Buttons
+   9. Animation Effects
+   10. Responsive Design
+   ========================================================================== */
+
+/* ==========================================================================
+   1. Font Definitions
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Noto Sans Regular'), local('NotoSans-Regular'), 
+       url('fonts/Noto\ Sans/NotoSans-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 500;
+  src: local('Noto Sans Medium'), local('NotoSans-Medium'), 
+       url('fonts/Noto\ Sans/NotoSans-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Noto Sans SemiBold'), local('NotoSans-SemiBold'), 
+       url('fonts/Noto\ Sans/NotoSans-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Noto Sans Bold'), local('NotoSans-Bold'), 
+       url('fonts/Noto\ Sans/NotoSans-Bold.ttf') format('truetype');
+}
+
+/* ==========================================================================
+   2. Basic Styles & Variables
+   ========================================================================== */
+
+/* Set proper viewport handling for mobile */
+html {
+  height: -webkit-fill-available;
+  height: 100%;
+}
+
+/* Discord-accurate color scheme */
+:root {
+  /* Colors */
+  --primary-color: #5865F2; /* Discord brand blue */
+  --primary-color-dark: #4752C4; /* Darker shade for hover states */
+  --discord-bg: #36393f; /* Main Discord background */
+  --discord-sidebar: #2f3136; /* Sidebar background */
+  --discord-active-channel: #42464d; /* Active channel background */
+  --discord-hover: #393c43; /* Hover state for items */
+  --discord-text: #dcddde; /* Primary text color */
+  --discord-muted-text: #9c9ca3; /* Secondary text color */
+  --discord-header: #202225; /* Header color */
+  --discord-separator: #40444b; /* Separator line color */
+  --discord-input-bg: #40444b; /* Input box background */
+  --discord-button: #4f545c; /* Button background */
+  --discord-button-hover: #686d73; /* Button hover background */
+  --discord-message-hover: #32353b; /* Message hover background */
+  --discord-embed: #2f3136; /* Embed background */
+  --discord-link: #00b0f4; /* Link color */
+  --discord-green: #3ba55d; /* Success/online color */
+  --discord-yellow: #faa81a; /* Warning color */
+  --discord-red: #ed4245; /* Error/danger color */
+  
+  /* Additional standardized colors */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent-black: rgba(0, 0, 0, 0.2);
+  --discord-command-bg: #373f63; /* Command background */
+  --discord-command-text: #cad2f9; /* Command text color */
+  --discord-code-text: #ff9d5c; /* Code text color */
+  
+  /* Typography */
+  --font-size-xs: 0.7rem;      /* 11px at 16px base */
+  --font-size-sm: 0.8125rem;   /* 13px at 16px base */
+  --font-size-md: 0.875rem;    /* 14px at 16px base */
+  --font-size-base: 0.9375rem; /* 15px at 16px base */
+  --font-size-lg: 1rem;        /* 16px at 16px base */
+  --font-size-xl: 1.125rem;    /* 18px at 16px base */
+  --line-height-base: 1.375rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  /* Font families */
+  --font-family-main: "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-family-code: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+  
+  /* SVG Icons */
+  --svg-avatar-dungeon-gate: url("dungeon-gate.svg");
+  
+  /* Spacing */
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 6px;
+  --spacing-md: 8px;
+  --spacing-lg: 12px;
+  --spacing-xl: 16px;
+  --spacing-xxl: 24px;
+  
+  /* Border radius */
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-round: 50%;
+  
+  /* Effects */
+  --transition-short: 0.1s ease;
+  --transition-medium: 0.17s ease;
+  --transition-sidebar: 0.3s ease;
+  --shadow-message: 0 1px 0 rgba(4,4,5,0.2),0 1.5px 0 rgba(6,6,7,0.05),0 2px 0 rgba(4,4,5,0.05);
+  --shadow-embed: 0 4px 20px rgba(0, 0, 0, 0.3);
+  
+  /* Layout */
+  --sidebar-width: 240px;
+  --server-icon-size: 32px;
+  --avatar-size: 40px;
+  --header-height-mobile: 48px;
+  --footer-height-mobile: 60px;
+  
+  /* Z-index */
+  --z-index-base: 1;      /* Base content level */
+  --z-index-dropdown: 100; /* Dropdowns and tooltips */
+  --z-index-overlay: 200;  /* Overlays like sidebar */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base structure */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-family-main);
+  line-height: var(--line-height-base);
+  color: var(--discord-text);
+  background-color: var(--discord-bg);
+  font-size: var(--font-size-base);
+}
+
+/* Typography */
+h1, h2, h3 {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-md);
+  line-height: 1.25;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: var(--font-size-xl);
+}
+
+h3 {
+  font-size: var(--font-size-lg);
+}
+
+a {
+  color: var(--discord-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   3. Layout & Structure
+   ========================================================================== */
+
+/* Core app layout */
+.discord-app {
+  display: flex;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+/* Content area */
+.content-area {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - var(--sidebar-width));
+  margin-left: var(--sidebar-width);
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  }
+
+/* ==========================================================================
+   4. Sidebar Components
+   ========================================================================== */
+
+/* Sidebar styles */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--discord-sidebar);
+  height: 100%;
+  overflow-y: auto;
+  border-right: 1px solid var(--color-transparent-black);
+  position: absolute;
+  left: calc(-1 * var(--sidebar-width));
+  top: 0;
+  bottom: 0;
+  z-index: var(--z-index-overlay);
+  transition: left var(--transition-sidebar);
+}
+
+.sidebar.visible {
+  left: 0;
+}
+
+.server-info {
+  padding: var(--spacing-xl);
+  background-color: var(--discord-header);
+  border-bottom: 1px solid var(--discord-separator);
+  display: flex;
+  align-items: center;
+}
+
+.server-info h1, .server-info h2 {
+  font-size: var(--font-size-base);
+  margin-bottom: 0;
+  flex-grow: 1;
+}
+
+.channels-container {
+  padding: 0 var(--spacing-md);
+}
+
+.channels-category {
+  padding: var(--spacing-xl) var(--spacing-md) var(--spacing-xs);
+  color: var(--discord-muted-text);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.channels-list {
+  list-style: none;
+}
+
+.channel {
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin: var(--spacing-xxs) 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--discord-muted-text);
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-md);
+}
+
+.channel:hover {
+  background-color: var(--discord-hover);
+  color: var(--discord-text);
+}
+
+.channel.active {
+  background-color: var(--discord-active-channel);
+  color: var(--discord-text);
+}
+
+.channel-hash {
+  margin-right: var(--spacing-xs);
+  opacity: 0.6;
+  font-size: 20px;
+  position: relative;
+  top: -1px;
+}
+
+/* ==========================================================================
+   5. Content Area Components
+   ========================================================================== */
+
+/* Fixed header */
+.channel-header {
+  flex: 0 0 auto;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background-color: var(--discord-bg);
+  box-shadow: var(--shadow-message);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+  display: none; /* Hidden by default on desktop */
+  background: none;
+  border: none;
+  color: var(--discord-text);
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  margin-right: var(--spacing-md);
+  transition: color var(--transition-short);
+}
+
+.sidebar-toggle:hover {
+  color: var(--color-white);
+}
+
+.channel-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+}
+
+.channel-description {
+  margin-left: var(--spacing-xxl);
+  color: var(--discord-muted-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+}
+
+/* Scrollable message area */
+.message-area {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 0;
+  background-color: var(--discord-bg);
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  position: relative;
+  scroll-snap-type: y proximity;
+  overscroll-behavior: contain;
+}
+
+/* ==========================================================================
+   6. Message Components
+   ========================================================================== */
+
+/* Messages container */
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md);
+  padding-bottom: 0;
+}
+
+/* Make sure first and last messages have proper spacing */
+.messages-container > :first-child {
+  margin-top: 0;
+  scroll-snap-align: start;
+}
+
+.messages-container > :last-child {
+  margin-bottom: 0;
+  scroll-snap-align: end;
+}
+
+/* Add Firefox-specific adjustments for first message */
+@supports (-moz-appearance:none) {
+  .messages-container > :first-child {
+    margin-top: -4px; /* More aggressive for Firefox */
+  }
+}
+
+.message {
+  display: flex;
+  margin-bottom: var(--spacing-xl);
+  padding: 0.125rem var(--spacing-xl) 0.125rem var(--spacing-xs);
+  border-radius: var(--radius-md);
+}
+
+.message:hover {
+  background-color: var(--discord-message-hover);
+}
+
+/* Common circular avatar styles */
+.message-avatar, .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-round);
+  background-color: var(--primary-color);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Message avatar specific styles */
+.message-avatar {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  margin-right: var(--spacing-xl);
+  flex-shrink: 0;
+  background-image: var(--svg-avatar-dungeon-gate);
+  background-size: cover;
+}
+
+.message-avatar.no-background-image {
+  background-image: none;
+}
+
+.message-content {
+  flex-grow: 1;
+}
+
+.message-header {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: var(--spacing-xs);
+}
+
+.message-username {
+  font-weight: var(--font-weight-medium);
+  margin-right: var(--spacing-md);
+  color: var(--color-white);
+  font-size: var(--font-size-base);
+}
+
+.message-timestamp {
+  font-size: var(--font-size-xs);
+  color: var(--discord-muted-text);
+  font-weight: var(--font-weight-medium);
+}
+
+.message-text {
+  color: var(--discord-text);
+  word-wrap: break-word;
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-base);
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: none;
+  padding: var(--spacing-md) var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+  color: var(--discord-muted-text);
+  font-size: var(--font-size-sm);
+  align-items: center;
+}
+
+/* When typing indicator is inside messages container */
+.messages-container .typing-indicator {
+  margin-left: var(--spacing-xs);
+  padding-left: var(--spacing-xs);
+  margin-top: -5px;
+}
+
+.typing-indicator.active {
+  display: flex;
+}
+
+.typing-indicator .text {
+  font-weight: var(--font-weight-medium);
+}
+
+.typing-indicator .username {
+  font-weight: var(--font-weight-bold);
+  color: var(--discord-text);
+}
+
+.typing-dots {
+  display: inline-flex;
+  margin-left: var(--spacing-xs);
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--discord-muted-text);
+  border-radius: var(--radius-round);
+  margin-right: 3px;
+}
+
+/* ==========================================================================
+   7. Command Input Components
+   ========================================================================== */
+
+/* Fixed footer */
+footer {
+  flex: 0 0 auto;
+  background-color: var(--discord-bg);
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  margin-top: 0;
+}
+
+/* Command input container */
+.command-input-container {
+  padding: var(--spacing-xs) var(--spacing-xl) var(--spacing-md);
+  background-color: var(--discord-bg);
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  position: relative;
+}
+
+.command-input-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#command-input {
+  flex-grow: 1;
+  background-color: var(--discord-input-bg);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 11px var(--spacing-xl);
+  color: var(--discord-text);
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-main);
+  outline: none;
+  resize: none;
+}
+
+#command-input::placeholder {
+  color: var(--discord-muted-text);
+}
+
+/* Autocomplete styles */
+.autocomplete-container {
+  position: relative;
+  flex-grow: 1;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--discord-input-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--discord-separator);
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: var(--z-index-dropdown);
+  margin-bottom: var(--spacing-xs);
+  box-shadow: var(--shadow-embed);
+}
+
+.autocomplete-dropdown.visible {
+  display: block;
+}
+
+.autocomplete-item {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  cursor: pointer;
+  color: var(--discord-text);
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+  background-color: var(--discord-hover);
+}
+
+.autocomplete-item .command-name {
+  font-weight: var(--font-weight-medium);
+}
+
+.autocomplete-item .command-description {
+  font-size: var(--font-size-sm);
+  color: var(--discord-muted-text);
+  margin-left: var(--spacing-md);
+}
+
+/* ==========================================================================
+   8. UI Elements & Buttons
+   ========================================================================== */
+
+/* Discord button styling */
+.discord-button {
+  background-color: var(--primary-color);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  margin: var(--spacing-md) var(--spacing-xxs);
+  border: none;
+  transition: background-color var(--transition-medium);
+  cursor: pointer;
+  font-family: var(--font-family-main);
+  line-height: 1.25;
+}
+
+.discord-button:hover {
+  background-color: var(--primary-color-dark);
+  text-decoration: none;
+}
+
+/* Feature styles */
+.feature {
+  background-color: var(--discord-embed);
+  padding: var(--spacing-xl);
+  border-radius: var(--radius-md);
+  margin-top: var(--spacing-md);
+}
+
+.feature-icon {
+  margin-bottom: var(--spacing-md);
+}
+
+/* Icon specific styles (uses common avatar styles) */
+.icon {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  font-size: var(--font-size-sm);
+}
+
+/* Join options styling */
+.join-options {
+  display: flex;
+  gap: var(--spacing-xl);
+  margin-top: var(--spacing-lg);
+}
+
+.join-option {
+  flex: 1;
+  padding: var(--spacing-lg);
+  background-color: var(--discord-embed);
+  border-radius: var(--radius-md);
+}
+
+/* Code block styling */
+code {
+  background-color: var(--discord-header);
+  color: var(--discord-code-text);
+  font-family: var(--font-family-code);
+  padding: var(--spacing-xxs) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  border: none;
+  display: inline-block;
+}
+
+/* Discord command styling */
+.discord-command {
+  background-color: var(--discord-command-bg);
+  color: var(--discord-command-text);
+  padding: var(--spacing-xxs) var(--spacing-xs);
+  border-radius: var(--radius-md);
+  font-size: 0.9em;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background-color var(--transition-short);
+}
+
+.discord-command::before {
+  content: "/";
+}
+
+/* ==========================================================================
+   9. Animation Effects
+   ========================================================================== */
+
+.typing-dot:nth-child(1) {
+  animation: typingAnimation 1.4s infinite 0s;
+}
+
+.typing-dot:nth-child(2) {
+  animation: typingAnimation 1.4s infinite 0.2s;
+}
+
+.typing-dot:nth-child(3) {
+  animation: typingAnimation 1.4s infinite 0.4s;
+}
+
+@keyframes typingAnimation {
+  0% { transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+/* ==========================================================================
+   10. Responsive Design
+   ========================================================================== */
+
+/* Show the sidebar toggle on mobile or when sidebar is collapsed */
+@media (max-width: 768px) {
+  .sidebar-toggle {
+    display: block;
+  }
+  
+  .discord-app {
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+  }
+  
+  .sidebar {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: var(--z-index-overlay); /* Consistent z-index for mobile sidebar */
+    left: -100%;
+  }
+  
+  .content-area {
+    margin-left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Fixed header for mobile */
+  .channel-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-left: var(--spacing-md);
+    height: var(--header-height-mobile);
+    box-shadow: var(--shadow-message);
+  }
+  
+  /* Message area adjusted for fixed header and footer */
+  .message-area {
+    flex: 1;
+    padding-bottom: var(--footer-height-mobile);
+    overflow-y: auto;
+    height: calc(100vh - var(--header-height-mobile) - var(--footer-height-mobile));
+    position: fixed;
+    top: var(--header-height-mobile);
+    left: 0;
+    right: 0;
+    bottom: var(--footer-height-mobile);
+    z-index: var(--z-index-base);
+    margin: 0;
+    overscroll-behavior: none;
+  }
+  
+  /* Keep messages container flush with edges */
+  .messages-container {
+    min-height: calc(100% - 16px);
+    justify-content: flex-start;
+    margin-top: 0;
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-xl);
+  }
+
+  /* Fixed footer for mobile */
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--discord-bg);
+  }
+  
+  .command-input-container {
+    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 0px));
+  }
+  
+  /* Join options stack on mobile */
+  .join-options {
+    flex-direction: column;
+  }
+}
+
+/* Firefox-specific mobile fixes */
+@supports (-moz-appearance:none) {
+  @media (max-width: 768px) {
+    .discord-app {
+      height: -moz-available;
+      min-height: -moz-available;
+    }
+  }
+}

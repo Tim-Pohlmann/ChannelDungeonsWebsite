@@ -1,0 +1,24 @@
+@namespace ChannelDungeons.BlazorWasm.Components.Channel
+@using ChannelDungeons.BlazorWasm.Models
+
+<div class="message">
+    <div class="message-avatar no-background-image">
+        <span>CD</span>
+    </div>
+
+    <div class="message-content">
+        <div class="message-header">
+            <span class="message-username">@MessageData.Username</span>
+            <span class="message-timestamp">@MessageData.Timestamp</span>
+        </div>
+
+        <div class="message-text">
+            @((MarkupString)MessageData.Content)
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Models.Message MessageData { get; set; } = new();
+}

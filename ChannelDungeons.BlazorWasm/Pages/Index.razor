@@ -1,0 +1,208 @@
+@page "/"
+@page "/{ChannelName}"
+@using System.Collections.ObjectModel
+@using Microsoft.AspNetCore.Components.Web
+@using ChannelDungeons.BlazorWasm.Components.Layout
+@using ChannelDungeons.BlazorWasm.Components.Channel
+@inject ChannelService ChannelService
+@inject MessageAnimationService AnimationService
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+
+<PageTitle>Channel Dungeons</PageTitle>
+
+<div class="discord-app">
+    <Sidebar 
+        CurrentChannel="@currentChannel?.Id" 
+        IsVisible="@isSidebarVisible"
+        OnChannelSelected="@HandleChannelSelected"
+        Channels="@channels" />
+    
+    <div class="content-area" class:sidebar-visible="@isSidebarVisible">
+        @if (currentChannel != null)
+        {
+            <ChannelHeader 
+                ChannelName="@currentChannel.Name"
+                Description="@currentChannel.Description"
+                OnToggleSidebar="@HandleToggleSidebar" />
+            
+            <div class="message-area">
+                <MessagesList 
+                    Messages="@displayedMessages"
+                    ShowTypingIndicator="@showTypingIndicator" />
+            </div>
+            
+            <footer>
+                <CommandInput 
+                    IsVisible="@inputVisible"
+                    OnCommandSubmit="@HandleCommandSubmit" />
+            </footer>
+        }
+        else if (isLoading)
+        {
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--discord-muted-text);">
+                <p>Loading channel...</p>
+            </div>
+        }
+        else
+        {
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--discord-muted-text);">
+                <p>Channel not found.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? ChannelName { get; set; }
+
+    private List<Channel> channels = new();
+    private Channel? currentChannel;
+    private List<Message> displayedMessages = new();
+    private bool showTypingIndicator = false;
+    private bool isSidebarVisible = false;
+    private bool inputVisible = false;
+    private bool isLoading = false;
+    private CancellationTokenSource? animationCts;
+    private AppConfig? config;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            channels = await ChannelService.GetAllChannelsAsync();
+            config = await ChannelService.GetConfigAsync();
+            
+            await LoadChannelAsync(ChannelName ?? channels.FirstOrDefault()?.Id);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading channels: {ex.Message}");
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(ChannelName) && currentChannel?.Id != ChannelName)
+        {
+            await LoadChannelAsync(ChannelName);
+        }
+    }
+
+    private async Task LoadChannelAsync(string? channelId)
+    {
+        if (string.IsNullOrEmpty(channelId))
+        {
+            return;
+        }
+
+        animationCts?.Cancel();
+        animationCts = new CancellationTokenSource();
+
+        isLoading = true;
+        displayedMessages.Clear();
+        showTypingIndicator = false;
+        inputVisible = false;
+
+        try
+        {
+            currentChannel = await ChannelService.GetChannelAsync(channelId);
+            
+            if (currentChannel == null)
+            {
+                isLoading = false;
+                return;
+            }
+
+            var cachedMessages = ChannelService.GetCachedMessages(currentChannel.Id);
+            if (cachedMessages != null)
+            {
+                displayedMessages = cachedMessages;
+                inputVisible = true;
+                isLoading = false;
+                return;
+            }
+
+            if (config != null)
+            {
+                await Task.Delay(config.UiShowDelay, animationCts.Token);
+
+                var messagesToAnimate = currentChannel.Messages.Select(m => new Message
+                {
+                    Username = m.Username,
+                    Content = m.Content,
+                    TypingDuration = m.TypingDuration,
+                    Delay = m.Delay,
+                    Timestamp = GetCurrentTime()
+                }).ToList();
+
+                await AnimationService.AnimateMessagesAsync(
+                    messagesToAnimate,
+                    async (messageIndex) =>
+                    {
+                        displayedMessages.Add(messagesToAnimate[messageIndex]);
+                        await InvokeAsync(StateHasChanged);
+                    },
+                    async (isTyping) =>
+                    {
+                        showTypingIndicator = isTyping;
+                        await InvokeAsync(StateHasChanged);
+                    },
+                    config,
+                    animationCts.Token);
+
+                ChannelService.CacheMessages(currentChannel.Id, displayedMessages);
+                inputVisible = true;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when navigating away
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleChannelSelected(string channelId)
+    {
+        isSidebarVisible = false;
+        await LoadChannelAsync(channelId);
+        NavigationManager.NavigateTo($"/{channelId}");
+    }
+
+    private Task HandleToggleSidebar()
+    {
+        isSidebarVisible = !isSidebarVisible;
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleCommandSubmit(string command)
+    {
+        if (command.StartsWith("/"))
+        {
+            var channelName = command.Substring(1).ToLowerInvariant();
+            var channel = channels.FirstOrDefault(c => 
+                c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
+            
+            if (channel != null)
+            {
+                await HandleChannelSelected(channel.Id);
+            }
+        }
+    }
+
+    private string GetCurrentTime()
+    {
+        return DateTime.Now.ToString("HH:mm");
+    }
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        animationCts?.Cancel();
+        animationCts?.Dispose();
+        await Task.CompletedTask;
+    }
+}

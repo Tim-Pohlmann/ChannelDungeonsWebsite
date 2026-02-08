@@ -1,0 +1,43 @@
+@namespace ChannelDungeons.BlazorWasm.Components.Layout
+
+<nav class="sidebar @(IsVisible ? "visible" : "")">
+    <header class="server-info">
+        <h2>Channel Dungeons</h2>
+    </header>
+
+    <div class="channels-container">
+        <ul class="channels-list">
+            @foreach (var channel in Channels)
+            {
+                <li>
+                    <a class="channel-link @(IsChannelActive(channel.Id) ? "active" : "")" 
+                       @onclick="@(() => OnChannelSelected.InvokeAsync(channel.Id))"
+                       href="javascript:void(0)">
+                        <span class="channel-hash">#</span>
+                        <span>@channel.Name</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</nav>
+
+@code {
+    [Parameter]
+    public List<Channel> Channels { get; set; } = new();
+
+    [Parameter]
+    public string? CurrentChannel { get; set; }
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnChannelSelected { get; set; }
+
+    private bool IsChannelActive(string channelId)
+    {
+        return !string.IsNullOrEmpty(CurrentChannel) && 
+               CurrentChannel.Equals(channelId, StringComparison.OrdinalIgnoreCase);
+    }
+}

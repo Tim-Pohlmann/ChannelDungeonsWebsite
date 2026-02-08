@@ -1,0 +1,130 @@
+@namespace ChannelDungeons.BlazorWasm.Components.Layout
+@using Microsoft.AspNetCore.Components.Web
+@using ChannelDungeons.BlazorWasm.Components.Autocomplete
+@inject ChannelService ChannelService
+
+<footer class:@(IsVisible ? "visible" : "hidden")">
+    <div class="autocomplete-container">
+        <AutocompleteDropdown 
+            SearchTerm="@searchTerm"
+            OnCommandSelected="@HandleCommandSelected"
+            IsVisible="@showAutocomplete"
+            AvailableCommands="@availableCommands"
+            SelectedIndex="@selectedIndex" />
+        
+        <div class="command-input-container">
+            <input 
+                @ref="inputElement"
+                id="command-input"
+                type="text"
+                placeholder="Type a command (try /about)"
+                @onkeydown="@HandleKeyDown"
+                @oninput="@HandleInput"
+                autocomplete="off"
+                spellcheck="false"
+                class="command-input" />
+        </div>
+    </div>
+</footer>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCommandSubmit { get; set; }
+
+    private ElementReference inputElement;
+    private string searchTerm = string.Empty;
+    private bool showAutocomplete = false;
+    private List<string> availableCommands = new();
+    private int selectedIndex = -1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        availableCommands = await ChannelService.GetChannelCommandsAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsVisible)
+        {
+            await Task.Delay(100);
+            try
+            {
+                await inputElement.FocusAsync();
+            }
+            catch { }
+        }
+    }
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        searchTerm = (e.Value?.ToString() ?? string.Empty).ToLowerInvariant();
+        selectedIndex = -1;
+        showAutocomplete = searchTerm.StartsWith("/") && searchTerm.Length > 1;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        var filteredCommands = GetFilteredCommands();
+
+        if (showAutocomplete && filteredCommands.Count > 0)
+        {
+            switch (e.Key)
+            {
+                case "ArrowDown":
+                    selectedIndex = Math.Min(selectedIndex + 1, filteredCommands.Count - 1);
+                    await InvokeAsync(StateHasChanged);
+                    break;
+
+                case "ArrowUp":
+                    selectedIndex = Math.Max(selectedIndex - 1, -1);
+                    await InvokeAsync(StateHasChanged);
+                    break;
+
+                case "Enter":
+                    if (selectedIndex >= 0 && selectedIndex < filteredCommands.Count)
+                    {
+                        await HandleCommandSelected(filteredCommands[selectedIndex]);
+                    }
+                    break;
+
+                case "Escape":
+                    showAutocomplete = false;
+                    await InvokeAsync(StateHasChanged);
+                    break;
+            }
+        }
+        else if (e.Key == "Enter" && !string.IsNullOrEmpty(searchTerm))
+        {
+            await SubmitCommand();
+        }
+    }
+
+    private async Task HandleCommandSelected(string command)
+    {
+        searchTerm = command;
+        showAutocomplete = false;
+        await SubmitCommand();
+    }
+
+    private async Task SubmitCommand()
+    {
+        if (!string.IsNullOrEmpty(searchTerm))
+        {
+            await OnCommandSubmit.InvokeAsync(searchTerm);
+            searchTerm = string.Empty;
+            showAutocomplete = false;
+            selectedIndex = -1;
+        }
+    }
+
+    private List<string> GetFilteredCommands()
+    {
+        return availableCommands
+            .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+}

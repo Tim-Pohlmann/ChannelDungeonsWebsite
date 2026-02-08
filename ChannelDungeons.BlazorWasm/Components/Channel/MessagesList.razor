@@ -1,0 +1,25 @@
+@namespace ChannelDungeons.BlazorWasm.Components.Channel
+@using ChannelDungeons.BlazorWasm.Models
+
+<div class="messages-container">
+    @if (Messages != null && Messages.Count > 0)
+    {
+        @foreach (var message in Messages)
+        {
+            <MessageDisplay MessageData="@message" />
+        }
+    }
+
+    @if (ShowTypingIndicator)
+    {
+        <TypingIndicator IsVisible="true" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public List<Message> Messages { get; set; } = new();
+
+    [Parameter]
+    public bool ShowTypingIndicator { get; set; }
+}

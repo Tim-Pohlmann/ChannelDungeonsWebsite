@@ -1,0 +1,40 @@
+@namespace ChannelDungeons.BlazorWasm.Components.Autocomplete
+
+@if (IsVisible && FilteredCommands.Count > 0)
+{
+    <div class="autocomplete-dropdown">
+        @foreach (var (command, index) in FilteredCommands.Select((cmd, idx) => (cmd, idx)))
+        {
+            <div class="autocomplete-item @(IsSelected(index) ? "selected" : "")"
+                 @onclick="@(() => OnCommandSelected.InvokeAsync(command))">
+                <span>@command</span>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string SearchTerm { get; set; } = string.Empty;
+
+    [Parameter]
+    public List<string> AvailableCommands { get; set; } = new();
+
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnCommandSelected { get; set; }
+
+    [Parameter]
+    public int SelectedIndex { get; set; } = -1;
+
+    private List<string> FilteredCommands => AvailableCommands
+        .Where(cmd => cmd.StartsWith(SearchTerm, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    private bool IsSelected(int index)
+    {
+        return index == SelectedIndex;
+    }
+}

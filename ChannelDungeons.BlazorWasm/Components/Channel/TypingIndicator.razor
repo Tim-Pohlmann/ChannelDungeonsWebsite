@@ -1,0 +1,20 @@
+@namespace ChannelDungeons.BlazorWasm.Components.Channel
+
+@if (IsVisible)
+{
+    <div class="typing-indicator">
+        <div class="text">
+            <span class="typing-dots">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+            </span>
+            <span class="username">Channel Dungeons</span> is typing...
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+}
