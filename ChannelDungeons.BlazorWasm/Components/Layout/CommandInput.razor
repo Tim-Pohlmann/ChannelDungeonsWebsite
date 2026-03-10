@@ -6,13 +6,13 @@
 <footer class:@(IsVisible ? "visible" : "hidden")">
     <div class="autocomplete-container">
         <AutocompleteDropdown
-            Commands="@GetFilteredCommands()"
+            Commands="@filteredCommands"
             OnCommandSelected="@HandleCommandSelected"
             IsVisible="@showAutocomplete"
             SelectedIndex="@selectedIndex" />
-        
+
         <div class="command-input-container">
-            <input 
+            <input
                 @ref="inputElement"
                 id="command-input"
                 type="text"
@@ -37,6 +37,7 @@
     private string searchTerm = string.Empty;
     private bool showAutocomplete = false;
     private List<string> availableCommands = new();
+    private List<string> filteredCommands = [];
     private int selectedIndex = -1;
 
     protected override async Task OnInitializedAsync()
@@ -57,6 +58,10 @@
             {
                 // FocusAsync can throw if the element is not yet rendered; safe to ignore
             }
+            catch (JSException)
+            {
+                // FocusAsync can throw if JS interop fails during navigation; safe to ignore
+            }
         }
     }
 
@@ -65,19 +70,16 @@
         searchTerm = (e.Value?.ToString() ?? string.Empty).ToLowerInvariant();
         selectedIndex = -1;
         showAutocomplete = searchTerm.StartsWith("/") && searchTerm.Length > 1;
+        filteredCommands = showAutocomplete
+            ? availableCommands
+                .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList()
+            : [];
         await InvokeAsync(StateHasChanged);
     }
 
-    private List<string> GetFilteredCommands() => showAutocomplete
-        ? availableCommands
-            .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
-            .ToList()
-        : [];
-
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        var filteredCommands = GetFilteredCommands();
-
         if (showAutocomplete && filteredCommands.Count > 0)
         {
             switch (e.Key)
