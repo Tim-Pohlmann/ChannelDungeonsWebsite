@@ -1,6 +1,7 @@
 using ChannelDungeons.BlazorWasm.Models;
 using ChannelDungeons.BlazorWasm.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Diagnostics;
 
 namespace ChannelDungeons.Tests.Services;
 
@@ -105,23 +106,31 @@ public class MessageAnimationServiceTests
     public async Task AnimateMessagesAsync_UsesMessageSpecificTypingDuration()
     {
         var service = new MessageAnimationService();
-        var typingEvents = new List<bool>();
 
+        // Message has a distinct TypingDuration; config default is 0
         var messages = new List<Message>
         {
-            new() { Content = "Hello", TypingDuration = 0, Delay = 0 }
+            new() { Content = "Hello", TypingDuration = 100, Delay = 0 }
         };
 
+        var config = new AppConfig
+        {
+            DefaultTypingDuration = 0,
+            DefaultMessageDelay = 0,
+            UiShowDelay = 0
+        };
+
+        var stopwatch = Stopwatch.StartNew();
         await service.AnimateMessagesAsync(
             messages,
             _ => Task.CompletedTask,
-            b => { typingEvents.Add(b); return Task.CompletedTask; },
-            ZeroDelayConfig());
+            _ => Task.CompletedTask,
+            config);
+        stopwatch.Stop();
 
-        // Should show typing=true then typing=false
-        Assert.AreEqual(2, typingEvents.Count);
-        Assert.IsTrue(typingEvents[0]);
-        Assert.IsFalse(typingEvents[1]);
+        // If the message-specific 100ms was used (not the config default of 0ms), elapsed should be >= 80ms
+        Assert.IsTrue(stopwatch.ElapsedMilliseconds >= 80,
+            $"Expected at least 80ms but elapsed was {stopwatch.ElapsedMilliseconds}ms");
     }
 
     [TestMethod]
