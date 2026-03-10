@@ -5,11 +5,10 @@
 
 <footer class:@(IsVisible ? "visible" : "hidden")">
     <div class="autocomplete-container">
-        <AutocompleteDropdown 
-            SearchTerm="@searchTerm"
+        <AutocompleteDropdown
+            Commands="@FilteredCommands"
             OnCommandSelected="@HandleCommandSelected"
             IsVisible="@showAutocomplete"
-            AvailableCommands="@availableCommands"
             SelectedIndex="@selectedIndex" />
         
         <div class="command-input-container">
@@ -54,7 +53,7 @@
             {
                 await inputElement.FocusAsync();
             }
-            catch { }
+            catch { } // FocusAsync can throw if the element is not yet rendered; safe to ignore
         }
     }
 
@@ -66,9 +65,13 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private List<string> FilteredCommands => availableCommands
+        .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        var filteredCommands = GetFilteredCommands();
+        var filteredCommands = FilteredCommands;
 
         if (showAutocomplete && filteredCommands.Count > 0)
         {
@@ -121,10 +124,4 @@
         }
     }
 
-    private List<string> GetFilteredCommands()
-    {
-        return availableCommands
-            .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-    }
 }
