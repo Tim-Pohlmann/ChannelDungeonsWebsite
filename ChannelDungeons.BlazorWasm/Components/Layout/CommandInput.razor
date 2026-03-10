@@ -43,6 +43,7 @@
     protected override async Task OnInitializedAsync()
     {
         availableCommands = await ChannelService.GetChannelCommandsAsync();
+        UpdateFilteredCommands();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -70,12 +71,17 @@
         searchTerm = (e.Value?.ToString() ?? string.Empty).ToLowerInvariant();
         selectedIndex = -1;
         showAutocomplete = searchTerm.StartsWith("/") && searchTerm.Length > 1;
+        UpdateFilteredCommands();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateFilteredCommands()
+    {
         filteredCommands = showAutocomplete
             ? availableCommands
                 .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList()
             : [];
-        await InvokeAsync(StateHasChanged);
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
