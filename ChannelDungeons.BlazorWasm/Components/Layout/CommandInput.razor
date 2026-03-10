@@ -3,10 +3,10 @@
 @using ChannelDungeons.BlazorWasm.Components.Autocomplete
 @inject ChannelService ChannelService
 
-<footer class:@(IsVisible ? "visible" : "hidden")">
+<footer class="@(IsVisible ? "visible" : "hidden")">
     <div class="autocomplete-container">
         <AutocompleteDropdown
-            Commands="@GetFilteredCommands()"
+            Commands="@filteredCommands"
             OnCommandSelected="@HandleCommandSelected"
             IsVisible="@showAutocomplete"
             SelectedIndex="@selectedIndex" />
@@ -38,16 +38,21 @@
     private bool showAutocomplete = false;
     private List<string> availableCommands = new();
     private int selectedIndex = -1;
+    private IReadOnlyList<string> filteredCommands = [];
 
-    private IReadOnlyList<string> GetFilteredCommands() => showAutocomplete
-        ? availableCommands
-            .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
-            .ToList()
-        : [];
+    private void UpdateFilteredCommands()
+    {
+        filteredCommands = showAutocomplete
+            ? availableCommands
+                .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .ToList()
+            : [];
+    }
 
     protected override async Task OnInitializedAsync()
     {
         availableCommands = await ChannelService.GetChannelCommandsAsync();
+        UpdateFilteredCommands();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -75,18 +80,18 @@
         searchTerm = (e.Value?.ToString() ?? string.Empty).ToLowerInvariant();
         selectedIndex = -1;
         showAutocomplete = searchTerm.StartsWith("/") && searchTerm.Length > 1;
+        UpdateFilteredCommands();
         await InvokeAsync(StateHasChanged);
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        var filtered = GetFilteredCommands();
-        if (showAutocomplete && filtered.Count > 0)
+        if (showAutocomplete && filteredCommands.Count > 0)
         {
             switch (e.Key)
             {
                 case "ArrowDown":
-                    selectedIndex = Math.Min(selectedIndex + 1, filtered.Count - 1);
+                    selectedIndex = Math.Min(selectedIndex + 1, filteredCommands.Count - 1);
                     await InvokeAsync(StateHasChanged);
                     break;
 
@@ -96,14 +101,15 @@
                     break;
 
                 case "Enter":
-                    if (selectedIndex >= 0 && selectedIndex < filtered.Count)
+                    if (selectedIndex >= 0 && selectedIndex < filteredCommands.Count)
                     {
-                        await HandleCommandSelected(filtered[selectedIndex]);
+                        await HandleCommandSelected(filteredCommands[selectedIndex]);
                     }
                     break;
 
                 case "Escape":
                     showAutocomplete = false;
+                    UpdateFilteredCommands();
                     await InvokeAsync(StateHasChanged);
                     break;
             }
@@ -129,6 +135,7 @@
             searchTerm = string.Empty;
             showAutocomplete = false;
             selectedIndex = -1;
+            UpdateFilteredCommands();
         }
     }
 
