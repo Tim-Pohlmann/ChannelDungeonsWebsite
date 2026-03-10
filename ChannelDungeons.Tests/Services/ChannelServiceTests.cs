@@ -10,6 +10,11 @@ namespace ChannelDungeons.Tests.Services;
 [TestClass]
 public class ChannelServiceTests
 {
+    private static readonly JsonSerializerOptions CamelCaseOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
     private static ChannelData CreateSampleData() => new()
     {
         Config = new AppConfig
@@ -28,10 +33,7 @@ public class ChannelServiceTests
     private static ChannelService CreateService(ChannelData? data = null)
     {
         var mockHttp = new MockHttpMessageHandler();
-        var json = JsonSerializer.Serialize(data ?? CreateSampleData(), new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+        var json = JsonSerializer.Serialize(data ?? CreateSampleData(), CamelCaseOptions);
         mockHttp.When("http://localhost/data/channels.json").Respond("application/json", json);
         var client = mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("http://localhost/");
@@ -55,10 +57,7 @@ public class ChannelServiceTests
     {
         var callCount = 0;
         var mockHttp = new MockHttpMessageHandler();
-        var json = JsonSerializer.Serialize(CreateSampleData(), new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+        var json = JsonSerializer.Serialize(CreateSampleData(), CamelCaseOptions);
         mockHttp.When("http://localhost/data/channels.json")
             .Respond(_ =>
             {
