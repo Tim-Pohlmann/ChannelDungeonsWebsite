@@ -36,6 +36,12 @@ jobs:
       - name: Publish
         run: dotnet publish ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj --configuration Release --output release --nologo
 
+      - name: Fix base href for GitHub Pages subdirectory
+        run: sed -i 's|<base href="/" />|<base href="/ChannelDungeonsWebsite/" />|g' release/wwwroot/index.html
+
+      - name: Add 404.html for SPA routing
+        run: cp release/wwwroot/index.html release/wwwroot/404.html
+
       - name: Add .nojekyll
         run: touch release/wwwroot/.nojekyll
 
