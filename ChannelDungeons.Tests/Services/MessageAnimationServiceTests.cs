@@ -104,8 +104,8 @@ public class MessageAnimationServiceTests
     [TestMethod]
     public async Task AnimateMessagesAsync_UsesMessageSpecificTypingDuration()
     {
-        var service = new MessageAnimationService();
         var capturedDelays = new List<int>();
+        var service = new MessageAnimationService((ms, _) => { capturedDelays.Add(ms); return Task.CompletedTask; });
 
         // Message has a distinct TypingDuration; config default is different
         var messages = new List<Message>
@@ -124,8 +124,7 @@ public class MessageAnimationServiceTests
             messages,
             _ => Task.CompletedTask,
             _ => Task.CompletedTask,
-            config,
-            delay: (ms, _) => { capturedDelays.Add(ms); return Task.CompletedTask; });
+            config);
 
         // The message-specific TypingDuration (100) should have been used, not the config default (0)
         Assert.IsTrue(capturedDelays.Contains(100),
