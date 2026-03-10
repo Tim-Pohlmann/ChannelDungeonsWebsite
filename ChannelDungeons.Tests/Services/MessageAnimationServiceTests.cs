@@ -1,7 +1,6 @@
 using ChannelDungeons.BlazorWasm.Models;
 using ChannelDungeons.BlazorWasm.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
 
 namespace ChannelDungeons.Tests.Services;
 
@@ -106,8 +105,9 @@ public class MessageAnimationServiceTests
     public async Task AnimateMessagesAsync_UsesMessageSpecificTypingDuration()
     {
         var service = new MessageAnimationService();
+        var capturedDelays = new List<int>();
 
-        // Message has a distinct TypingDuration; config default is 0
+        // Message has a distinct TypingDuration; config default is different
         var messages = new List<Message>
         {
             new() { Content = "Hello", TypingDuration = 100, Delay = 0 }
@@ -120,17 +120,16 @@ public class MessageAnimationServiceTests
             UiShowDelay = 0
         };
 
-        var stopwatch = Stopwatch.StartNew();
         await service.AnimateMessagesAsync(
             messages,
             _ => Task.CompletedTask,
             _ => Task.CompletedTask,
-            config);
-        stopwatch.Stop();
+            config,
+            delay: (ms, _) => { capturedDelays.Add(ms); return Task.CompletedTask; });
 
-        // If the message-specific 100ms was used (not the config default of 0ms), elapsed should be >= 80ms
-        Assert.IsTrue(stopwatch.ElapsedMilliseconds >= 80,
-            $"Expected at least 80ms but elapsed was {stopwatch.ElapsedMilliseconds}ms");
+        // The message-specific TypingDuration (100) should have been used, not the config default (0)
+        Assert.IsTrue(capturedDelays.Contains(100),
+            $"Expected delay of 100ms but captured: [{string.Join(", ", capturedDelays)}]");
     }
 
     [TestMethod]

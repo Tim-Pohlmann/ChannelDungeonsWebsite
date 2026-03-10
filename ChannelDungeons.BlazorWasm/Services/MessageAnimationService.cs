@@ -22,8 +22,10 @@ public class MessageAnimationService
         Func<int, Task> onMessageAdded,
         Func<bool, Task> onTypingIndicatorChanged,
         AppConfig config,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        Func<int, CancellationToken, Task>? delay = null)
     {
+        delay ??= Task.Delay;
         try
         {
             int cumulativeDelay = 0;
@@ -42,14 +44,14 @@ public class MessageAnimationService
                 // Add initial delay before showing typing indicator
                 if (cumulativeDelay > 0)
                 {
-                    await Task.Delay(cumulativeDelay, cancellationToken);
+                    await delay(cumulativeDelay, cancellationToken);
                 }
 
                 // Show typing indicator
                 await onTypingIndicatorChanged(true);
 
                 // Wait for "typing" duration
-                await Task.Delay(typingDuration, cancellationToken);
+                await delay(typingDuration, cancellationToken);
 
                 // Hide typing, show message
                 await onTypingIndicatorChanged(false);
