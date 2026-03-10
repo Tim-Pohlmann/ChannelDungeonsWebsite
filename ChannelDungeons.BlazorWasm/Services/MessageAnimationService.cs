@@ -8,6 +8,15 @@ namespace ChannelDungeons.BlazorWasm.Services;
 /// </summary>
 public class MessageAnimationService
 {
+    private readonly Func<int, CancellationToken, Task> _delay;
+
+    public MessageAnimationService() : this(Task.Delay) { }
+
+    public MessageAnimationService(Func<int, CancellationToken, Task> delay)
+    {
+        _delay = delay;
+    }
+
     /// <summary>
     /// Animates messages by showing typing indicator, then revealing message.
     /// Uses CancellationToken to allow cleanup when navigating away.
@@ -42,14 +51,14 @@ public class MessageAnimationService
                 // Add initial delay before showing typing indicator
                 if (cumulativeDelay > 0)
                 {
-                    await Task.Delay(cumulativeDelay, cancellationToken);
+                    await _delay(cumulativeDelay, cancellationToken);
                 }
 
                 // Show typing indicator
                 await onTypingIndicatorChanged(true);
 
                 // Wait for "typing" duration
-                await Task.Delay(typingDuration, cancellationToken);
+                await _delay(typingDuration, cancellationToken);
 
                 // Hide typing, show message
                 await onTypingIndicatorChanged(false);
