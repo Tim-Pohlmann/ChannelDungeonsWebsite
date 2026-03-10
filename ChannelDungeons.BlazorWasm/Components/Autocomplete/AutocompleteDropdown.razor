@@ -15,7 +15,7 @@
 
 @code {
     [Parameter]
-    public List<string> Commands { get; set; } = new();
+    public IReadOnlyList<string> Commands { get; set; } = [];
 
     [Parameter]
     public bool IsVisible { get; set; }

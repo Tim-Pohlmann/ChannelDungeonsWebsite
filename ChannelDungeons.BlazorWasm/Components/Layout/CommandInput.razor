@@ -6,7 +6,7 @@
 <footer class:@(IsVisible ? "visible" : "hidden")">
     <div class="autocomplete-container">
         <AutocompleteDropdown
-            Commands="@FilteredCommands"
+            Commands="@GetFilteredCommands()"
             OnCommandSelected="@HandleCommandSelected"
             IsVisible="@showAutocomplete"
             SelectedIndex="@selectedIndex" />
@@ -39,7 +39,7 @@
     private List<string> availableCommands = new();
     private int selectedIndex = -1;
 
-    private IReadOnlyList<string> FilteredCommands => showAutocomplete
+    private IReadOnlyList<string> GetFilteredCommands() => showAutocomplete
         ? availableCommands
             .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
             .ToList()
@@ -80,12 +80,13 @@
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        if (showAutocomplete && FilteredCommands.Count > 0)
+        var filtered = GetFilteredCommands();
+        if (showAutocomplete && filtered.Count > 0)
         {
             switch (e.Key)
             {
                 case "ArrowDown":
-                    selectedIndex = Math.Min(selectedIndex + 1, FilteredCommands.Count - 1);
+                    selectedIndex = Math.Min(selectedIndex + 1, filtered.Count - 1);
                     await InvokeAsync(StateHasChanged);
                     break;
 
@@ -95,9 +96,9 @@
                     break;
 
                 case "Enter":
-                    if (selectedIndex >= 0 && selectedIndex < FilteredCommands.Count)
+                    if (selectedIndex >= 0 && selectedIndex < filtered.Count)
                     {
-                        await HandleCommandSelected(FilteredCommands[selectedIndex]);
+                        await HandleCommandSelected(filtered[selectedIndex]);
                     }
                     break;
 
