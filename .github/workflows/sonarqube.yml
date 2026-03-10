@@ -40,10 +40,19 @@ jobs:
             /k:"Tim-Pohlmann_ChannelDungeonsWebsite" \
             /o:"tim-pohlmann" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.token="${SONAR_TOKEN}"
+            /d:sonar.token="${SONAR_TOKEN}" \
+            /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml"
 
-      - name: Build project
-        run: dotnet build ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj --configuration Release
+      - name: Build solution
+        run: dotnet build ChannelDungeons.sln --configuration Release
+
+      - name: Run tests with coverage
+        run: |
+          dotnet test ChannelDungeons.Tests/ChannelDungeons.Tests.csproj \
+            --configuration Release \
+            --no-build \
+            --collect:"XPlat Code Coverage" \
+            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: End SonarQube analysis
         env:
