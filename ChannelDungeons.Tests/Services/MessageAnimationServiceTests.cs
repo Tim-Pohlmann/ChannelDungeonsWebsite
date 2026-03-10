@@ -1,8 +1,10 @@
 using ChannelDungeons.BlazorWasm.Models;
 using ChannelDungeons.BlazorWasm.Services;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ChannelDungeons.Tests.Services;
 
+[TestClass]
 public class MessageAnimationServiceTests
 {
     private static AppConfig ZeroDelayConfig() => new()
@@ -12,7 +14,7 @@ public class MessageAnimationServiceTests
         UiShowDelay = 0
     };
 
-    [Fact]
+    [TestMethod]
     public async Task AnimateMessagesAsync_EmptyList_DoesNotInvokeCallbacks()
     {
         var service = new MessageAnimationService();
@@ -25,11 +27,11 @@ public class MessageAnimationServiceTests
             b => { typingChanges.Add(b); return Task.CompletedTask; },
             ZeroDelayConfig());
 
-        Assert.Empty(messagesAdded);
-        Assert.Empty(typingChanges);
+        Assert.AreEqual(0, messagesAdded.Count);
+        Assert.AreEqual(0, typingChanges.Count);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task AnimateMessagesAsync_SingleMessage_InvokesCallbacksInOrder()
     {
         var service = new MessageAnimationService();
@@ -46,13 +48,13 @@ public class MessageAnimationServiceTests
             b => { events.Add($"typing:{b}"); return Task.CompletedTask; },
             ZeroDelayConfig());
 
-        Assert.Equal(3, events.Count);
-        Assert.Equal("typing:True", events[0]);
-        Assert.Equal("typing:False", events[1]);
-        Assert.Equal("message:0", events[2]);
+        Assert.AreEqual(3, events.Count);
+        Assert.AreEqual("typing:True", events[0]);
+        Assert.AreEqual("typing:False", events[1]);
+        Assert.AreEqual("message:0", events[2]);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task AnimateMessagesAsync_MultipleMessages_AnimatesAllInOrder()
     {
         var service = new MessageAnimationService();
@@ -71,11 +73,11 @@ public class MessageAnimationServiceTests
             _ => Task.CompletedTask,
             ZeroDelayConfig());
 
-        Assert.Equal(3, messagesAdded.Count);
-        Assert.Equal([0, 1, 2], messagesAdded);
+        Assert.AreEqual(3, messagesAdded.Count);
+        CollectionAssert.AreEqual(new List<int> { 0, 1, 2 }, messagesAdded);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task AnimateMessagesAsync_UsesDefaultConfigValues_WhenMessageValuesAreNull()
     {
         var service = new MessageAnimationService();
@@ -96,10 +98,10 @@ public class MessageAnimationServiceTests
             config);
 
         // Typing indicator was shown once (for the one message)
-        Assert.Equal(1, typingShownCount);
+        Assert.AreEqual(1, typingShownCount);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task AnimateMessagesAsync_UsesMessageSpecificTypingDuration()
     {
         var service = new MessageAnimationService();
@@ -117,12 +119,12 @@ public class MessageAnimationServiceTests
             ZeroDelayConfig());
 
         // Should show typing=true then typing=false
-        Assert.Equal(2, typingEvents.Count);
-        Assert.True(typingEvents[0]);
-        Assert.False(typingEvents[1]);
+        Assert.AreEqual(2, typingEvents.Count);
+        Assert.IsTrue(typingEvents[0]);
+        Assert.IsFalse(typingEvents[1]);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task AnimateMessagesAsync_CancelledBeforeStart_DoesNotAnimate()
     {
         var service = new MessageAnimationService();
@@ -143,10 +145,10 @@ public class MessageAnimationServiceTests
             ZeroDelayConfig(),
             cts.Token);
 
-        Assert.Empty(messagesAdded);
+        Assert.AreEqual(0, messagesAdded.Count);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task AnimateMessagesAsync_CancellationDuringAnimation_StopsGracefully()
     {
         var service = new MessageAnimationService();
@@ -174,10 +176,10 @@ public class MessageAnimationServiceTests
             cts.Token);
 
         // Only the first message should have been added before cancellation
-        Assert.Equal([0], messagesAdded);
+        CollectionAssert.AreEqual(new List<int> { 0 }, messagesAdded);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task AnimateMessagesAsync_CompletesWithoutException_OnNormalFlow()
     {
         var service = new MessageAnimationService();
@@ -186,13 +188,20 @@ public class MessageAnimationServiceTests
             new() { Content = "Test message", TypingDuration = 0, Delay = 0 }
         };
 
-        // Should not throw
-        var exception = await Record.ExceptionAsync(() => service.AnimateMessagesAsync(
-            messages,
-            _ => Task.CompletedTask,
-            _ => Task.CompletedTask,
-            ZeroDelayConfig()));
+        Exception? caughtException = null;
+        try
+        {
+            await service.AnimateMessagesAsync(
+                messages,
+                _ => Task.CompletedTask,
+                _ => Task.CompletedTask,
+                ZeroDelayConfig());
+        }
+        catch (Exception ex)
+        {
+            caughtException = ex;
+        }
 
-        Assert.Null(exception);
+        Assert.IsNull(caughtException);
     }
 }

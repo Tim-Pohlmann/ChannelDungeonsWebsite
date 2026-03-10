@@ -2,10 +2,12 @@ using System.Net;
 using System.Text.Json;
 using ChannelDungeons.BlazorWasm.Models;
 using ChannelDungeons.BlazorWasm.Services;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RichardSzalay.MockHttp;
 
 namespace ChannelDungeons.Tests.Services;
 
+[TestClass]
 public class ChannelServiceTests
 {
     private static ChannelData CreateSampleData() => new()
@@ -36,19 +38,19 @@ public class ChannelServiceTests
         return new ChannelService(client);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetAllChannelsAsync_ReturnsChannelsFromJson()
     {
         var service = CreateService();
 
         var channels = await service.GetAllChannelsAsync();
 
-        Assert.Equal(2, channels.Count);
-        Assert.Equal("general", channels[0].Id);
-        Assert.Equal("rules", channels[1].Id);
+        Assert.AreEqual(2, channels.Count);
+        Assert.AreEqual("general", channels[0].Id);
+        Assert.AreEqual("rules", channels[1].Id);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetAllChannelsAsync_CachesData_OnlyOneHttpCall()
     {
         var callCount = 0;
@@ -73,10 +75,10 @@ public class ChannelServiceTests
         await service.GetAllChannelsAsync();
         await service.GetAllChannelsAsync();
 
-        Assert.Equal(1, callCount);
+        Assert.AreEqual(1, callCount);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetAllChannelsAsync_ThrowsHttpRequestException_OnHttpFailure()
     {
         var mockHttp = new MockHttpMessageHandler();
@@ -86,55 +88,55 @@ public class ChannelServiceTests
         client.BaseAddress = new Uri("http://localhost/");
         var service = new ChannelService(client);
 
-        await Assert.ThrowsAsync<HttpRequestException>(() => service.GetAllChannelsAsync());
+        await Assert.ThrowsExceptionAsync<HttpRequestException>(() => service.GetAllChannelsAsync());
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetChannelAsync_ReturnsMatchingChannel()
     {
         var service = CreateService();
 
         var channel = await service.GetChannelAsync("general");
 
-        Assert.NotNull(channel);
-        Assert.Equal("general", channel.Id);
-        Assert.Equal("General channel", channel.Description);
+        Assert.IsNotNull(channel);
+        Assert.AreEqual("general", channel.Id);
+        Assert.AreEqual("General channel", channel.Description);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetChannelAsync_IsCaseInsensitive()
     {
         var service = CreateService();
 
         var channel = await service.GetChannelAsync("GENERAL");
 
-        Assert.NotNull(channel);
-        Assert.Equal("general", channel.Id);
+        Assert.IsNotNull(channel);
+        Assert.AreEqual("general", channel.Id);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetChannelAsync_ReturnsNull_ForUnknownId()
     {
         var service = CreateService();
 
         var channel = await service.GetChannelAsync("nonexistent");
 
-        Assert.Null(channel);
+        Assert.IsNull(channel);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetConfigAsync_ReturnsConfigFromJson()
     {
         var service = CreateService();
 
         var config = await service.GetConfigAsync();
 
-        Assert.Equal(500, config.DefaultTypingDuration);
-        Assert.Equal(100, config.DefaultMessageDelay);
-        Assert.Equal(300, config.UiShowDelay);
+        Assert.AreEqual(500, config.DefaultTypingDuration);
+        Assert.AreEqual(100, config.DefaultMessageDelay);
+        Assert.AreEqual(300, config.UiShowDelay);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetConfigAsync_ReturnsDefaultConfig_WhenConfigIsNull()
     {
         var data = new ChannelData
@@ -146,32 +148,32 @@ public class ChannelServiceTests
 
         var config = await service.GetConfigAsync();
 
-        Assert.NotNull(config);
-        Assert.Equal(1000, config.DefaultTypingDuration);
-        Assert.Equal(200, config.DefaultMessageDelay);
+        Assert.IsNotNull(config);
+        Assert.AreEqual(1000, config.DefaultTypingDuration);
+        Assert.AreEqual(200, config.DefaultMessageDelay);
     }
 
-    [Fact]
+    [TestMethod]
     public async Task GetChannelCommandsAsync_ReturnsCommandsWithSlashPrefix()
     {
         var service = CreateService();
 
         var commands = await service.GetChannelCommandsAsync();
 
-        Assert.Equal(2, commands.Count);
-        Assert.Contains("/general", commands);
-        Assert.Contains("/rules", commands);
+        Assert.AreEqual(2, commands.Count);
+        CollectionAssert.Contains(commands, "/general");
+        CollectionAssert.Contains(commands, "/rules");
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCached_ReturnsFalse_Initially()
     {
         var service = CreateService();
 
-        Assert.False(service.IsCached("general"));
+        Assert.IsFalse(service.IsCached("general"));
     }
 
-    [Fact]
+    [TestMethod]
     public void IsCached_ReturnsTrue_AfterCaching()
     {
         var service = CreateService();
@@ -179,20 +181,20 @@ public class ChannelServiceTests
 
         service.CacheMessages("general", messages);
 
-        Assert.True(service.IsCached("general"));
+        Assert.IsTrue(service.IsCached("general"));
     }
 
-    [Fact]
+    [TestMethod]
     public void GetCachedMessages_ReturnsNull_WhenNotCached()
     {
         var service = CreateService();
 
         var result = service.GetCachedMessages("general");
 
-        Assert.Null(result);
+        Assert.IsNull(result);
     }
 
-    [Fact]
+    [TestMethod]
     public void GetCachedMessages_ReturnsMessages_AfterCaching()
     {
         var service = CreateService();
@@ -205,12 +207,12 @@ public class ChannelServiceTests
         service.CacheMessages("general", messages);
         var result = service.GetCachedMessages("general");
 
-        Assert.NotNull(result);
-        Assert.Equal(2, result.Count);
-        Assert.Equal("Hello", result[0].Content);
+        Assert.IsNotNull(result);
+        Assert.AreEqual(2, result.Count);
+        Assert.AreEqual("Hello", result[0].Content);
     }
 
-    [Fact]
+    [TestMethod]
     public void CacheMessages_OverwritesPreviousCache()
     {
         var service = CreateService();
@@ -221,12 +223,12 @@ public class ChannelServiceTests
         service.CacheMessages("general", secondMessages);
         var result = service.GetCachedMessages("general");
 
-        Assert.NotNull(result);
-        Assert.Single(result);
-        Assert.Equal("Second", result[0].Content);
+        Assert.IsNotNull(result);
+        Assert.AreEqual(1, result.Count);
+        Assert.AreEqual("Second", result[0].Content);
     }
 
-    [Fact]
+    [TestMethod]
     public void ClearCache_RemovesAllCachedMessages()
     {
         var service = CreateService();
@@ -235,7 +237,7 @@ public class ChannelServiceTests
 
         service.ClearCache();
 
-        Assert.False(service.IsCached("general"));
-        Assert.False(service.IsCached("rules"));
+        Assert.IsFalse(service.IsCached("general"));
+        Assert.IsFalse(service.IsCached("rules"));
     }
 }

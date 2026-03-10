@@ -1,4 +1,4 @@
-name: SonarQube Cloud Analysis
+name: CI
 
 on:
   push:
