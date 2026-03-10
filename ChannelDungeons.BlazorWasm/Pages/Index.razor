@@ -173,10 +173,9 @@
         NavigationManager.NavigateTo($"/{channelId}");
     }
 
-    private Task HandleToggleSidebar()
+    private void HandleToggleSidebar()
     {
         isSidebarVisible = !isSidebarVisible;
-        return Task.CompletedTask;
     }
 
     private async Task HandleCommandSubmit(string command)
@@ -199,10 +198,10 @@
         return DateTime.Now.ToString("HH:mm");
     }
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    ValueTask IAsyncDisposable.DisposeAsync()
     {
         animationCts?.Cancel();
         animationCts?.Dispose();
-        await Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }
