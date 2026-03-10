@@ -136,7 +136,7 @@ public class ChannelServiceTests
     }
 
     [TestMethod]
-    public async Task GetConfigAsync_ReturnsDefaultConfig_WhenConfigIsNull()
+    public async Task GetConfigAsync_ReturnsDefaultConfig_WhenConfigIsDefault()
     {
         var data = new ChannelData
         {
