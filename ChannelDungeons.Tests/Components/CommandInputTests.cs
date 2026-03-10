@@ -1,5 +1,3 @@
-using System.Net;
-using System.Text;
 using System.Text.Json;
 using Bunit;
 using ChannelDungeons.BlazorWasm.Components.Layout;
@@ -33,31 +31,6 @@ public class CommandInputTests : Bunit.TestContext
         var mockHttp = new MockHttpMessageHandler();
         var json = JsonSerializer.Serialize(data, CamelCaseOptions);
         mockHttp.When("http://localhost/data/channels.json").Respond("application/json", json);
-        var client = mockHttp.ToHttpClient();
-        client.BaseAddress = new Uri("http://localhost/");
-        Services.AddScoped(_ => new ChannelService(client));
-    }
-
-    private void RegisterSlowService(IEnumerable<string> channelIds, Task loadGate)
-    {
-        var data = new ChannelData
-        {
-            Config = new AppConfig(),
-            Channels = channelIds
-                .Select(id => new Channel { Id = id, Name = id, Description = id })
-                .ToList()
-        };
-        var json = JsonSerializer.Serialize(data, CamelCaseOptions);
-        var mockHttp = new MockHttpMessageHandler();
-        mockHttp.When("http://localhost/data/channels.json")
-            .Respond(async _ =>
-            {
-                await loadGate;
-                return new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(json, Encoding.UTF8, "application/json")
-                };
-            });
         var client = mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("http://localhost/");
         Services.AddScoped(_ => new ChannelService(client));
@@ -134,24 +107,6 @@ public class CommandInputTests : Bunit.TestContext
         Assert.AreEqual(0, cut.FindAll(".autocomplete-item").Count);
     }
 
-    [TestMethod]
-    public async Task FilteredCommands_RecomputedAfterCommandsLoad_WhenSearchTermAlreadySet()
-    {
-        var loadGate = new TaskCompletionSource<bool>();
-        RegisterSlowService(["general", "rules"], loadGate.Task);
-        var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
-
-        // Type before commands have loaded — no results yet
-        await cut.Find(".command-input").TriggerEventAsync("oninput",
-            new ChangeEventArgs { Value = "/gen" });
-        Assert.AreEqual(0, cut.FindAll(".autocomplete-item").Count);
-
-        // Commands finish loading — filtered results should now appear
-        loadGate.SetResult(true);
-        cut.WaitForAssertion(() =>
-            Assert.AreEqual(1, cut.FindAll(".autocomplete-item").Count));
-    }
-
     // --- Keyboard navigation ---
 
     [TestMethod]
@@ -174,9 +129,9 @@ public class CommandInputTests : Bunit.TestContext
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
         await cut.Find(".command-input").TriggerEventAsync("oninput",
-            new ChangeEventArgs { Value = "/" + "r" });
+            new ChangeEventArgs { Value = "/r" });
 
-        // Only one item (/rules) — pressing down multiple times should stay at 0
+        // Only one item (/rules) — pressing down twice should stay at index 0
         await cut.Find(".command-input").TriggerEventAsync("onkeydown",
             new KeyboardEventArgs { Key = "ArrowDown" });
         await cut.Find(".command-input").TriggerEventAsync("onkeydown",

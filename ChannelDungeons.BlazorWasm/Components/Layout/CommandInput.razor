@@ -6,7 +6,7 @@
 <footer class:@(IsVisible ? "visible" : "hidden")">
     <div class="autocomplete-container">
         <AutocompleteDropdown
-            Commands="@filteredCommands"
+            Commands="@FilteredCommands"
             OnCommandSelected="@HandleCommandSelected"
             IsVisible="@showAutocomplete"
             SelectedIndex="@selectedIndex" />
@@ -37,13 +37,17 @@
     private string searchTerm = string.Empty;
     private bool showAutocomplete = false;
     private List<string> availableCommands = new();
-    private List<string> filteredCommands = [];
     private int selectedIndex = -1;
+
+    private IReadOnlyList<string> FilteredCommands => showAutocomplete
+        ? availableCommands
+            .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
+            .ToList()
+        : [];
 
     protected override async Task OnInitializedAsync()
     {
         availableCommands = await ChannelService.GetChannelCommandsAsync();
-        UpdateFilteredCommands();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -71,27 +75,17 @@
         searchTerm = (e.Value?.ToString() ?? string.Empty).ToLowerInvariant();
         selectedIndex = -1;
         showAutocomplete = searchTerm.StartsWith("/") && searchTerm.Length > 1;
-        UpdateFilteredCommands();
         await InvokeAsync(StateHasChanged);
-    }
-
-    private void UpdateFilteredCommands()
-    {
-        filteredCommands = showAutocomplete
-            ? availableCommands
-                .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
-                .ToList()
-            : [];
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        if (showAutocomplete && filteredCommands.Count > 0)
+        if (showAutocomplete && FilteredCommands.Count > 0)
         {
             switch (e.Key)
             {
                 case "ArrowDown":
-                    selectedIndex = Math.Min(selectedIndex + 1, filteredCommands.Count - 1);
+                    selectedIndex = Math.Min(selectedIndex + 1, FilteredCommands.Count - 1);
                     await InvokeAsync(StateHasChanged);
                     break;
 
@@ -101,9 +95,9 @@
                     break;
 
                 case "Enter":
-                    if (selectedIndex >= 0 && selectedIndex < filteredCommands.Count)
+                    if (selectedIndex >= 0 && selectedIndex < FilteredCommands.Count)
                     {
-                        await HandleCommandSelected(filteredCommands[selectedIndex]);
+                        await HandleCommandSelected(FilteredCommands[selectedIndex]);
                     }
                     break;
 
