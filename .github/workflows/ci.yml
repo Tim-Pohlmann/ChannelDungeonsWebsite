@@ -53,7 +53,7 @@ jobs:
             --no-build \
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults \
-            -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+            --settings .runsettings
 
       - name: End SonarQube analysis
         env:
