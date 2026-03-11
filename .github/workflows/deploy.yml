@@ -36,7 +36,7 @@ jobs:
       - name: Publish
         run: dotnet publish ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj --configuration Release --output release --nologo
 
-      - name: Fix base href for GitHub Pages subdirectory
+      - name: Configure base href for GitHub Pages deployment
         run: |
           INDEX="release/wwwroot/index.html"
           if [ ! -f "${INDEX}" ]; then
