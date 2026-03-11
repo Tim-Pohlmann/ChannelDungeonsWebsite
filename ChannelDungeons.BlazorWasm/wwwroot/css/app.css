@@ -285,6 +285,7 @@ a:hover {
   border: none;
   font-family: inherit;
   text-align: left;
+  text-decoration: none;
 }
 
 .channel:hover,

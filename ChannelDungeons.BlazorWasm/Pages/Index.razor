@@ -142,12 +142,21 @@
                     async (messageIndex) =>
                     {
                         displayedMessages.Add(messagesToAnimate[messageIndex]);
+                        await InvokeAsync(StateHasChanged);
+
                         if (messageIndex == messagesToAnimate.Count - 1)
                         {
-                            await Task.Delay(config.UiShowDelay, animationCts.Token);
-                            isSidebarVisible = true;
+                            try
+                            {
+                                await Task.Delay(config.UiShowDelay, animationCts.Token);
+                                isSidebarVisible = true;
+                                await InvokeAsync(StateHasChanged);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                // Expected when navigating away
+                            }
                         }
-                        await InvokeAsync(StateHasChanged);
                     },
                     async (isTyping) =>
                     {
