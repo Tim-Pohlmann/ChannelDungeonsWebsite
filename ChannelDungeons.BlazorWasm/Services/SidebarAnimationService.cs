@@ -4,7 +4,7 @@ namespace ChannelDungeons.BlazorWasm.Services;
 /// Service for managing sidebar animation timing and visibility state.
 /// Determines when the sidebar should become visible during message animations.
 /// </summary>
-public class SidebarAnimationService
+public static class SidebarAnimationService
 {
     /// <summary>
     /// Determines if the sidebar should be shown based on the current message index.

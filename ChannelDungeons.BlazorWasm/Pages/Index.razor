@@ -97,11 +97,13 @@
             return;
         }
 
-        if (animationCts != null)
-        {
-            await animationCts.CancelAsync();
-        }
+        var previousCts = animationCts;
         animationCts = new CancellationTokenSource();
+        if (previousCts != null)
+        {
+            await previousCts.CancelAsync();
+            previousCts.Dispose();
+        }
 
         isLoading = true;
         displayedMessages.Clear();
@@ -129,7 +131,8 @@
 
             if (config != null)
             {
-                await Task.Delay(config.UiShowDelay, animationCts.Token);
+                var token = animationCts.Token;
+                await Task.Delay(config.UiShowDelay, token);
 
                 var messagesToAnimate = currentChannel.Messages.Select(m => new Message
                 {
@@ -151,7 +154,7 @@
                         {
                             try
                             {
-                                await Task.Delay(config.UiShowDelay, animationCts.Token);
+                                await Task.Delay(config.UiShowDelay, token);
                                 isSidebarVisible = true;
                                 await InvokeAsync(StateHasChanged);
                             }
@@ -167,7 +170,7 @@
                         await InvokeAsync(StateHasChanged);
                     },
                     config,
-                    animationCts.Token);
+                    token);
 
                 ChannelService.CacheMessages(currentChannel.Id, displayedMessages);
                 inputVisible = true;
