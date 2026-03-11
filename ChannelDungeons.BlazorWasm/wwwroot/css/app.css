@@ -293,6 +293,12 @@ a:hover {
   color: var(--discord-text);
 }
 
+.channel:focus-visible,
+.channel-link:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
 .channel.active,
 .channel-link.active {
   background-color: var(--discord-active-channel);
