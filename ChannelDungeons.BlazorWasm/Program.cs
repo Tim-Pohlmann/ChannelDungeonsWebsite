@@ -13,5 +13,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 // Register application services
 builder.Services.AddScoped<ChannelService>();
 builder.Services.AddScoped<MessageAnimationService>();
+builder.Services.AddScoped<SidebarAnimationService>();
 
 await builder.Build().RunAsync();

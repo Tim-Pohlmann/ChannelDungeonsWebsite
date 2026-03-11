@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "HIbIDD+PXW4=",
+  "dgSpecHash": "3NXx9Ghk4Qo=",
   "success": true,
   "projectFilePath": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.Tests\\ChannelDungeons.Tests.csproj",
   "expectedPackageFiles": [
@@ -10,6 +10,7 @@
     "C:\\Users\\pohlm\\.nuget\\packages\\bunit\\1.40.0\\bunit.1.40.0.nupkg.sha512",
     "C:\\Users\\pohlm\\.nuget\\packages\\bunit.core\\1.40.0\\bunit.core.1.40.0.nupkg.sha512",
     "C:\\Users\\pohlm\\.nuget\\packages\\bunit.web\\1.40.0\\bunit.web.1.40.0.nupkg.sha512",
+    "C:\\Users\\pohlm\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\pohlm\\.nuget\\packages\\coverlet.collector\\6.0.4\\coverlet.collector.6.0.4.nupkg.sha512",
     "C:\\Users\\pohlm\\.nuget\\packages\\microsoft.applicationinsights\\2.22.0\\microsoft.applicationinsights.2.22.0.nupkg.sha512",
     "C:\\Users\\pohlm\\.nuget\\packages\\microsoft.aspnetcore.authorization\\10.0.0\\microsoft.aspnetcore.authorization.10.0.0.nupkg.sha512",
@@ -58,7 +59,22 @@
     "C:\\Users\\pohlm\\.nuget\\packages\\mstest.testadapter\\3.7.3\\mstest.testadapter.3.7.3.nupkg.sha512",
     "C:\\Users\\pohlm\\.nuget\\packages\\mstest.testframework\\3.7.3\\mstest.testframework.3.7.3.nupkg.sha512",
     "C:\\Users\\pohlm\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
-    "C:\\Users\\pohlm\\.nuget\\packages\\richardszalay.mockhttp\\7.0.0\\richardszalay.mockhttp.7.0.0.nupkg.sha512"
+    "C:\\Users\\pohlm\\.nuget\\packages\\nsubstitute\\5.3.0\\nsubstitute.5.3.0.nupkg.sha512",
+    "C:\\Users\\pohlm\\.nuget\\packages\\richardszalay.mockhttp\\7.0.0\\richardszalay.mockhttp.7.0.0.nupkg.sha512",
+    "C:\\Users\\pohlm\\.nuget\\packages\\system.diagnostics.eventlog\\6.0.0\\system.diagnostics.eventlog.6.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "message": "ChannelDungeons.Tests depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.",
+      "projectPath": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.Tests\\ChannelDungeons.Tests.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.Tests\\ChannelDungeons.Tests.csproj",
+      "libraryId": "NSubstitute",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

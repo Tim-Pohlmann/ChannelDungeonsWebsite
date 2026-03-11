@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChannelDungeons.BlazorWasm")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+841079eb5a7d34605d0bfff79b3b4db1717e9f9b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9f3bd5707632a6679ba72161ef7d420bdf563b02")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChannelDungeons.BlazorWasm")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChannelDungeons.BlazorWasm")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
