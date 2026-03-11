@@ -6,7 +6,6 @@
 @using ChannelDungeons.BlazorWasm.Components.Channel
 @inject ChannelService ChannelService
 @inject MessageAnimationService AnimationService
-@inject SidebarAnimationService SidebarAnimation
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 
@@ -148,7 +147,7 @@
                         displayedMessages.Add(messagesToAnimate[messageIndex]);
                         await InvokeAsync(StateHasChanged);
 
-                        if (SidebarAnimation.ShouldShowSidebar(messageIndex, messagesToAnimate.Count))
+                        if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count))
                         {
                             try
                             {

@@ -18,12 +18,10 @@ public class IndexComponentTests : Bunit.TestContext
         var httpClient = new HttpClient(new MockHttpMessageHandler());
         var channelService = new ChannelService(httpClient);
         var animationService = new MessageAnimationService();
-        var sidebarAnimationService = new SidebarAnimationService();
         var navigationManager = Substitute.For<Microsoft.AspNetCore.Components.NavigationManager>();
 
         Services.AddScoped(_ => channelService);
         Services.AddScoped(_ => animationService);
-        Services.AddScoped(_ => sidebarAnimationService);
         Services.AddScoped(_ => navigationManager);
 
         // Act

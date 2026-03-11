@@ -13,7 +13,7 @@ public class SidebarAnimationService
     /// <param name="currentMessageIndex">Zero-based index of the current message</param>
     /// <param name="totalMessages">Total number of messages in the sequence</param>
     /// <returns>True if sidebar should become visible</returns>
-    public bool ShouldShowSidebar(int currentMessageIndex, int totalMessages)
+    public static bool ShouldShowSidebar(int currentMessageIndex, int totalMessages)
     {
         return currentMessageIndex == totalMessages - 1 && totalMessages > 0;
     }
