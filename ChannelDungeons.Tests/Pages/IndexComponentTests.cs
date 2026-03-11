@@ -28,15 +28,25 @@ public class IndexComponentTests : Bunit.TestContext
 
         // Act
         var cut = RenderComponent<Index>();
-        await Task.Delay(100); // Allow component to render
+
+        // Wait for channel loading and message animation to complete
+        // (animation delay is 100ms per message + 100ms UI delay = ~400ms total)
+        await Task.Delay(600);
 
         // Assert - component should render without throwing
         Assert.IsNotNull(cut);
+
+        // Verify component structure exists
+        var sidebarElement = cut.Find(".sidebar");
+        Assert.IsNotNull(sidebarElement, "Sidebar should be rendered");
+
+        var contentArea = cut.Find(".content-area");
+        Assert.IsNotNull(contentArea, "Content area should be rendered");
     }
 }
 
 /// <summary>
-/// Mock HTTP handler that returns empty data for testing.
+/// Mock HTTP handler that returns test channel data for testing.
 /// </summary>
 internal class MockHttpMessageHandler : HttpMessageHandler
 {
@@ -44,7 +54,33 @@ internal class MockHttpMessageHandler : HttpMessageHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        var content = new StringContent("""{"channels":[]}""");
+        // Return test channel data with messages to trigger animation
+        var json = """
+{
+  "channels": [
+    {
+      "id": "test-channel",
+      "name": "test",
+      "description": "Test channel",
+      "messages": [
+        {
+          "username": "Test User",
+          "content": "Hello",
+          "typingDuration": 100,
+          "delay": 100
+        },
+        {
+          "username": "Test User",
+          "content": "World",
+          "typingDuration": 100,
+          "delay": 100
+        }
+      ]
+    }
+  ]
+}
+""";
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         return Task.FromResult(new HttpResponseMessage
         {
             StatusCode = System.Net.HttpStatusCode.OK,
