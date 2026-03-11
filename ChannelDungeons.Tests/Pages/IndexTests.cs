@@ -24,7 +24,7 @@ public class IndexTests : Bunit.TestContext
             Id = "test",
             Name = "Test Channel",
             Description = "A test channel",
-            Messages = new List<ChannelMessage>
+            Messages = new List<Message>
             {
                 new() { Username = "Bot", Content = "Hello", TypingDuration = 0, Delay = 0 },
                 new() { Username = "Bot", Content = "World", TypingDuration = 0, Delay = 0 }
