@@ -142,6 +142,11 @@
                     async (messageIndex) =>
                     {
                         displayedMessages.Add(messagesToAnimate[messageIndex]);
+                        if (messageIndex == messagesToAnimate.Count - 1)
+                        {
+                            await Task.Delay(config.UiShowDelay, animationCts.Token);
+                            isSidebarVisible = true;
+                        }
                         await InvokeAsync(StateHasChanged);
                     },
                     async (isTyping) =>
