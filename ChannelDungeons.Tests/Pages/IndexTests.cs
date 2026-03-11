@@ -1,9 +1,10 @@
 using Bunit;
 using ChannelDungeons.BlazorWasm.Models;
-using ChannelDungeons.BlazorWasm.Pages;
 using ChannelDungeons.BlazorWasm.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using Index = ChannelDungeons.BlazorWasm.Pages.Index;
 
 namespace ChannelDungeons.Tests.Pages;
 

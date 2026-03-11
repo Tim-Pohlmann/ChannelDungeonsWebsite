@@ -97,7 +97,10 @@
             return;
         }
 
-        animationCts?.Cancel();
+        if (animationCts != null)
+        {
+            await animationCts.CancelAsync();
+        }
         animationCts = new CancellationTokenSource();
 
         isLoading = true;
@@ -194,9 +197,9 @@
 
     private async Task HandleCommandSubmit(string command)
     {
-        if (command.StartsWith("/"))
+        if (command.StartsWith('/'))
         {
-            var channelName = command.Substring(1).ToLowerInvariant();
+            var channelName = command[1..].ToLowerInvariant();
             var channel = channels.FirstOrDefault(c => 
                 c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
             
@@ -207,7 +210,7 @@
         }
     }
 
-    private string GetCurrentTime()
+    private static string GetCurrentTime()
     {
         return DateTime.Now.ToString("HH:mm");
     }
