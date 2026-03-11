@@ -43,14 +43,17 @@ jobs:
             echo "ERROR: ${INDEX} not found — publish step may have failed"
             exit 1
           fi
+          # CNAME is present in source and copied by dotnet publish to release/wwwroot/
           if [ -f "release/wwwroot/CNAME" ]; then
             echo "Custom domain detected (CNAME present) — keeping base href as /"
           else
             REPO_NAME="${{ github.event.repository.name }}"
             TARGET_HREF="/${REPO_NAME}/"
+            ROOT_HREF_PATTERN='<base[[:space:]]+href="/"'
             if grep -qF "<base href=\"${TARGET_HREF}\"" "${INDEX}"; then
               echo "base href is already set to ${TARGET_HREF} — no change needed"
-            elif grep -qE '<base[[:space:]]+href="/"' "${INDEX}"; then
+            elif grep -qE "${ROOT_HREF_PATTERN}" "${INDEX}"; then
+              # Replace root-relative base href with the target subdirectory path
               sed -i -E "s|<base[[:space:]]+href=\"/\"[[:space:]]*/?>|<base href=\"${TARGET_HREF}\" />|g" "${INDEX}"
               if grep -qF "<base href=\"${TARGET_HREF}\"" "${INDEX}"; then
                 echo "Replaced base href with ${TARGET_HREF}"
