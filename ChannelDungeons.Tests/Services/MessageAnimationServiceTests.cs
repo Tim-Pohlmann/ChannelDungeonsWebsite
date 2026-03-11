@@ -211,4 +211,33 @@ public class MessageAnimationServiceTests
 
         Assert.IsNull(caughtException);
     }
+
+    [TestMethod]
+    public async Task AnimateMessagesAsync_CallsOnMessageAddedWithCorrectIndices()
+    {
+        var service = new MessageAnimationService();
+        var messageIndices = new List<int>();
+
+        var messages = new List<Message>
+        {
+            new() { Content = "First", TypingDuration = 0, Delay = 0 },
+            new() { Content = "Second", TypingDuration = 0, Delay = 0 },
+            new() { Content = "Third", TypingDuration = 0, Delay = 0 }
+        };
+
+        await service.AnimateMessagesAsync(
+            messages,
+            i => { messageIndices.Add(i); return Task.CompletedTask; },
+            _ => Task.CompletedTask,
+            ZeroDelayConfig());
+
+        // Verify all messages were added with correct indices
+        Assert.AreEqual(3, messageIndices.Count);
+        Assert.AreEqual(0, messageIndices[0]);
+        Assert.AreEqual(1, messageIndices[1]);
+        Assert.AreEqual(2, messageIndices[2]);
+
+        // Verify the last index can be identified for UI animations (sidebar display)
+        Assert.AreEqual(messages.Count - 1, messageIndices[messageIndices.Count - 1]);
+    }
 }
