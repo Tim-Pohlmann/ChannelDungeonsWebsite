@@ -19,4 +19,9 @@ public class AppConfig
     /// Delay in milliseconds to show UI elements on first visit.
     /// </summary>
     public int UiShowDelay { get; set; } = 500;
+
+    /// <summary>
+    /// Delay in milliseconds before revealing the sidebar after the final message is displayed.
+    /// </summary>
+    public int SidebarRevealDelay { get; set; } = 500;
 }

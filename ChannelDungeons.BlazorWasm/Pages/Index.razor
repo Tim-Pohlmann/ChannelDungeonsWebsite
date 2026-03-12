@@ -142,6 +142,25 @@
                     async (messageIndex) =>
                     {
                         displayedMessages.Add(messagesToAnimate[messageIndex]);
+
+                        if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count))
+                        {
+                            var token = animationCts.Token;
+                            var revealDelay = config.SidebarRevealDelay;
+                            _ = Task.Delay(revealDelay, token)
+                                .ContinueWith(
+                                    async t =>
+                                    {
+                                        if (!t.IsCanceled)
+                                        {
+                                            isSidebarVisible = true;
+                                            await InvokeAsync(StateHasChanged);
+                                        }
+                                    },
+                                    TaskScheduler.Default)
+                                .Unwrap();
+                        }
+
                         await InvokeAsync(StateHasChanged);
                     },
                     async (isTyping) =>
