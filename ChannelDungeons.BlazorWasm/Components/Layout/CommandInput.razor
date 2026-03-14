@@ -3,7 +3,7 @@
 @using ChannelDungeons.BlazorWasm.Components.Autocomplete
 @inject ChannelService ChannelService
 
-<footer class="@(IsVisible ? "visible" : "hidden")">
+<footer>
     <div class="autocomplete-container">
         <AutocompleteDropdown
             Commands="@filteredCommands"
@@ -11,7 +11,7 @@
             IsVisible="@showAutocomplete"
             SelectedIndex="@selectedIndex" />
 
-        <div class="command-input-container">
+        <div class="command-input-container @(IsVisible ? "visible" : "")">
             <input
                 @ref="inputElement"
                 id="command-input"
@@ -36,15 +36,15 @@
     private ElementReference inputElement;
     private string searchTerm = string.Empty;
     private bool showAutocomplete = false;
-    private List<string> availableCommands = new();
+    private List<CommandSuggestion> availableCommands = new();
     private int selectedIndex = -1;
-    private IReadOnlyList<string> filteredCommands = [];
+    private IReadOnlyList<CommandSuggestion> filteredCommands = [];
 
     private void UpdateFilteredCommands()
     {
         filteredCommands = showAutocomplete
             ? availableCommands
-                .Where(cmd => cmd.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .Where(cmd => cmd.Name.StartsWith(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList()
             : [];
     }
@@ -78,8 +78,8 @@
     private async Task HandleInput(ChangeEventArgs e)
     {
         searchTerm = (e.Value?.ToString() ?? string.Empty).ToLowerInvariant();
-        selectedIndex = -1;
-        showAutocomplete = searchTerm.StartsWith("/") && searchTerm.Length > 1;
+        showAutocomplete = searchTerm.StartsWith("/") && searchTerm.Length >= 1;
+        selectedIndex = showAutocomplete ? 0 : -1;
         UpdateFilteredCommands();
         await InvokeAsync(StateHasChanged);
     }
@@ -100,6 +100,7 @@
                     await InvokeAsync(StateHasChanged);
                     break;
 
+                case "Tab":
                 case "Enter":
                     if (selectedIndex >= 0 && selectedIndex < filteredCommands.Count)
                     {
@@ -120,9 +121,9 @@
         }
     }
 
-    private async Task HandleCommandSelected(string command)
+    private async Task HandleCommandSelected(CommandSuggestion command)
     {
-        searchTerm = command;
+        searchTerm = command.Name;
         showAutocomplete = false;
         await SubmitCommand();
     }

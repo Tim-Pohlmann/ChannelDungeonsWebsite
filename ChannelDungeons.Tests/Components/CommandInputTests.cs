@@ -25,7 +25,7 @@ public class CommandInputTests : Bunit.TestContext
         {
             Config = new AppConfig(),
             Channels = channelIds
-                .Select(id => new Channel { Id = id, Name = id, Description = id })
+                .Select(id => new Channel { Id = id, Name = id, Description = $"{id} description" })
                 .ToList()
         };
         var mockHttp = new MockHttpMessageHandler();
@@ -56,7 +56,20 @@ public class CommandInputTests : Bunit.TestContext
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/gen" });
 
-        Assert.AreEqual("/general", cut.Find(".autocomplete-item").TextContent.Trim());
+        Assert.AreEqual("/general", cut.Find(".autocomplete-item .command-name").TextContent.Trim());
+    }
+
+    [TestMethod]
+    public async Task AutocompleteShown_WhenInputIsOnlySlash()
+    {
+        // Typing just "/" should show all available commands
+        RegisterService(["general", "rules"]);
+        var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+
+        await cut.Find(".command-input").TriggerEventAsync("oninput",
+            new ChangeEventArgs { Value = "/" });
+
+        Assert.AreEqual(2, cut.FindAll(".autocomplete-item").Count);
     }
 
     [TestMethod]
@@ -72,18 +85,6 @@ public class CommandInputTests : Bunit.TestContext
     }
 
     [TestMethod]
-    public async Task AutocompleteHidden_WhenInputIsOnlySlash()
-    {
-        RegisterService(["general", "rules"]);
-        var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
-
-        await cut.Find(".command-input").TriggerEventAsync("oninput",
-            new ChangeEventArgs { Value = "/" });
-
-        Assert.AreEqual(0, cut.FindAll(".autocomplete-dropdown").Count);
-    }
-
-    [TestMethod]
     public async Task FilterIsCaseInsensitive()
     {
         RegisterService(["general", "rules"]);
@@ -92,7 +93,7 @@ public class CommandInputTests : Bunit.TestContext
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/GEN" });
 
-        Assert.AreEqual("/general", cut.Find(".autocomplete-item").TextContent.Trim());
+        Assert.AreEqual("/general", cut.Find(".autocomplete-item .command-name").TextContent.Trim());
     }
 
     [TestMethod]
@@ -105,6 +106,18 @@ public class CommandInputTests : Bunit.TestContext
             new ChangeEventArgs { Value = "/xyz" });
 
         Assert.AreEqual(0, cut.FindAll(".autocomplete-item").Count);
+    }
+
+    [TestMethod]
+    public async Task CommandDescriptions_ShownInAutocomplete()
+    {
+        RegisterService(["general"]);
+        var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+
+        await cut.Find(".command-input").TriggerEventAsync("oninput",
+            new ChangeEventArgs { Value = "/gen" });
+
+        Assert.AreEqual("general description", cut.Find(".autocomplete-item .command-description").TextContent.Trim());
     }
 
     // --- Keyboard navigation ---

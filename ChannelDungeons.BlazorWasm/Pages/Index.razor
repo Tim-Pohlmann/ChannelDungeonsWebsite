@@ -7,33 +7,34 @@
 @inject ChannelService ChannelService
 @inject MessageAnimationService AnimationService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
 <PageTitle>Channel Dungeons</PageTitle>
 
 <div class="discord-app">
-    <Sidebar 
-        CurrentChannel="@currentChannel?.Id" 
+    <Sidebar
+        CurrentChannel="@currentChannel?.Id"
         IsVisible="@isSidebarVisible"
         OnChannelSelected="@HandleChannelSelected"
         Channels="@channels" />
-    
-    <div class="content-area" class:sidebar-visible="@isSidebarVisible">
+
+    <div class="content-area">
         @if (currentChannel != null)
         {
-            <ChannelHeader 
+            <ChannelHeader
                 ChannelName="@currentChannel.Name"
                 Description="@currentChannel.Description"
                 OnToggleSidebar="@HandleToggleSidebar" />
-            
+
             <div class="message-area">
-                <MessagesList 
+                <MessagesList
                     Messages="@displayedMessages"
                     ShowTypingIndicator="@showTypingIndicator" />
             </div>
-            
+
             <footer>
-                <CommandInput 
+                <CommandInput
                     IsVisible="@inputVisible"
                     OnCommandSubmit="@HandleCommandSubmit" />
             </footer>
@@ -66,15 +67,29 @@
     private bool isLoading = false;
     private CancellationTokenSource? animationCts;
     private AppConfig? config;
+    private bool _isMobile = false;
+    private bool _sidebarRevealDone = false;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            _isMobile = await JSRuntime.InvokeAsync<bool>("eval", "window.innerWidth <= 768");
+
             channels = await ChannelService.GetAllChannelsAsync();
             config = await ChannelService.GetConfigAsync();
-            
-            await LoadChannelAsync(ChannelName ?? channels.FirstOrDefault()?.Id);
+
+            var initialChannelId = ChannelName ?? channels.FirstOrDefault()?.Id;
+
+            // On desktop, show sidebar immediately for any channel other than welcome
+            if (!_isMobile && !string.IsNullOrEmpty(initialChannelId) &&
+                !initialChannelId.Equals("welcome", StringComparison.OrdinalIgnoreCase))
+            {
+                isSidebarVisible = true;
+                _sidebarRevealDone = true;
+            }
+
+            await LoadChannelAsync(initialChannelId);
         }
         catch (Exception ex)
         {
@@ -113,7 +128,7 @@
         try
         {
             currentChannel = await ChannelService.GetChannelAsync(channelId);
-            
+
             if (currentChannel == null)
             {
                 isLoading = false;
@@ -132,7 +147,6 @@
             if (config != null)
             {
                 var token = animationCts.Token;
-                await Task.Delay(config.UiShowDelay, token);
 
                 var messagesToAnimate = currentChannel.Messages.Select(m => new Message
                 {
@@ -150,12 +164,17 @@
                         displayedMessages.Add(messagesToAnimate[messageIndex]);
                         await InvokeAsync(StateHasChanged);
 
-                        if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count))
+                        if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count, currentChannel.Id, _sidebarRevealDone))
                         {
                             try
                             {
                                 await Task.Delay(config.UiShowDelay, token);
-                                isSidebarVisible = true;
+                                if (!_isMobile)
+                                {
+                                    isSidebarVisible = true;
+                                }
+                                _sidebarRevealDone = true;
+                                inputVisible = true;
                                 await InvokeAsync(StateHasChanged);
                             }
                             catch (OperationCanceledException)
@@ -188,7 +207,12 @@
 
     private async Task HandleChannelSelected(string channelId)
     {
-        isSidebarVisible = false;
+        // On mobile, close sidebar when switching channels; on desktop, keep it open
+        if (_isMobile)
+        {
+            isSidebarVisible = false;
+        }
+
         await LoadChannelAsync(channelId);
         NavigationManager.NavigateTo($"/{channelId}");
     }
@@ -203,19 +227,40 @@
         if (command.StartsWith('/'))
         {
             var channelName = command[1..].ToLowerInvariant();
-            var channel = channels.FirstOrDefault(c => 
+            var channel = channels.FirstOrDefault(c =>
                 c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
-            
+
             if (channel != null)
             {
                 await HandleChannelSelected(channel.Id);
             }
+            else
+            {
+                var availableNames = string.Join(", ", channels.Select(c => $"<span class='discord-command'>/{c.Name}</span>"));
+                AddBotMessage($"Unknown command: <span class='discord-command'>{command}</span>. Available commands are: {availableNames}");
+            }
         }
+        else
+        {
+            AddBotMessage("This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>about</span> to navigate.");
+        }
+    }
+
+    private void AddBotMessage(string content)
+    {
+        displayedMessages.Add(new Message
+        {
+            Username = "Channel Dungeons",
+            Content = content,
+            Timestamp = GetCurrentTime()
+        });
+        ChannelService.CacheMessages(currentChannel?.Id ?? string.Empty, displayedMessages);
     }
 
     private static string GetCurrentTime()
     {
-        return DateTime.Now.ToString("HH:mm");
+        var now = DateTime.Now;
+        return now.ToString("h:mm ") + (now.Hour < 12 ? "AM" : "PM");
     }
 
     ValueTask IAsyncDisposable.DisposeAsync()

@@ -19,6 +19,9 @@ public class MessageAnimationService
 
     /// <summary>
     /// Animates messages by showing typing indicator, then revealing message.
+    /// Uses cumulative timing matching the original vanilla JS behavior:
+    /// each message's delay is an additional pause on top of the previous message's
+    /// completion time, plus the configured between-message gap.
     /// Uses CancellationToken to allow cleanup when navigating away.
     /// </summary>
     /// <param name="messages">Messages to animate</param>
@@ -46,12 +49,14 @@ public class MessageAnimationService
 
                 var message = messages[i];
                 var typingDuration = message.TypingDuration ?? config.DefaultTypingDuration;
-                var messageDelay = message.Delay ?? config.DefaultMessageDelay;
+                // Delay is additional time on top of cumulative (matches original data-delay semantics)
+                var additionalDelay = message.Delay ?? 0;
+                var messageDelay = cumulativeDelay + additionalDelay;
 
-                // Add initial delay before showing typing indicator
-                if (cumulativeDelay > 0)
+                // Wait until it is time to show the typing indicator
+                if (messageDelay > 0)
                 {
-                    await _delay(cumulativeDelay, cancellationToken);
+                    await _delay(messageDelay, cancellationToken);
                 }
 
                 // Show typing indicator
@@ -64,8 +69,9 @@ public class MessageAnimationService
                 await onTypingIndicatorChanged(false);
                 await onMessageAdded(i);
 
-                // Update cumulative delay for next message
-                cumulativeDelay = messageDelay;
+                // Cumulative delay for next message includes this message's start time,
+                // its typing duration, and the standard between-message gap
+                cumulativeDelay = messageDelay + typingDuration + config.DefaultMessageDelay;
             }
         }
         catch (OperationCanceledException)

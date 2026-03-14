@@ -1,13 +1,15 @@
 @namespace ChannelDungeons.BlazorWasm.Components.Autocomplete
+@using ChannelDungeons.BlazorWasm.Models
 
 @if (IsVisible && Commands.Count > 0)
 {
-    <div class="autocomplete-dropdown">
+    <div class="autocomplete-dropdown visible">
         @foreach (var (command, index) in Commands.Select((cmd, idx) => (cmd, idx)))
         {
             <div class="autocomplete-item @(index == SelectedIndex ? "selected" : "")"
                  @onclick="@(() => OnCommandSelected.InvokeAsync(command))">
-                <span>@command</span>
+                <span class="command-name">@command.Name</span>
+                <span class="command-description">@command.Description</span>
             </div>
         }
     </div>
@@ -15,13 +17,13 @@
 
 @code {
     [Parameter]
-    public IReadOnlyList<string> Commands { get; set; } = [];
+    public IReadOnlyList<CommandSuggestion> Commands { get; set; } = [];
 
     [Parameter]
     public bool IsVisible { get; set; }
 
     [Parameter]
-    public EventCallback<string> OnCommandSelected { get; set; }
+    public EventCallback<CommandSuggestion> OnCommandSelected { get; set; }
 
     [Parameter]
     public int SelectedIndex { get; set; } = -1;

@@ -68,12 +68,12 @@ public class ChannelService
     }
 
     /// <summary>
-    /// Gets all available channel IDs for command completion.
+    /// Gets all available channel commands with descriptions for autocomplete.
     /// </summary>
-    public async Task<List<string>> GetChannelCommandsAsync()
+    public async Task<List<CommandSuggestion>> GetChannelCommandsAsync()
     {
         var channels = await GetAllChannelsAsync();
-        return channels.Select(c => $"/{c.Name}").ToList();
+        return channels.Select(c => new CommandSuggestion($"/{c.Name}", c.Description)).ToList();
     }
 
     /// <summary>
