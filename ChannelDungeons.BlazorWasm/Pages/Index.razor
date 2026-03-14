@@ -151,7 +151,7 @@
                                 .ContinueWith(
                                     async t =>
                                     {
-                                        if (!t.IsCanceled)
+                                        if (!t.IsCanceled && !token.IsCancellationRequested)
                                         {
                                             isSidebarVisible = true;
                                             await InvokeAsync(StateHasChanged);
@@ -201,8 +201,8 @@
     {
         if (command.StartsWith("/"))
         {
-            var channelName = command.Substring(1).ToLowerInvariant();
-            var channel = channels.FirstOrDefault(c => 
+            var channelName = command[1..];
+            var channel = channels.FirstOrDefault(c =>
                 c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
             
             if (channel != null)
