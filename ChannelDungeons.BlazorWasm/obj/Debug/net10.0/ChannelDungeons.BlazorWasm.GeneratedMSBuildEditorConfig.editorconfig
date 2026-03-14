@@ -17,57 +17,57 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = ChannelDungeons.BlazorWasm
 build_property.RootNamespace = ChannelDungeons.BlazorWasm
-build_property.ProjectDir = /root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/
+build_property.ProjectDir = C:\Users\pohlm\Dropbox\Tim\Daten\Dokumente\Programmierung\ChannelDungeonsWebsite\ChannelDungeons.BlazorWasm\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = /root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm
+build_property.MSBuildProjectDirectory = C:\Users\pohlm\Dropbox\Tim\Daten\Dokumente\Programmierung\ChannelDungeonsWebsite\ChannelDungeons.BlazorWasm
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/App.razor]
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Autocomplete/AutocompleteDropdown.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BdXRvY29tcGxldGUvQXV0b2NvbXBsZXRlRHJvcGRvd24ucmF6b3I=
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Autocomplete/AutocompleteDropdown.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBdXRvY29tcGxldGVcQXV0b2NvbXBsZXRlRHJvcGRvd24ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Channel/MessageDisplay.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DaGFubmVsL01lc3NhZ2VEaXNwbGF5LnJhem9y
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Channel/MessageDisplay.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDaGFubmVsXE1lc3NhZ2VEaXNwbGF5LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Channel/MessagesList.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DaGFubmVsL01lc3NhZ2VzTGlzdC5yYXpvcg==
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Channel/MessagesList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDaGFubmVsXE1lc3NhZ2VzTGlzdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Channel/TypingIndicator.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DaGFubmVsL1R5cGluZ0luZGljYXRvci5yYXpvcg==
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Channel/TypingIndicator.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xDaGFubmVsXFR5cGluZ0luZGljYXRvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Layout/ChannelHeader.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvQ2hhbm5lbEhlYWRlci5yYXpvcg==
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Layout/ChannelHeader.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcQ2hhbm5lbEhlYWRlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Layout/CommandInput.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvQ29tbWFuZElucHV0LnJhem9y
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Layout/CommandInput.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcQ29tbWFuZElucHV0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Layout/Sidebar.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvU2lkZWJhci5yYXpvcg==
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Layout/Sidebar.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcU2lkZWJhci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Pages/Index.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/_Imports.razor]
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Layout/MainLayout.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTWFpbkxheW91dC5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = b-1o3pmj2d83
+[C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/Components/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-61n9562za6

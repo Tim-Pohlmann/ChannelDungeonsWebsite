@@ -97,8 +97,13 @@
             return;
         }
 
-        animationCts?.Cancel();
+        var previousCts = animationCts;
         animationCts = new CancellationTokenSource();
+        if (previousCts != null)
+        {
+            await previousCts.CancelAsync();
+            previousCts.Dispose();
+        }
 
         isLoading = true;
         displayedMessages.Clear();
@@ -126,7 +131,8 @@
 
             if (config != null)
             {
-                await Task.Delay(config.UiShowDelay, animationCts.Token);
+                var token = animationCts.Token;
+                await Task.Delay(config.UiShowDelay, token);
 
                 var messagesToAnimate = currentChannel.Messages.Select(m => new Message
                 {
@@ -143,6 +149,20 @@
                     {
                         displayedMessages.Add(messagesToAnimate[messageIndex]);
                         await InvokeAsync(StateHasChanged);
+
+                        if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count))
+                        {
+                            try
+                            {
+                                await Task.Delay(config.UiShowDelay, token);
+                                isSidebarVisible = true;
+                                await InvokeAsync(StateHasChanged);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                // Expected when navigating away
+                            }
+                        }
                     },
                     async (isTyping) =>
                     {
@@ -150,7 +170,7 @@
                         await InvokeAsync(StateHasChanged);
                     },
                     config,
-                    animationCts.Token);
+                    token);
 
                 ChannelService.CacheMessages(currentChannel.Id, displayedMessages);
                 inputVisible = true;
@@ -180,9 +200,9 @@
 
     private async Task HandleCommandSubmit(string command)
     {
-        if (command.StartsWith("/"))
+        if (command.StartsWith('/'))
         {
-            var channelName = command.Substring(1).ToLowerInvariant();
+            var channelName = command[1..].ToLowerInvariant();
             var channel = channels.FirstOrDefault(c => 
                 c.Name.Equals(channelName, StringComparison.OrdinalIgnoreCase));
             
@@ -193,7 +213,7 @@
         }
     }
 
-    private string GetCurrentTime()
+    private static string GetCurrentTime()
     {
         return DateTime.Now.ToString("HH:mm");
     }

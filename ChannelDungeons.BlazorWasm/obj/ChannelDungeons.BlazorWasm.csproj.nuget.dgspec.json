@@ -1,26 +1,31 @@
 {
   "format": 1,
   "restore": {
-    "/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj": {}
+    "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.BlazorWasm\\ChannelDungeons.BlazorWasm.csproj": {}
   },
   "projects": {
-    "/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj": {
+    "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.BlazorWasm\\ChannelDungeons.BlazorWasm.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj",
+        "projectUniqueName": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.BlazorWasm\\ChannelDungeons.BlazorWasm.csproj",
         "projectName": "ChannelDungeons.BlazorWasm",
-        "projectPath": "/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/",
+        "projectPath": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.BlazorWasm\\ChannelDungeons.BlazorWasm.csproj",
+        "packagesPath": "C:\\Users\\pohlm\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.BlazorWasm\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\pohlm\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "/usr/lib/dotnet/library-packs": {},
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -48,7 +53,7 @@
             "Microsoft.AspNetCore.App.Internal.Assets": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.0, )",
+              "version": "[10.0.2, )",
               "autoReferenced": true
             },
             "Microsoft.AspNetCore.Components.WebAssembly": {
@@ -60,16 +65,21 @@
               "target": "Package",
               "version": "[10.0.0, )"
             },
+            "Microsoft.DotNet.HotReload.WebAssembly.Browser": {
+              "target": "Package",
+              "version": "[10.0.102, )",
+              "autoReferenced": true
+            },
             "Microsoft.NET.ILLink.Tasks": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.0, )",
+              "version": "[10.0.2, )",
               "autoReferenced": true
             },
             "Microsoft.NET.Sdk.WebAssembly.Pack": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.0, )",
+              "version": "[10.0.2, )",
               "autoReferenced": true
             }
           },
@@ -87,7 +97,7 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
-              "version": "[10.0.0, 10.0.0]"
+              "version": "[10.0.2, 10.0.2]"
             }
           ],
           "frameworkReferences": {
@@ -95,7 +105,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

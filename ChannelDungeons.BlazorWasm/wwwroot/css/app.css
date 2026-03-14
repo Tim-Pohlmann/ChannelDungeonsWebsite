@@ -271,7 +271,8 @@ a:hover {
   list-style: none;
 }
 
-.channel {
+.channel,
+.channel-link {
   padding: var(--spacing-sm) var(--spacing-md);
   margin: var(--spacing-xxs) 0;
   border-radius: var(--radius-md);
@@ -280,14 +281,27 @@ a:hover {
   display: flex;
   align-items: center;
   font-size: var(--font-size-md);
+  background: none;
+  border: none;
+  font-family: inherit;
+  text-align: left;
+  text-decoration: none;
 }
 
-.channel:hover {
+.channel:hover,
+.channel-link:hover {
   background-color: var(--discord-hover);
   color: var(--discord-text);
 }
 
-.channel.active {
+.channel:focus-visible,
+.channel-link:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+}
+
+.channel.active,
+.channel-link.active {
   background-color: var(--discord-active-channel);
   color: var(--discord-text);
 }
