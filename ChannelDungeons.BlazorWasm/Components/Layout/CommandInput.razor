@@ -78,7 +78,7 @@
     private async Task HandleInput(ChangeEventArgs e)
     {
         searchTerm = (e.Value?.ToString() ?? string.Empty).ToLowerInvariant();
-        showAutocomplete = searchTerm.StartsWith("/") && searchTerm.Length >= 1;
+        showAutocomplete = searchTerm.StartsWith("/");
         selectedIndex = showAutocomplete ? 0 : -1;
         UpdateFilteredCommands();
         await InvokeAsync(StateHasChanged);

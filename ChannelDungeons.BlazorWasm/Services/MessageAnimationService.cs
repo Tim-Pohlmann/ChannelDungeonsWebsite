@@ -38,8 +38,6 @@ public class MessageAnimationService
     {
         try
         {
-            int cumulativeDelay = 0;
-
             for (int i = 0; i < messages.Count; i++)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -49,14 +47,13 @@ public class MessageAnimationService
 
                 var message = messages[i];
                 var typingDuration = message.TypingDuration ?? config.DefaultTypingDuration;
-                // Delay is additional time on top of cumulative (matches original data-delay semantics)
                 var additionalDelay = message.Delay ?? 0;
-                var messageDelay = cumulativeDelay + additionalDelay;
 
-                // Wait until it is time to show the typing indicator
-                if (messageDelay > 0)
+                // Wait for between-message gap (skip for first message) plus any per-message extra delay
+                var preDelay = (i > 0 ? config.DefaultMessageDelay : 0) + additionalDelay;
+                if (preDelay > 0)
                 {
-                    await _delay(messageDelay, cancellationToken);
+                    await _delay(preDelay, cancellationToken);
                 }
 
                 // Show typing indicator
@@ -68,10 +65,6 @@ public class MessageAnimationService
                 // Hide typing, show message
                 await onTypingIndicatorChanged(false);
                 await onMessageAdded(i);
-
-                // Cumulative delay for next message includes this message's start time,
-                // its typing duration, and the standard between-message gap
-                cumulativeDelay = messageDelay + typingDuration + config.DefaultMessageDelay;
             }
         }
         catch (OperationCanceledException)
