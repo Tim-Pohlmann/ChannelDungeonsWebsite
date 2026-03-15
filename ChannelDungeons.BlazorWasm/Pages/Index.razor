@@ -1,6 +1,7 @@
 @page "/"
 @page "/{ChannelName}"
 @using System.Collections.ObjectModel
+@using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.Components.Web
 @using ChannelDungeons.BlazorWasm.Components.Layout
 @using ChannelDungeons.BlazorWasm.Components.Channel
@@ -19,7 +20,7 @@
         OnChannelSelected="@HandleChannelSelected"
         Channels="@channels" />
 
-    <div class="content-area">
+    <div class="content-area" class:sidebar-visible="@isSidebarVisible">
         @if (currentChannel != null)
         {
             <ChannelHeader
@@ -74,7 +75,7 @@
     {
         try
         {
-            _isMobile = await JSRuntime.InvokeAsync<bool>("eval", "window.innerWidth <= 768");
+            _isMobile = await JSRuntime.InvokeAsync<bool>("channelDungeons.isMobile");
 
             channels = await ChannelService.GetAllChannelsAsync();
             config = await ChannelService.GetConfigAsync();
@@ -87,6 +88,7 @@
             {
                 isSidebarVisible = true;
                 _sidebarRevealDone = true;
+                inputVisible = true; // Show input immediately for non-welcome channels on desktop
             }
 
             await LoadChannelAsync(initialChannelId);
@@ -192,7 +194,11 @@
                     token);
 
                 ChannelService.CacheMessages(currentChannel.Id, displayedMessages);
-                inputVisible = true;
+                // Ensure input is visible at end of animation if not already set
+                if (!inputVisible)
+                {
+                    inputVisible = true;
+                }
             }
         }
         catch (OperationCanceledException)
@@ -236,13 +242,13 @@
             }
             else
             {
-                var availableNames = string.Join(", ", channels.Select(c => $"<span class='discord-command'>/{c.Name}</span>"));
-                AddBotMessage($"Unknown command: <span class='discord-command'>{command}</span>. Available commands are: {availableNames}");
+                var availableNames = string.Join(", ", channels.Select(c => $"<span class='discord-command'>/{HtmlEncoder.Default.Encode(c.Name)}</span>"));
+                AddBotMessage($"Unknown command: <span class='discord-command'>{HtmlEncoder.Default.Encode(command)}</span>. Available commands are: {availableNames}");
             }
         }
         else
         {
-            AddBotMessage("This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>about</span> to navigate.");
+            AddBotMessage("This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>/about</span> to navigate.");
         }
     }
 
@@ -259,8 +265,7 @@
 
     private static string GetCurrentTime()
     {
-        var now = DateTime.Now;
-        return now.ToString("h:mm ") + (now.Hour < 12 ? "AM" : "PM");
+        return DateTime.Now.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     ValueTask IAsyncDisposable.DisposeAsync()
