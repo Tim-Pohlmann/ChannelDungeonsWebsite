@@ -12,7 +12,7 @@ namespace ChannelDungeons.Tests.Pages;
 public class IndexComponentTests : Bunit.TestContext
 {
     [TestMethod]
-    public async Task Index_DisplaysSidebarAfterMessagesLoad()
+    public async Task Index_RendersWithoutException()
     {
         // Arrange
         var httpClient = new HttpClient(new MockHttpMessageHandler());
@@ -24,11 +24,13 @@ public class IndexComponentTests : Bunit.TestContext
         Services.AddScoped(_ => animationService);
         Services.AddScoped(_ => navigationManager);
 
+        // Configure JSRuntime: use loose mode so unmocked calls return defaults (false for bool = desktop)
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
         // Act
         var cut = RenderComponent<Index>();
 
         // Wait for channel loading and message animation to complete
-        // (animation delay is 100ms per message + 100ms UI delay = ~400ms total)
         await Task.Delay(600);
 
         // Assert - component should render without throwing
@@ -52,7 +54,7 @@ internal class MockHttpMessageHandler : HttpMessageHandler
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        // Return test channel data with messages to trigger animation
+        // Return test channel data with a non-welcome channel so sidebar is visible immediately
         var json = """
 {
   "channels": [
@@ -65,13 +67,13 @@ internal class MockHttpMessageHandler : HttpMessageHandler
           "username": "Test User",
           "content": "Hello",
           "typingDuration": 100,
-          "delay": 100
+          "delay": 0
         },
         {
           "username": "Test User",
           "content": "World",
           "typingDuration": 100,
-          "delay": 100
+          "delay": 0
         }
       ]
     }

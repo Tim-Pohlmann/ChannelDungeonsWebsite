@@ -19,6 +19,9 @@ public class MessageAnimationService
 
     /// <summary>
     /// Animates messages by showing typing indicator, then revealing message.
+    /// Uses cumulative timing matching the original vanilla JS behavior:
+    /// each message's delay is an additional pause on top of the previous message's
+    /// completion time, plus the configured between-message gap.
     /// Uses CancellationToken to allow cleanup when navigating away.
     /// </summary>
     /// <param name="messages">Messages to animate</param>
@@ -35,8 +38,6 @@ public class MessageAnimationService
     {
         try
         {
-            int cumulativeDelay = 0;
-
             for (int i = 0; i < messages.Count; i++)
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -46,12 +47,13 @@ public class MessageAnimationService
 
                 var message = messages[i];
                 var typingDuration = message.TypingDuration ?? config.DefaultTypingDuration;
-                var messageDelay = message.Delay ?? config.DefaultMessageDelay;
+                var additionalDelay = message.Delay ?? 0;
 
-                // Add initial delay before showing typing indicator
-                if (cumulativeDelay > 0)
+                // Wait for between-message gap (skip for first message) plus any per-message extra delay
+                var preDelay = (i > 0 ? config.DefaultMessageDelay : 0) + additionalDelay;
+                if (preDelay > 0)
                 {
-                    await _delay(cumulativeDelay, cancellationToken);
+                    await _delay(preDelay, cancellationToken);
                 }
 
                 // Show typing indicator
@@ -63,9 +65,6 @@ public class MessageAnimationService
                 // Hide typing, show message
                 await onTypingIndicatorChanged(false);
                 await onMessageAdded(i);
-
-                // Update cumulative delay for next message
-                cumulativeDelay = messageDelay;
             }
         }
         catch (OperationCanceledException)
