@@ -18,6 +18,7 @@
                 type="text"
                 placeholder="Type a command (try /about)"
                 @onkeydown="@HandleKeyDown"
+                @onkeydown:preventDefault="@showAutocomplete"
                 @oninput="@HandleInput"
                 autocomplete="off"
                 spellcheck="false"

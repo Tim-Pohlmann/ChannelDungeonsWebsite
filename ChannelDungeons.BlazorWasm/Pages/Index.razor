@@ -260,7 +260,10 @@
             Content = content,
             Timestamp = GetCurrentTime()
         });
-        ChannelService.CacheMessages(currentChannel?.Id ?? string.Empty, displayedMessages);
+        if (currentChannel != null)
+        {
+            ChannelService.CacheMessages(currentChannel.Id, displayedMessages);
+        }
     }
 
     private static string GetCurrentTime()
