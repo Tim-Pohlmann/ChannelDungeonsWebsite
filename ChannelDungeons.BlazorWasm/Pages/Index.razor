@@ -125,7 +125,7 @@
         isLoading = true;
         displayedMessages.Clear();
         showTypingIndicator = false;
-        inputVisible = false;
+        // Preserve inputVisible if already set (e.g., for non-welcome desktop channels)
 
         try
         {
@@ -148,57 +148,7 @@
 
             if (config != null)
             {
-                var token = animationCts.Token;
-
-                var messagesToAnimate = currentChannel.Messages.Select(m => new Message
-                {
-                    Username = m.Username,
-                    Content = m.Content,
-                    TypingDuration = m.TypingDuration,
-                    Delay = m.Delay,
-                    Timestamp = GetCurrentTime()
-                }).ToList();
-
-                await AnimationService.AnimateMessagesAsync(
-                    messagesToAnimate,
-                    async (messageIndex) =>
-                    {
-                        displayedMessages.Add(messagesToAnimate[messageIndex]);
-                        await InvokeAsync(StateHasChanged);
-
-                        if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count, currentChannel.Id, _sidebarRevealDone))
-                        {
-                            try
-                            {
-                                await Task.Delay(config.UiShowDelay, token);
-                                if (!_isMobile)
-                                {
-                                    isSidebarVisible = true;
-                                }
-                                _sidebarRevealDone = true;
-                                inputVisible = true;
-                                await InvokeAsync(StateHasChanged);
-                            }
-                            catch (OperationCanceledException)
-                            {
-                                // Expected when navigating away
-                            }
-                        }
-                    },
-                    async (isTyping) =>
-                    {
-                        showTypingIndicator = isTyping;
-                        await InvokeAsync(StateHasChanged);
-                    },
-                    config,
-                    token);
-
-                ChannelService.CacheMessages(currentChannel.Id, displayedMessages);
-                // Ensure input is visible at end of animation if not already set
-                if (!inputVisible)
-                {
-                    inputVisible = true;
-                }
+                await AnimateChannelMessagesAsync(currentChannel, config);
             }
         }
         catch (OperationCanceledException)
@@ -208,6 +158,65 @@
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private async Task AnimateChannelMessagesAsync(Channel channel, AppConfig config)
+    {
+        var token = animationCts!.Token;
+
+        var messagesToAnimate = channel.Messages.Select(m => new Message
+        {
+            Username = m.Username,
+            Content = m.Content,
+            TypingDuration = m.TypingDuration,
+            Delay = m.Delay,
+            Timestamp = GetCurrentTime()
+        }).ToList();
+
+        await AnimationService.AnimateMessagesAsync(
+            messagesToAnimate,
+            async (messageIndex) =>
+            {
+                displayedMessages.Add(messagesToAnimate[messageIndex]);
+                await InvokeAsync(StateHasChanged);
+
+                if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count, channel.Id, _sidebarRevealDone))
+                {
+                    await ShowSidebarAfterDelayAsync(config, token);
+                }
+            },
+            async (isTyping) =>
+            {
+                showTypingIndicator = isTyping;
+                await InvokeAsync(StateHasChanged);
+            },
+            config,
+            token);
+
+        ChannelService.CacheMessages(channel.Id, displayedMessages);
+        if (!inputVisible)
+        {
+            inputVisible = true;
+        }
+    }
+
+    private async Task ShowSidebarAfterDelayAsync(AppConfig config, CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(config.UiShowDelay, token);
+            if (!_isMobile)
+            {
+                isSidebarVisible = true;
+            }
+            _sidebarRevealDone = true;
+            inputVisible = true;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected when navigating away
         }
     }
 

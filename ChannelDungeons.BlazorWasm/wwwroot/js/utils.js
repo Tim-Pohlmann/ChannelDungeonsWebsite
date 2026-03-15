@@ -1,5 +1,5 @@
-window.channelDungeons = {
+globalThis.channelDungeons = {
     isMobile: function() {
-        return window.innerWidth <= 768;
+        return globalThis.innerWidth <= 768;
     }
 };
