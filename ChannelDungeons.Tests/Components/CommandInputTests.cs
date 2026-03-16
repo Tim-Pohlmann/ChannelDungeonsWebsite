@@ -52,6 +52,7 @@ public class CommandInputTests : Bunit.TestContext
     {
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
 
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/gen" });
@@ -65,6 +66,7 @@ public class CommandInputTests : Bunit.TestContext
         // Typing just "/" should show all available commands
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
 
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/" });
@@ -89,6 +91,7 @@ public class CommandInputTests : Bunit.TestContext
     {
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
 
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/GEN" });
@@ -101,6 +104,7 @@ public class CommandInputTests : Bunit.TestContext
     {
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
 
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/xyz" });
@@ -113,6 +117,7 @@ public class CommandInputTests : Bunit.TestContext
     {
         RegisterService(["general"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
 
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/gen" });
@@ -127,6 +132,7 @@ public class CommandInputTests : Bunit.TestContext
     {
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/gen" });
 
@@ -141,6 +147,7 @@ public class CommandInputTests : Bunit.TestContext
     {
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/r" });
 
@@ -158,6 +165,7 @@ public class CommandInputTests : Bunit.TestContext
     {
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/gen" });
         await cut.Find(".command-input").TriggerEventAsync("onkeydown",
@@ -174,6 +182,7 @@ public class CommandInputTests : Bunit.TestContext
     {
         RegisterService(["general", "rules"]);
         var cut = RenderComponent<CommandInput>(p => p.Add(x => x.IsVisible, false));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/gen" });
 
@@ -194,6 +203,7 @@ public class CommandInputTests : Bunit.TestContext
             .Add(x => x.IsVisible, false)
             .Add(x => x.OnCommandSubmit,
                 EventCallback.Factory.Create<string>(this, cmd => submitted = cmd)));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
 
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/gen" });
@@ -214,6 +224,7 @@ public class CommandInputTests : Bunit.TestContext
             .Add(x => x.IsVisible, false)
             .Add(x => x.OnCommandSubmit,
                 EventCallback.Factory.Create<string>(this, cmd => submitted = cmd)));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
 
         // /about has no match → autocomplete list is empty → direct submit
         await cut.Find(".command-input").TriggerEventAsync("oninput",
@@ -233,6 +244,7 @@ public class CommandInputTests : Bunit.TestContext
             .Add(x => x.IsVisible, false)
             .Add(x => x.OnCommandSubmit,
                 EventCallback.Factory.Create<string>(this, cmd => submitted = cmd)));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
 
         await cut.Find(".command-input").TriggerEventAsync("oninput",
             new ChangeEventArgs { Value = "/r" });
