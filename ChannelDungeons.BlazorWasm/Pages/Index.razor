@@ -90,7 +90,7 @@
 
             // On desktop, show sidebar immediately for any channel other than welcome
             if (!_isMobile && !string.IsNullOrEmpty(initialChannelId) &&
-                !initialChannelId.Equals("welcome", StringComparison.OrdinalIgnoreCase))
+                !string.Equals(initialChannelId, SidebarAnimationService.WelcomeChannelId, StringComparison.OrdinalIgnoreCase))
             {
                 isSidebarVisible = true;
                 _sidebarRevealDone = true;

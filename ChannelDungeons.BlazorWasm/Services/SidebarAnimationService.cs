@@ -6,7 +6,7 @@ namespace ChannelDungeons.BlazorWasm.Services;
 /// </summary>
 public static class SidebarAnimationService
 {
-    private const string WelcomeChannelId = "welcome";
+    public const string WelcomeChannelId = "welcome";
 
     /// <summary>
     /// Determines if the sidebar should be shown based on the current message index.
@@ -21,7 +21,7 @@ public static class SidebarAnimationService
     public static bool ShouldShowSidebar(int currentMessageIndex, int totalMessages, string channelId, bool sidebarRevealDone)
     {
         return !sidebarRevealDone
-            && channelId.Equals(WelcomeChannelId, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(channelId, WelcomeChannelId, StringComparison.OrdinalIgnoreCase)
             && currentMessageIndex == totalMessages - 1
             && totalMessages > 0;
     }
