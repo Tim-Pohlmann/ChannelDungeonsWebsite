@@ -79,8 +79,8 @@
     {
         searchTerm = (e.Value?.ToString() ?? string.Empty).ToLowerInvariant();
         showAutocomplete = searchTerm.StartsWith('/');
-        selectedIndex = showAutocomplete ? 0 : -1;
         UpdateFilteredCommands();
+        selectedIndex = (showAutocomplete && filteredCommands.Count > 0) ? 0 : -1;
         await InvokeAsync(StateHasChanged);
     }
 

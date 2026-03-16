@@ -200,7 +200,7 @@
             config,
             token);
 
-        ChannelService.CacheMessages(channel.Id, displayedMessages);
+        ChannelService.CacheMessages(channel.Id, displayedMessages.ToList());
         if (!inputVisible)
         {
             inputVisible = true;
@@ -277,7 +277,7 @@
         });
         if (currentChannel != null)
         {
-            ChannelService.CacheMessages(currentChannel.Id, displayedMessages);
+            ChannelService.CacheMessages(currentChannel.Id, displayedMessages.ToList());
         }
     }
 
