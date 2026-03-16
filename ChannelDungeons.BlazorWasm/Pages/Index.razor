@@ -34,11 +34,9 @@
                     ShowTypingIndicator="@showTypingIndicator" />
             </div>
 
-            <footer>
-                <CommandInput
-                    IsVisible="@inputVisible"
-                    OnCommandSubmit="@HandleCommandSubmit" />
-            </footer>
+            <CommandInput
+                IsVisible="@inputVisible"
+                OnCommandSubmit="@HandleCommandSubmit" />
         }
         else if (isLoading)
         {
@@ -75,7 +73,15 @@
     {
         try
         {
-            _isMobile = await JSRuntime.InvokeAsync<bool>("channelDungeons.isMobile");
+            try
+            {
+                _isMobile = await JSRuntime.InvokeAsync<bool>("channelDungeons.isMobile");
+            }
+            catch (JSException)
+            {
+                // Script load failure or CSP issue - default to desktop view
+                _isMobile = false;
+            }
 
             channels = await ChannelService.GetAllChannelsAsync();
             config = await ChannelService.GetConfigAsync();
