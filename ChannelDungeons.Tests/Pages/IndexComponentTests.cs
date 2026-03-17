@@ -30,8 +30,16 @@ public class IndexComponentTests : Bunit.TestContext
         // Act
         var cut = RenderComponent<Index>();
 
-        // Wait for channel loading and message animation to complete
-        await Task.Delay(600);
+        // Wait for component to fully initialize and render with expected state
+        cut.WaitForState(() =>
+        {
+            var sidebar = cut.FindAll(".sidebar").FirstOrDefault();
+            var commandInput = cut.FindAll(".command-input-container").FirstOrDefault();
+            return sidebar != null &&
+                   sidebar.ClassList.Contains("visible") &&
+                   commandInput != null &&
+                   commandInput.ClassList.Contains("visible");
+        }, timeout: TimeSpan.FromSeconds(2));
 
         // Assert - component should render without throwing
         Assert.IsNotNull(cut);
