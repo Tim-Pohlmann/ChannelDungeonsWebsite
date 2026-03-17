@@ -42,6 +42,14 @@ public class IndexComponentTests : Bunit.TestContext
 
         var contentArea = cut.Find(".content-area");
         Assert.IsNotNull(contentArea, "Content area should be rendered");
+
+        // Verify sidebar visibility behavior (should be visible for non-welcome channels on desktop)
+        Assert.IsTrue(sidebarElement.ClassList.Contains("visible"), "Sidebar should have 'visible' class for non-welcome channels on desktop");
+        Assert.IsTrue(contentArea.ClassList.Contains("sidebar-visible"), "Content area should have 'sidebar-visible' class when sidebar is shown");
+
+        // Verify command input is visible
+        var commandInput = cut.Find(".command-input-container");
+        Assert.IsTrue(commandInput.ClassList.Contains("visible"), "Command input should be visible after messages load");
     }
 }
 
