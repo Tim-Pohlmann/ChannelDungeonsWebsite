@@ -130,9 +130,10 @@
         isLoading = true;
         displayedMessages.Clear();
         showTypingIndicator = false;
-        // Initially show for non-welcome desktop; for welcome/mobile, input is revealed after animation completes
+        // Show input immediately for non-welcome desktop, or when re-visiting welcome after the intro has already played.
+        // For welcome on first visit (or mobile), input is revealed after animation completes.
         var isWelcomeChannel = string.Equals(channelId, SidebarAnimationService.WelcomeChannelId, StringComparison.OrdinalIgnoreCase);
-        inputVisible = !isWelcomeChannel && !_isMobile;
+        inputVisible = (!isWelcomeChannel || _sidebarRevealDone) && !_isMobile;
 
         try
         {
@@ -297,6 +298,7 @@
 
     private static string GetCurrentTime()
     {
+        // InvariantCulture is intentional: produces a consistent Discord-like "h:mm AM/PM" format
         return DateTime.Now.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
     }
 
