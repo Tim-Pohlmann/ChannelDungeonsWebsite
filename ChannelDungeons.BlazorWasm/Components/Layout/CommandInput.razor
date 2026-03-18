@@ -90,9 +90,9 @@
             {
                 await JSRuntime.InvokeVoidAsync("channelDungeons.setupCommandInputKeyHandler", inputElement);
             }
-            catch (JSException)
+            catch (Exception)
             {
-                // JS interop failure - preventDefault won't work but component will still function
+                // Any interop failure (JSException, ObjectDisposedException, etc.) - component still functions without key handler
             }
         }
     }

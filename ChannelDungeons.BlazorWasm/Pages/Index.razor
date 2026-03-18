@@ -207,6 +207,7 @@
         if (!inputVisible)
         {
             inputVisible = true;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
@@ -260,15 +261,25 @@
             }
             else
             {
-                var availableNames = string.Join(", ", channels.Select(c => $"<span class='discord-command'>/{HtmlEncoder.Default.Encode(c.Name)}</span>"));
-                AddBotMessage($"Unknown command: <span class='discord-command'>{HtmlEncoder.Default.Encode(command)}</span>. Available commands are: {availableNames}");
+                AddBotMessage(BuildUnknownCommandContent(command));
             }
         }
         else
         {
-            AddBotMessage("This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>/about</span> to navigate.");
+            AddBotMessage(BuildNonCommandContent());
         }
     }
+
+    private string BuildUnknownCommandContent(string command)
+    {
+        var encodedCommand = HtmlEncoder.Default.Encode(command);
+        var availableNames = string.Join(", ", channels.Select(c =>
+            $"<span class='discord-command'>/{HtmlEncoder.Default.Encode(c.Name)}</span>"));
+        return $"Unknown command: <span class='discord-command'>{encodedCommand}</span>. Available commands are: {availableNames}";
+    }
+
+    private static string BuildNonCommandContent() =>
+        "This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>/about</span> to navigate.";
 
     private void AddBotMessage(string content)
     {
