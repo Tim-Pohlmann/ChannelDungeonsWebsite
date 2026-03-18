@@ -297,7 +297,7 @@
 
     private static string GetCurrentTime()
     {
-        return DateTime.Now.ToString("h:mm tt", System.Globalization.CultureInfo.CurrentCulture);
+        return DateTime.Now.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     ValueTask IAsyncDisposable.DisposeAsync()
