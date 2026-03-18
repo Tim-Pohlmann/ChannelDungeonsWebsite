@@ -34,6 +34,9 @@ public class CommandInputTests : Bunit.TestContext
         var client = mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("http://localhost/");
         Services.AddScoped(_ => new ChannelService(client));
+
+        // Mock the JS interop call for keyboard handler setup
+        JSInterop.SetupVoid("channelDungeons.setupCommandInputKeyHandler", _ => true);
     }
 
     // --- Filtering ---

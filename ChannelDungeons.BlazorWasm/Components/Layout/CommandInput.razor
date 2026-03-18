@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using ChannelDungeons.BlazorWasm.Components.Autocomplete
 @inject ChannelService ChannelService
+@inject IJSRuntime JSRuntime
 
 <footer>
     <div class="autocomplete-container">
@@ -71,6 +72,21 @@
             catch (JSException)
             {
                 // FocusAsync can throw if JS interop fails during navigation; safe to ignore
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("channelDungeons.setupCommandInputKeyHandler", inputElement);
+            }
+            catch (JSException)
+            {
+                // JS interop failure - preventDefault won't work but component will still function
             }
         }
     }

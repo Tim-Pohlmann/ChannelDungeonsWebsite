@@ -220,11 +220,11 @@
           }
         }
       },
-      "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.102": {
+      "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.104": {
         "runtime": {
           "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll": {
-            "assemblyVersion": "10.0.102.0",
-            "fileVersion": "10.1.225.61305"
+            "assemblyVersion": "10.0.104.0",
+            "fileVersion": "10.1.426.12010"
           }
         }
       },
@@ -1056,7 +1056,7 @@
             "rid": "win",
             "assetType": "runtime",
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "0.0.0.0"
+            "fileVersion": "6.0.21.52210"
           },
           "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.dll": {
             "rid": "win",
@@ -1069,7 +1069,7 @@
       "ChannelDungeons.BlazorWasm/1.0.0": {
         "dependencies": {
           "Microsoft.AspNetCore.Components.WebAssembly": "10.0.0",
-          "Microsoft.DotNet.HotReload.WebAssembly.Browser": "10.0.102"
+          "Microsoft.DotNet.HotReload.WebAssembly.Browser": "10.0.104"
         },
         "runtime": {
           "ChannelDungeons.BlazorWasm.dll": {
@@ -1213,12 +1213,12 @@
       "path": "microsoft.codecoverage/17.12.0",
       "hashPath": "microsoft.codecoverage.17.12.0.nupkg.sha512"
     },
-    "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.102": {
+    "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.104": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Y8Xq5gLe6l3bW82uGJODzom5Z7pn+Y71BHObnmWF0LqbKFqfOOVDg76a2vyJnRLHn0X1LmsXSec/QdCWFOPl4A==",
-      "path": "microsoft.dotnet.hotreload.webassembly.browser/10.0.102",
-      "hashPath": "microsoft.dotnet.hotreload.webassembly.browser.10.0.102.nupkg.sha512"
+      "sha512": "sha512-OkWFygvFdm9emwxRW5ahcsU6saKO9EOYCFVNEXWl+23A4ssZy40VCQuqPhyurU7IyaPEhgA4iXh0/o7fhyNngA==",
+      "path": "microsoft.dotnet.hotreload.webassembly.browser/10.0.104",
+      "hashPath": "microsoft.dotnet.hotreload.webassembly.browser.10.0.104.nupkg.sha512"
     },
     "Microsoft.Extensions.Caching.Abstractions/9.0.5": {
       "type": "package",
