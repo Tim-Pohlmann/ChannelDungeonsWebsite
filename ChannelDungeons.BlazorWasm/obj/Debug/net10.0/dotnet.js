@@ -5,7 +5,7 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
   "mainAssemblyName": "ChannelDungeons.BlazorWasm",
   "applicationEnvironment": "Development",
   "resources": {
-    "hash": "sha256-1A08OzcQL3mJksRqVrrcvfP8snnrns9+1DJ+gDiH85g=",
+    "hash": "sha256-0AHGsh31aMXM10D8J31B2eetkOC+0uoWRwdVCmnrZs4=",
     "jsModuleNative": [
       {
         "name": "dotnet.native.4xbsgn06op.js"
@@ -1242,16 +1242,16 @@ var e=!1;const t=async()=>WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,
       },
       {
         "virtualPath": "ChannelDungeons.BlazorWasm.wasm",
-        "name": "ChannelDungeons.BlazorWasm.yfdpkj7vvg.wasm",
-        "integrity": "sha256-TgAvwjcjfWtfAiMAZv3nnSRkHPg/wVkN5QsGnJbVBTE=",
+        "name": "ChannelDungeons.BlazorWasm.9qqxbz78hj.wasm",
+        "integrity": "sha256-kcwuENv28BA1bMlPizMC7N18RkLRqeHd81hAWG17XcI=",
         "cache": "force-cache"
       }
     ],
     "pdb": [
       {
         "virtualPath": "ChannelDungeons.BlazorWasm.pdb",
-        "name": "ChannelDungeons.BlazorWasm.0hhgbwnjc9.pdb",
-        "integrity": "sha256-jKhMSXrB6BeTcWGop4QXCYmg6ucBVBgip7smkmzoKTg=",
+        "name": "ChannelDungeons.BlazorWasm.7zfm1g9j4s.pdb",
+        "integrity": "sha256-ndRh63Mpq47qR5cv0TCRDFxf9hG2rqetV/u1M7fxXTU=",
         "cache": "force-cache"
       }
     ],

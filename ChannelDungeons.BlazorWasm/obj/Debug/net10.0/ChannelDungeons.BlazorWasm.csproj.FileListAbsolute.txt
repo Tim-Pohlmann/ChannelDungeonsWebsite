@@ -2250,10 +2250,10 @@ C:/Users/pohlm/Dropbox/Tim/Daten/Dokumente/Programmierung/ChannelDungeonsWebsite
 /root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/gyt9d6bwk4-{0}-zj9dll5ffg-zj9dll5ffg.gz
 /root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/lvebu6d6pm-{0}-norj1umm1w-norj1umm1w.gz
 /root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/bb7la9ao9t-{0}-8jluf5u2kl-8jluf5u2kl.gz
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Debug/net10.0/wwwroot/_framework/ChannelDungeons.BlazorWasm.yfdpkj7vvg.wasm
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Debug/net10.0/wwwroot/_framework/ChannelDungeons.BlazorWasm.0hhgbwnjc9.pdb
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Debug/net10.0/wwwroot/_framework/ChannelDungeons.BlazorWasm.yfdpkj7vvg.wasm.gz
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Debug/net10.0/wwwroot/_framework/ChannelDungeons.BlazorWasm.0hhgbwnjc9.pdb.gz
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/3j3v5ictje-{0}-yfdpkj7vvg-yfdpkj7vvg.gz
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/21jxutzplo-{0}-0hhgbwnjc9-0hhgbwnjc9.gz
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/7utgyn6dtt-{0}-w1essyikun-w1essyikun.gz
+/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Debug/net10.0/wwwroot/_framework/ChannelDungeons.BlazorWasm.9qqxbz78hj.wasm
+/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Debug/net10.0/wwwroot/_framework/ChannelDungeons.BlazorWasm.7zfm1g9j4s.pdb
+/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Debug/net10.0/wwwroot/_framework/ChannelDungeons.BlazorWasm.9qqxbz78hj.wasm.gz
+/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Debug/net10.0/wwwroot/_framework/ChannelDungeons.BlazorWasm.7zfm1g9j4s.pdb.gz
+/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/3j3v5ictje-{0}-9qqxbz78hj-9qqxbz78hj.gz
+/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/21jxutzplo-{0}-7zfm1g9j4s-7zfm1g9j4s.gz
+/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/obj/Debug/net10.0/compressed/7utgyn6dtt-{0}-3dgrcvqj5v-3dgrcvqj5v.gz

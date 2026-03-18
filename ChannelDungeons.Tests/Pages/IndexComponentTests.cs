@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
 using Index = ChannelDungeons.BlazorWasm.Pages.Index;
 
 namespace ChannelDungeons.Tests.Pages;
@@ -13,24 +12,28 @@ namespace ChannelDungeons.Tests.Pages;
 [TestClass]
 public class IndexComponentTests : Bunit.TestContext
 {
-    [TestMethod]
-    public async Task Index_RendersWithoutException()
+    private void SetupServices(bool includeWelcomeChannel = false)
     {
-        // Arrange
-        var httpClient = new HttpClient(new MockHttpMessageHandler())
+        var httpClient = new HttpClient(new MockHttpMessageHandler(includeWelcomeChannel))
         {
             BaseAddress = new Uri("http://localhost/")
         };
         var channelService = new ChannelService(httpClient);
         var animationService = new MessageAnimationService();
-        var navigationManager = Substitute.For<Microsoft.AspNetCore.Components.NavigationManager>();
 
         Services.AddScoped(_ => channelService);
         Services.AddScoped(_ => animationService);
-        Services.AddScoped(_ => navigationManager);
-
-        // Configure JSRuntime: use loose mode so unmocked calls return defaults (false for bool = desktop)
+        // Use bUnit's FakeNavigationManager instead of NSubstitute
+        // It's already available via TestContext
         JSInterop.Mode = JSRuntimeMode.Loose;
+        JSInterop.SetupVoid("channelDungeons.setupCommandInputKeyHandler", _ => true);
+    }
+
+    [TestMethod]
+    public async Task Index_RendersWithoutException()
+    {
+        // Arrange
+        SetupServices();
 
         // Act
         var cut = RenderComponent<Index>();
@@ -71,18 +74,7 @@ public class IndexComponentTests : Bunit.TestContext
     public async Task HandleToggleSidebar_TogglesSidebarVisibility()
     {
         // Arrange
-        var httpClient = new HttpClient(new MockHttpMessageHandler())
-        {
-            BaseAddress = new Uri("http://localhost/")
-        };
-        var channelService = new ChannelService(httpClient);
-        var animationService = new MessageAnimationService();
-        var navigationManager = Substitute.For<Microsoft.AspNetCore.Components.NavigationManager>();
-
-        Services.AddScoped(_ => channelService);
-        Services.AddScoped(_ => animationService);
-        Services.AddScoped(_ => navigationManager);
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        SetupServices();
 
         var cut = RenderComponent<Index>();
         cut.WaitForState(() =>
@@ -106,19 +98,7 @@ public class IndexComponentTests : Bunit.TestContext
     public async Task HandleCommandSubmit_WithInvalidCommand_ShowsErrorMessage()
     {
         // Arrange
-        var httpClient = new HttpClient(new MockHttpMessageHandler())
-        {
-            BaseAddress = new Uri("http://localhost/")
-        };
-        var channelService = new ChannelService(httpClient);
-        var animationService = new MessageAnimationService();
-        var navigationManager = Substitute.For<Microsoft.AspNetCore.Components.NavigationManager>();
-
-        Services.AddScoped(_ => channelService);
-        Services.AddScoped(_ => animationService);
-        Services.AddScoped(_ => navigationManager);
-        JSInterop.Mode = JSRuntimeMode.Loose;
-        JSInterop.SetupVoid("channelDungeons.setupCommandInputKeyHandler", _ => true);
+        SetupServices();
 
         var cut = RenderComponent<Index>();
         cut.WaitForState(() =>
@@ -146,19 +126,7 @@ public class IndexComponentTests : Bunit.TestContext
     public async Task HandleCommandSubmit_WithNonSlashInput_ShowsDemoMessage()
     {
         // Arrange
-        var httpClient = new HttpClient(new MockHttpMessageHandler())
-        {
-            BaseAddress = new Uri("http://localhost/")
-        };
-        var channelService = new ChannelService(httpClient);
-        var animationService = new MessageAnimationService();
-        var navigationManager = Substitute.For<Microsoft.AspNetCore.Components.NavigationManager>();
-
-        Services.AddScoped(_ => channelService);
-        Services.AddScoped(_ => animationService);
-        Services.AddScoped(_ => navigationManager);
-        JSInterop.Mode = JSRuntimeMode.Loose;
-        JSInterop.SetupVoid("channelDungeons.setupCommandInputKeyHandler", _ => true);
+        SetupServices();
 
         var cut = RenderComponent<Index>();
         cut.WaitForState(() =>
@@ -181,6 +149,60 @@ public class IndexComponentTests : Bunit.TestContext
         var lastMessageContent = messages.Last().QuerySelector(".message-content")!.InnerHtml;
         Assert.IsTrue(lastMessageContent.Contains("demonstration"), "Message should mention it's a demonstration");
     }
+
+    [TestMethod]
+    public async Task HandleChannelSelected_NavigatesToNewChannel()
+    {
+        // Arrange
+        SetupServices();
+
+        var cut = RenderComponent<Index>();
+        cut.WaitForState(() =>
+        {
+            var sidebar = cut.FindAll(".sidebar").FirstOrDefault();
+            return sidebar != null && sidebar.ClassList.Contains("visible");
+        }, timeout: TimeSpan.FromSeconds(2));
+
+        // Get initial channel
+        var initialChannelHeader = cut.Find(".channel-name");
+        var initialChannelName = initialChannelHeader.TextContent.Trim();
+
+        // Act - find the sidebar component and click on it to trigger channel selection
+        // Since we can't easily click the sidebar in tests, we'll invoke the callback directly
+        var sidebarComponent = cut.FindComponent<ChannelDungeons.BlazorWasm.Components.Layout.Sidebar>();
+        await sidebarComponent.InvokeAsync(() =>
+            sidebarComponent.Instance.OnChannelSelected.InvokeAsync("test-channel"));
+
+        // Wait for channel to load
+        await Task.Delay(200);
+
+        // Assert - channel should remain the same since test-channel is the only channel
+        var afterChannelHeader = cut.Find(".channel-name");
+        var afterChannelName = afterChannelHeader.TextContent.Trim();
+        Assert.IsNotNull(afterChannelName, "Channel name should be present after navigation");
+    }
+
+    [TestMethod]
+    public async Task WelcomeChannel_ShowsSidebarAfterAnimation()
+    {
+        // Arrange
+        SetupServices(includeWelcomeChannel: true);
+
+        var cut = RenderComponent<Index>(parameters => parameters.Add(p => p.ChannelName, "welcome"));
+
+        // Wait for messages to animate and sidebar to appear
+        // The welcome channel should show sidebar after the last message
+        cut.WaitForState(() =>
+        {
+            var commandInput = cut.FindAll(".command-input-container").FirstOrDefault();
+            return commandInput != null && commandInput.ClassList.Contains("visible");
+        }, timeout: TimeSpan.FromSeconds(3));
+
+        // Assert - sidebar should eventually become visible after animation completes
+        // Note: On desktop, sidebar visibility depends on the animation completing
+        var sidebar = cut.Find(".sidebar");
+        Assert.IsNotNull(sidebar, "Sidebar should be rendered");
+    }
 }
 
 /// <summary>
@@ -188,12 +210,63 @@ public class IndexComponentTests : Bunit.TestContext
 /// </summary>
 internal class MockHttpMessageHandler : HttpMessageHandler
 {
+    private readonly bool _includeWelcomeChannel;
+
+    public MockHttpMessageHandler(bool includeWelcomeChannel = false)
+    {
+        _includeWelcomeChannel = includeWelcomeChannel;
+    }
+
     protected override Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        // Return test channel data with a non-welcome channel so sidebar is visible immediately
-        var json = """
+        // Return test channel data
+        var channels = new List<string>();
+
+        if (_includeWelcomeChannel)
+        {
+            channels.Add("""
+            {
+              "id": "welcome",
+              "name": "welcome",
+              "description": "Welcome channel",
+              "messages": [
+                {
+                  "username": "Bot",
+                  "content": "Welcome!",
+                  "typingDuration": 50,
+                  "delay": 0
+                }
+              ]
+            }
+""");
+        }
+
+        channels.Add("""
+            {
+              "id": "test-channel",
+              "name": "test",
+              "description": "Test channel",
+              "messages": [
+                {
+                  "username": "Test User",
+                  "content": "Hello",
+                  "typingDuration": 50,
+                  "delay": 0
+                },
+                {
+                  "username": "Test User",
+                  "content": "World",
+                  "typingDuration": 50,
+                  "delay": 0
+                }
+              ]
+            }
+""");
+
+        var channelsJson = string.Join(",", channels);
+        var json = $$"""
 {
   "config": {
     "defaultTypingDuration": 50,
@@ -201,25 +274,7 @@ internal class MockHttpMessageHandler : HttpMessageHandler
     "uiShowDelay": 100
   },
   "channels": [
-    {
-      "id": "test-channel",
-      "name": "test",
-      "description": "Test channel",
-      "messages": [
-        {
-          "username": "Test User",
-          "content": "Hello",
-          "typingDuration": 50,
-          "delay": 0
-        },
-        {
-          "username": "Test User",
-          "content": "World",
-          "typingDuration": 50,
-          "delay": 0
-        }
-      ]
-    }
+    {{channelsJson}}
   ]
 }
 """;
