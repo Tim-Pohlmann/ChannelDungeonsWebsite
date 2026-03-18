@@ -42,12 +42,10 @@ public class IndexComponentTests : Bunit.TestContext
         // Wait for component to fully initialize and render with expected state
         cut.WaitForState(() =>
         {
-            var sidebar = cut.FindAll(".sidebar").FirstOrDefault();
-            var commandInput = cut.FindAll(".command-input-container").FirstOrDefault();
-            return sidebar != null &&
-                   sidebar.ClassList.Contains("visible") &&
-                   commandInput != null &&
-                   commandInput.ClassList.Contains("visible");
+            var sidebars = cut.FindAll(".sidebar");
+            var inputs = cut.FindAll(".command-input-container");
+            return sidebars.Count > 0 && sidebars[0].ClassList.Contains("visible") &&
+                   inputs.Count > 0 && inputs[0].ClassList.Contains("visible");
         }, timeout: TimeSpan.FromSeconds(2));
 
         // Assert - component should render without throwing
@@ -80,8 +78,8 @@ public class IndexComponentTests : Bunit.TestContext
         var cut = RenderComponent<Index>();
         cut.WaitForState(() =>
         {
-            var sidebar = cut.FindAll(".sidebar").FirstOrDefault();
-            return sidebar != null && sidebar.ClassList.Contains("visible");
+            var sidebars = cut.FindAll(".sidebar");
+            return sidebars.Count > 0 && sidebars[0].ClassList.Contains("visible");
         }, timeout: TimeSpan.FromSeconds(2));
 
         var initiallyVisible = cut.Find(".sidebar").ClassList.Contains("visible");
@@ -104,8 +102,8 @@ public class IndexComponentTests : Bunit.TestContext
         var cut = RenderComponent<Index>();
         cut.WaitForState(() =>
         {
-            var commandInput = cut.FindAll(".command-input-container").FirstOrDefault();
-            return commandInput != null && commandInput.ClassList.Contains("visible");
+            var inputs = cut.FindAll(".command-input-container");
+            return inputs.Count > 0 && inputs[0].ClassList.Contains("visible");
         }, timeout: TimeSpan.FromSeconds(2));
 
         var initialMessagesCount = cut.FindAll(".message").Count;
@@ -119,7 +117,7 @@ public class IndexComponentTests : Bunit.TestContext
         var messages = cut.FindAll(".message");
         Assert.AreEqual(initialMessagesCount + 1, messages.Count, "One error message should be added");
 
-        var lastMessageContent = messages.Last().QuerySelector(".message-content")!.InnerHtml;
+        var lastMessageContent = messages[messages.Count - 1].QuerySelector(".message-content")!.InnerHtml;
         Assert.IsTrue(lastMessageContent.Contains("Unknown command"), "Error message should mention 'Unknown command'");
     }
 
@@ -132,8 +130,8 @@ public class IndexComponentTests : Bunit.TestContext
         var cut = RenderComponent<Index>();
         cut.WaitForState(() =>
         {
-            var commandInput = cut.FindAll(".command-input-container").FirstOrDefault();
-            return commandInput != null && commandInput.ClassList.Contains("visible");
+            var inputs = cut.FindAll(".command-input-container");
+            return inputs.Count > 0 && inputs[0].ClassList.Contains("visible");
         }, timeout: TimeSpan.FromSeconds(2));
 
         var initialMessagesCount = cut.FindAll(".message").Count;
@@ -147,7 +145,7 @@ public class IndexComponentTests : Bunit.TestContext
         var messages = cut.FindAll(".message");
         Assert.AreEqual(initialMessagesCount + 1, messages.Count, "One demo message should be added");
 
-        var lastMessageContent = messages.Last().QuerySelector(".message-content")!.InnerHtml;
+        var lastMessageContent = messages[messages.Count - 1].QuerySelector(".message-content")!.InnerHtml;
         Assert.IsTrue(lastMessageContent.Contains("demonstration"), "Message should mention it's a demonstration");
     }
 
@@ -160,8 +158,8 @@ public class IndexComponentTests : Bunit.TestContext
         var cut = RenderComponent<Index>();
         cut.WaitForState(() =>
         {
-            var sidebar = cut.FindAll(".sidebar").FirstOrDefault();
-            return sidebar != null && sidebar.ClassList.Contains("visible");
+            var sidebars = cut.FindAll(".sidebar");
+            return sidebars.Count > 0 && sidebars[0].ClassList.Contains("visible");
         }, timeout: TimeSpan.FromSeconds(2));
 
         // Get initial channel
@@ -195,8 +193,8 @@ public class IndexComponentTests : Bunit.TestContext
         // The welcome channel should show sidebar after the last message
         cut.WaitForState(() =>
         {
-            var commandInput = cut.FindAll(".command-input-container").FirstOrDefault();
-            return commandInput != null && commandInput.ClassList.Contains("visible");
+            var inputs = cut.FindAll(".command-input-container");
+            return inputs.Count > 0 && inputs[0].ClassList.Contains("visible");
         }, timeout: TimeSpan.FromSeconds(3));
 
         // Assert - sidebar should eventually become visible after animation completes

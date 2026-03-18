@@ -20,7 +20,7 @@ globalThis.channelDungeons = {
     },
 
     removeCommandInputKeyHandler: function(inputElement) {
-        if (!inputElement || !inputElement._keyHandler) return;
+        if (!inputElement?._keyHandler) return;
         inputElement.removeEventListener('keydown', inputElement._keyHandler);
         delete inputElement._keyHandler;
     }
