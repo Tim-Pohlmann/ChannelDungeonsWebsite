@@ -22,8 +22,9 @@ public class Message
     public int? TypingDuration { get; set; }
 
     /// <summary>
-    /// Delay in milliseconds before showing typing indicator for next message.
-    /// If null, uses default from config.
+    /// Extra pre-delay in milliseconds added on top of the configured between-message gap
+    /// before showing this message's typing indicator. Additive: does not replace the
+    /// default gap, it extends it. If null, no extra delay is applied.
     /// </summary>
     public int? Delay { get; set; }
 
