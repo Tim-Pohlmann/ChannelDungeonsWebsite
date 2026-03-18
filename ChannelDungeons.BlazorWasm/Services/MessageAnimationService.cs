@@ -47,10 +47,10 @@ public class MessageAnimationService
 
                 var message = messages[i];
                 var typingDuration = message.TypingDuration ?? config.DefaultTypingDuration;
-                var additionalDelay = message.Delay ?? 0;
+                var extraPreDelay = message.Delay ?? 0;
 
                 // Wait for between-message gap (skip for first message) plus any per-message extra delay
-                var preDelay = (i > 0 ? config.DefaultMessageDelay : 0) + additionalDelay;
+                var preDelay = (i > 0 ? config.DefaultMessageDelay : 0) + extraPreDelay;
                 if (preDelay > 0)
                 {
                     await _delay(preDelay, cancellationToken);

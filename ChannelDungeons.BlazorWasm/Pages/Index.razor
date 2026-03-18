@@ -77,9 +77,9 @@
             {
                 _isMobile = await JSRuntime.InvokeAsync<bool>("channelDungeons.isMobile");
             }
-            catch (JSException)
+            catch (Exception)
             {
-                // Script load failure or CSP issue - default to desktop view
+                // Any JS interop failure (JSException, ObjectDisposedException, etc.) - default to desktop view
                 _isMobile = false;
             }
 
@@ -286,7 +286,7 @@
 
     private static string GetCurrentTime()
     {
-        return DateTime.Now.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+        return DateTime.Now.ToString("h:mm tt", System.Globalization.CultureInfo.CurrentCulture);
     }
 
     ValueTask IAsyncDisposable.DisposeAsync()

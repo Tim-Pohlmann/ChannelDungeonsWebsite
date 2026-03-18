@@ -19,6 +19,11 @@
                 id="command-input"
                 type="text"
                 placeholder="Type a command (try /about)"
+                role="combobox"
+                aria-expanded="@(showAutocomplete ? "true" : "false")"
+                aria-autocomplete="list"
+                aria-controls="autocomplete-listbox"
+                aria-activedescendant="@(showAutocomplete && selectedIndex >= 0 ? $"autocomplete-option-{selectedIndex}" : null)"
                 @onkeydown="@HandleKeyDown"
                 @oninput="@HandleInput"
                 autocomplete="off"
@@ -163,9 +168,9 @@
         {
             await JSRuntime.InvokeVoidAsync("channelDungeons.removeCommandInputKeyHandler", inputElement);
         }
-        catch (JSException)
+        catch (Exception)
         {
-            // Ignore JS interop failure during disposal
+            // Any failure during disposal (JSException, ObjectDisposedException, etc.) is safe to ignore
         }
     }
 

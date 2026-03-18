@@ -3,10 +3,11 @@
 
 @if (IsVisible && Commands.Count > 0)
 {
-    <div class="autocomplete-dropdown visible" role="listbox">
+    <div id="autocomplete-listbox" class="autocomplete-dropdown visible" role="listbox">
         @foreach (var (command, index) in Commands.Select((cmd, idx) => (cmd, idx)))
         {
-            <div class="autocomplete-item @(index == SelectedIndex ? "selected" : "")"
+            <div id="autocomplete-option-@index"
+                 class="autocomplete-item @(index == SelectedIndex ? "selected" : "")"
                  role="option"
                  aria-selected="@(index == SelectedIndex ? "true" : "false")"
                  @onclick="@(() => OnCommandSelected.InvokeAsync(command))">
