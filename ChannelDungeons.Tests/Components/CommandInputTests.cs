@@ -219,6 +219,27 @@ public class CommandInputTests : Bunit.TestContext
     }
 
     [TestMethod]
+    public async Task Tab_SubmitsSelectedCommand_WhenItemSelected()
+    {
+        RegisterService(["general", "rules"]);
+        string? submitted = null;
+        var cut = RenderComponent<CommandInput>(p => p
+            .Add(x => x.IsVisible, false)
+            .Add(x => x.OnCommandSubmit,
+                EventCallback.Factory.Create<string>(this, cmd => submitted = cmd)));
+        cut.WaitForState(() => cut.Instance != null); // Wait for initialization
+
+        await cut.Find(".command-input").TriggerEventAsync("oninput",
+            new ChangeEventArgs { Value = "/gen" });
+        await cut.Find(".command-input").TriggerEventAsync("onkeydown",
+            new KeyboardEventArgs { Key = "ArrowDown" });
+        await cut.Find(".command-input").TriggerEventAsync("onkeydown",
+            new KeyboardEventArgs { Key = "Tab" });
+
+        Assert.AreEqual("/general", submitted);
+    }
+
+    [TestMethod]
     public async Task Enter_SubmitsSearchTerm_WhenNoAutocompleteMatch()
     {
         RegisterService(["general", "rules"]);

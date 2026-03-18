@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChannelDungeons.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c15c2cb435ed69934e048235ebb48489ebcc416")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d84b2bb39587ece54727499b2a0aec92346f6562")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChannelDungeons.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChannelDungeons.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

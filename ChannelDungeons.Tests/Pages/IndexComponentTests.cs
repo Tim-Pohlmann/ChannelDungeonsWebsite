@@ -1,6 +1,8 @@
 using Bunit;
 using ChannelDungeons.BlazorWasm.Models;
 using ChannelDungeons.BlazorWasm.Services;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
@@ -63,6 +65,121 @@ public class IndexComponentTests : Bunit.TestContext
         var commandInput = cut.Find(".command-input-container");
         Assert.IsTrue(commandInput.ClassList.Contains("visible"),
             "Command input should be visible after messages load");
+    }
+
+    [TestMethod]
+    public async Task HandleToggleSidebar_TogglesSidebarVisibility()
+    {
+        // Arrange
+        var httpClient = new HttpClient(new MockHttpMessageHandler())
+        {
+            BaseAddress = new Uri("http://localhost/")
+        };
+        var channelService = new ChannelService(httpClient);
+        var animationService = new MessageAnimationService();
+        var navigationManager = Substitute.For<Microsoft.AspNetCore.Components.NavigationManager>();
+
+        Services.AddScoped(_ => channelService);
+        Services.AddScoped(_ => animationService);
+        Services.AddScoped(_ => navigationManager);
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<Index>();
+        cut.WaitForState(() =>
+        {
+            var sidebar = cut.FindAll(".sidebar").FirstOrDefault();
+            return sidebar != null && sidebar.ClassList.Contains("visible");
+        }, timeout: TimeSpan.FromSeconds(2));
+
+        var initiallyVisible = cut.Find(".sidebar").ClassList.Contains("visible");
+
+        // Act - click the toggle button in the channel header
+        var toggleButton = cut.Find(".sidebar-toggle");
+        toggleButton.Click();
+
+        // Assert - sidebar visibility should toggle
+        var afterToggle = cut.Find(".sidebar").ClassList.Contains("visible");
+        Assert.AreNotEqual(initiallyVisible, afterToggle, "Sidebar visibility should toggle");
+    }
+
+    [TestMethod]
+    public async Task HandleCommandSubmit_WithInvalidCommand_ShowsErrorMessage()
+    {
+        // Arrange
+        var httpClient = new HttpClient(new MockHttpMessageHandler())
+        {
+            BaseAddress = new Uri("http://localhost/")
+        };
+        var channelService = new ChannelService(httpClient);
+        var animationService = new MessageAnimationService();
+        var navigationManager = Substitute.For<Microsoft.AspNetCore.Components.NavigationManager>();
+
+        Services.AddScoped(_ => channelService);
+        Services.AddScoped(_ => animationService);
+        Services.AddScoped(_ => navigationManager);
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        JSInterop.SetupVoid("channelDungeons.setupCommandInputKeyHandler", _ => true);
+
+        var cut = RenderComponent<Index>();
+        cut.WaitForState(() =>
+        {
+            var commandInput = cut.FindAll(".command-input-container").FirstOrDefault();
+            return commandInput != null && commandInput.ClassList.Contains("visible");
+        }, timeout: TimeSpan.FromSeconds(2));
+
+        var initialMessagesCount = cut.FindAll(".message").Count;
+
+        // Act - submit an invalid command through the CommandInput component
+        var commandInputComponent = cut.FindComponent<ChannelDungeons.BlazorWasm.Components.Layout.CommandInput>();
+        await commandInputComponent.InvokeAsync(() =>
+            commandInputComponent.Instance.OnCommandSubmit.InvokeAsync("/invalidchannel"));
+
+        // Assert - error message should be added with "Unknown command"
+        var messages = cut.FindAll(".message");
+        Assert.AreEqual(initialMessagesCount + 1, messages.Count, "One error message should be added");
+
+        var lastMessageContent = messages.Last().QuerySelector(".message-content")!.InnerHtml;
+        Assert.IsTrue(lastMessageContent.Contains("Unknown command"), "Error message should mention 'Unknown command'");
+    }
+
+    [TestMethod]
+    public async Task HandleCommandSubmit_WithNonSlashInput_ShowsDemoMessage()
+    {
+        // Arrange
+        var httpClient = new HttpClient(new MockHttpMessageHandler())
+        {
+            BaseAddress = new Uri("http://localhost/")
+        };
+        var channelService = new ChannelService(httpClient);
+        var animationService = new MessageAnimationService();
+        var navigationManager = Substitute.For<Microsoft.AspNetCore.Components.NavigationManager>();
+
+        Services.AddScoped(_ => channelService);
+        Services.AddScoped(_ => animationService);
+        Services.AddScoped(_ => navigationManager);
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        JSInterop.SetupVoid("channelDungeons.setupCommandInputKeyHandler", _ => true);
+
+        var cut = RenderComponent<Index>();
+        cut.WaitForState(() =>
+        {
+            var commandInput = cut.FindAll(".command-input-container").FirstOrDefault();
+            return commandInput != null && commandInput.ClassList.Contains("visible");
+        }, timeout: TimeSpan.FromSeconds(2));
+
+        var initialMessagesCount = cut.FindAll(".message").Count;
+
+        // Act - submit non-slash text through the CommandInput component
+        var commandInputComponent = cut.FindComponent<ChannelDungeons.BlazorWasm.Components.Layout.CommandInput>();
+        await commandInputComponent.InvokeAsync(() =>
+            commandInputComponent.Instance.OnCommandSubmit.InvokeAsync("hello"));
+
+        // Assert - demo message should be added
+        var messages = cut.FindAll(".message");
+        Assert.AreEqual(initialMessagesCount + 1, messages.Count, "One demo message should be added");
+
+        var lastMessageContent = messages.Last().QuerySelector(".message-content")!.InnerHtml;
+        Assert.IsTrue(lastMessageContent.Contains("demonstration"), "Message should mention it's a demonstration");
     }
 }
 
