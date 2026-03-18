@@ -94,7 +94,6 @@
             {
                 isSidebarVisible = true;
                 _sidebarRevealDone = true;
-                inputVisible = true; // Show input immediately for non-welcome channels on desktop
             }
 
             await LoadChannelAsync(initialChannelId);
@@ -131,7 +130,9 @@
         isLoading = true;
         displayedMessages.Clear();
         showTypingIndicator = false;
-        // Preserve inputVisible if already set (e.g., for non-welcome desktop channels)
+        // Show input immediately for non-welcome desktop channels; hide for welcome or mobile
+        var isWelcomeChannel = string.Equals(channelId, SidebarAnimationService.WelcomeChannelId, StringComparison.OrdinalIgnoreCase);
+        inputVisible = !isWelcomeChannel && !_isMobile;
 
         try
         {
@@ -170,6 +171,8 @@
     private async Task AnimateChannelMessagesAsync(Channel channel, AppConfig config)
     {
         var token = animationCts!.Token;
+
+        await Task.Delay(config.UiShowDelay, token);
 
         var messagesToAnimate = channel.Messages.Select(m => new Message
         {

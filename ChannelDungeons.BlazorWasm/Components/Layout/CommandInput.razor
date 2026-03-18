@@ -3,6 +3,7 @@
 @using ChannelDungeons.BlazorWasm.Components.Autocomplete
 @inject ChannelService ChannelService
 @inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
 
 <footer>
     <div class="autocomplete-container">
@@ -153,6 +154,18 @@
             showAutocomplete = false;
             selectedIndex = -1;
             UpdateFilteredCommands();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("channelDungeons.removeCommandInputKeyHandler", inputElement);
+        }
+        catch (JSException)
+        {
+            // Ignore JS interop failure during disposal
         }
     }
 

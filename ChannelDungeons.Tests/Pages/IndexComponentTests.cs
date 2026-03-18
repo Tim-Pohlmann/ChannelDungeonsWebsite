@@ -27,6 +27,7 @@ public class IndexComponentTests : Bunit.TestContext
         // It's already available via TestContext
         JSInterop.Mode = JSRuntimeMode.Loose;
         JSInterop.SetupVoid("channelDungeons.setupCommandInputKeyHandler", _ => true);
+        JSInterop.SetupVoid("channelDungeons.removeCommandInputKeyHandler", _ => true);
     }
 
     [TestMethod]
