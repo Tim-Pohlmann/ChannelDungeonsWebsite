@@ -73,7 +73,7 @@ public class ChannelService
     public async Task<List<CommandSuggestion>> GetChannelCommandsAsync()
     {
         var channels = await GetAllChannelsAsync();
-        return channels.Select(c => new CommandSuggestion($"/{c.Name}", c.Description)).ToList();
+        return channels.Select(c => new CommandSuggestion($"/{c.Name}", c.Description ?? string.Empty)).ToList();
     }
 
     /// <summary>

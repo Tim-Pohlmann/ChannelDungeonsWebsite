@@ -266,7 +266,7 @@
         }
         else
         {
-            AddBotMessage(BuildNonCommandContent());
+            AddBotMessage(NonCommandMessage);
         }
     }
 
@@ -278,7 +278,7 @@
         return $"Unknown command: <span class='discord-command'>{encodedCommand}</span>. Available commands are: {availableNames}";
     }
 
-    private static string BuildNonCommandContent() =>
+    private const string NonCommandMessage =
         "This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>/about</span> to navigate.";
 
     private void AddBotMessage(string content)
