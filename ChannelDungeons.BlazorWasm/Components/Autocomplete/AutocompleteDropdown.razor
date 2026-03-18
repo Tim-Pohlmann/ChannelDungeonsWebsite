@@ -12,7 +12,10 @@
                  aria-selected="@(index == SelectedIndex ? "true" : "false")"
                  @onclick="@(() => OnCommandSelected.InvokeAsync(command))">
                 <span class="command-name">@command.Name</span>
-                <span class="command-description">@command.Description</span>
+                @if (!string.IsNullOrWhiteSpace(command.Description))
+                {
+                    <span class="command-description">@command.Description</span>
+                }
             </div>
         }
     </div>

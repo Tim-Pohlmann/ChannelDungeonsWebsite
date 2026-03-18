@@ -77,9 +77,9 @@
             {
                 _isMobile = await JSRuntime.InvokeAsync<bool>("channelDungeons.isMobile");
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is JSException or ObjectDisposedException or OperationCanceledException)
             {
-                // Any JS interop failure (JSException, ObjectDisposedException, etc.) - default to desktop view
+                // JS interop unavailable (script load failure, CSP, runtime disposed, etc.) - default to desktop view
                 _isMobile = false;
             }
 

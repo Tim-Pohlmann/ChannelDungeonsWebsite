@@ -22,7 +22,7 @@ public static class SidebarAnimationService
     {
         return !sidebarRevealDone
             && string.Equals(channelId, WelcomeChannelId, StringComparison.OrdinalIgnoreCase)
-            && currentMessageIndex == totalMessages - 1
-            && totalMessages > 0;
+            && totalMessages > 0
+            && currentMessageIndex == totalMessages - 1;
     }
 }
