@@ -170,9 +170,9 @@
         {
             await JSRuntime.InvokeVoidAsync("channelDungeons.removeCommandInputKeyHandler", inputElement);
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is JSException or ObjectDisposedException or OperationCanceledException)
         {
-            // Any failure during disposal (JSException, ObjectDisposedException, etc.) is safe to ignore
+            // Interop/disposal failures are expected during teardown and safe to ignore
         }
     }
 
