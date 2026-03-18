@@ -77,11 +77,10 @@
             {
                 _isMobile = await JSRuntime.InvokeAsync<bool>("channelDungeons.isMobile");
             }
-            catch (Exception ex) when (ex is JSException or ObjectDisposedException or OperationCanceledException)
-            {
-                // JS interop unavailable (script load failure, CSP, runtime disposed, etc.) - default to desktop view
-                _isMobile = false;
-            }
+            catch (JSException) { _isMobile = false; }
+            catch (ObjectDisposedException) { _isMobile = false; }
+            catch (OperationCanceledException) { _isMobile = false; }
+            // Any of the above: JS interop unavailable (script load failure, CSP, runtime disposed) - default to desktop
 
             channels = await ChannelService.GetAllChannelsAsync();
             config = await ChannelService.GetConfigAsync();
@@ -271,6 +270,7 @@
         }
     }
 
+    /// <summary>Returns HTML markup for an unknown-command bot message. User input is HTML-encoded.</summary>
     private string BuildUnknownCommandContent(string command)
     {
         var encodedCommand = HtmlEncoder.Default.Encode(command);

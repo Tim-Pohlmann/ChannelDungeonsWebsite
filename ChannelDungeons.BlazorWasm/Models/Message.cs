@@ -11,7 +11,8 @@ public class Message
     public string Username { get; set; } = "Channel Dungeons";
 
     /// <summary>
-    /// HTML content of the message. Should be sanitized on load.
+    /// HTML markup content of the message, rendered via <c>MarkupString</c> in MessageDisplay.
+    /// Callers must ensure all user-supplied values are HTML-encoded before embedding.
     /// </summary>
     public string Content { get; set; } = string.Empty;
 
