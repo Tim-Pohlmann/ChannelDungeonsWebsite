@@ -11,7 +11,8 @@
             Commands="@filteredCommands"
             OnCommandSelected="@HandleCommandSelected"
             IsVisible="@showAutocomplete"
-            SelectedIndex="@selectedIndex" />
+            SelectedIndex="@selectedIndex"
+            ListboxId="@_listboxId" />
 
         <div class="command-input-container @(IsVisible ? "visible" : "")">
             <input
@@ -22,8 +23,8 @@
                 role="combobox"
                 aria-expanded="@(showAutocomplete && filteredCommands.Count > 0 ? "true" : "false")"
                 aria-autocomplete="list"
-                aria-controls="@(showAutocomplete && filteredCommands.Count > 0 ? "autocomplete-listbox" : null)"
-                aria-activedescendant="@(showAutocomplete && filteredCommands.Count > 0 && selectedIndex >= 0 ? $"autocomplete-option-{selectedIndex}" : null)"
+                aria-controls="@(showAutocomplete && filteredCommands.Count > 0 ? _listboxId : null)"
+                aria-activedescendant="@(showAutocomplete && filteredCommands.Count > 0 && selectedIndex >= 0 ? $"{_listboxId}-option-{selectedIndex}" : null)"
                 @onkeydown="@HandleKeyDown"
                 @oninput="@HandleInput"
                 autocomplete="off"
@@ -40,6 +41,7 @@
     [Parameter]
     public EventCallback<string> OnCommandSubmit { get; set; }
 
+    private readonly string _listboxId = $"autocomplete-listbox-{Guid.NewGuid():N}";
     private ElementReference inputElement;
     private string searchTerm = string.Empty;
     private bool showAutocomplete = false;

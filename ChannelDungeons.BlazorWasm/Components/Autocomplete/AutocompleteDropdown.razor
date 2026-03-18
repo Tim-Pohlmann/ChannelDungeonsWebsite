@@ -3,10 +3,10 @@
 
 @if (IsVisible && Commands.Count > 0)
 {
-    <div id="autocomplete-listbox" class="autocomplete-dropdown visible" role="listbox">
+    <div id="@ListboxId" class="autocomplete-dropdown visible" role="listbox">
         @foreach (var (command, index) in Commands.Select((cmd, idx) => (cmd, idx)))
         {
-            <div id="autocomplete-option-@index"
+            <div id="@($"{ListboxId}-option-{index}")"
                  class="autocomplete-item @(index == SelectedIndex ? "selected" : "")"
                  role="option"
                  aria-selected="@(index == SelectedIndex ? "true" : "false")"
@@ -33,4 +33,7 @@
 
     [Parameter]
     public int SelectedIndex { get; set; } = -1;
+
+    [Parameter]
+    public string ListboxId { get; set; } = "autocomplete-listbox";
 }
