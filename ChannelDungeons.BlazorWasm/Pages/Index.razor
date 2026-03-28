@@ -77,11 +77,10 @@
             {
                 _isMobile = await JSRuntime.InvokeAsync<bool>("channelDungeons.isMobile");
             }
-            catch (Exception ex) when (ex is JSException or ObjectDisposedException or OperationCanceledException)
-            {
-                // JS interop unavailable (script load failure, CSP, runtime disposed) - default to desktop view
-                _isMobile = false;
-            }
+            catch (JSException) { _isMobile = false; }
+            catch (ObjectDisposedException) { _isMobile = false; }
+            catch (OperationCanceledException) { _isMobile = false; }
+            // JS interop unavailable (script load failure, CSP, runtime disposed) - default to desktop view
 
             channels = await ChannelService.GetAllChannelsAsync();
             config = await ChannelService.GetConfigAsync();

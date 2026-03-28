@@ -92,10 +92,9 @@
             {
                 await JSRuntime.InvokeVoidAsync("channelDungeons.setupCommandInputKeyHandler", inputElement);
             }
-            catch (Exception ex) when (ex is JSException or ObjectDisposedException or OperationCanceledException)
-            {
-                // JS interop unavailable or component already disposed; key handler is optional
-            }
+            catch (JSException) { /* JS interop unavailable or component already disposed; key handler is optional */ }
+            catch (ObjectDisposedException) { /* JS interop unavailable or component already disposed; key handler is optional */ }
+            catch (OperationCanceledException) { /* JS interop unavailable or component already disposed; key handler is optional */ }
         }
     }
 
@@ -170,10 +169,9 @@
         {
             await JSRuntime.InvokeVoidAsync("channelDungeons.removeCommandInputKeyHandler", inputElement);
         }
-        catch (Exception ex) when (ex is JSException or ObjectDisposedException or OperationCanceledException)
-        {
-            // Interop/disposal failures are expected during teardown and safe to ignore
-        }
+        catch (JSException) { /* Interop/disposal failures are expected during teardown and safe to ignore */ }
+        catch (ObjectDisposedException) { /* Interop/disposal failures are expected during teardown and safe to ignore */ }
+        catch (OperationCanceledException) { /* Interop/disposal failures are expected during teardown and safe to ignore */ }
     }
 
 }
