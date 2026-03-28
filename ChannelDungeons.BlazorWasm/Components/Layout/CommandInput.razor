@@ -92,10 +92,10 @@
             {
                 await JSRuntime.InvokeVoidAsync("channelDungeons.setupCommandInputKeyHandler", inputElement);
             }
-            catch (JSException) { }
-            catch (ObjectDisposedException) { }
-            catch (OperationCanceledException) { }
-            // Any of the above: component still functions without the JS key handler
+            catch (Exception ex) when (ex is JSException or ObjectDisposedException or OperationCanceledException)
+            {
+                // JS interop unavailable or component already disposed; key handler is optional
+            }
         }
     }
 
