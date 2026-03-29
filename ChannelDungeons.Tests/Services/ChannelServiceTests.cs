@@ -160,8 +160,19 @@ public class ChannelServiceTests
         var commands = await service.GetChannelCommandsAsync();
 
         Assert.AreEqual(2, commands.Count);
-        CollectionAssert.Contains(commands, "/general");
-        CollectionAssert.Contains(commands, "/rules");
+        Assert.IsTrue(commands.Any(c => c.Name == "/general"), "Expected /general command");
+        Assert.IsTrue(commands.Any(c => c.Name == "/rules"), "Expected /rules command");
+    }
+
+    [TestMethod]
+    public async Task GetChannelCommandsAsync_IncludesDescriptions()
+    {
+        var service = CreateService();
+
+        var commands = await service.GetChannelCommandsAsync();
+
+        var general = commands.First(c => c.Name == "/general");
+        Assert.AreEqual("General channel", general.Description);
     }
 
     [TestMethod]

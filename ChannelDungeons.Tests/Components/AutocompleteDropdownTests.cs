@@ -1,5 +1,6 @@
 using Bunit;
 using ChannelDungeons.BlazorWasm.Components.Autocomplete;
+using ChannelDungeons.BlazorWasm.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -8,12 +9,15 @@ namespace ChannelDungeons.Tests.Components;
 [TestClass]
 public class AutocompleteDropdownTests : Bunit.TestContext
 {
+    private static List<CommandSuggestion> Commands(params (string name, string desc)[] items)
+        => items.Select(x => new CommandSuggestion(x.name, x.desc)).ToList();
+
     [TestMethod]
     public void RendersNothing_WhenNotVisible()
     {
         var cut = RenderComponent<AutocompleteDropdown>(p => p
             .Add(x => x.IsVisible, false)
-            .Add(x => x.Commands, new List<string> { "/general" }));
+            .Add(x => x.Commands, Commands(("/general", "General channel"))));
 
         Assert.AreEqual(0, cut.FindAll(".autocomplete-dropdown").Count);
     }
@@ -23,7 +27,7 @@ public class AutocompleteDropdownTests : Bunit.TestContext
     {
         var cut = RenderComponent<AutocompleteDropdown>(p => p
             .Add(x => x.IsVisible, true)
-            .Add(x => x.Commands, new List<string>()));
+            .Add(x => x.Commands, new List<CommandSuggestion>()));
 
         Assert.AreEqual(0, cut.FindAll(".autocomplete-dropdown").Count);
     }
@@ -33,12 +37,23 @@ public class AutocompleteDropdownTests : Bunit.TestContext
     {
         var cut = RenderComponent<AutocompleteDropdown>(p => p
             .Add(x => x.IsVisible, true)
-            .Add(x => x.Commands, new List<string> { "/general", "/rules" }));
+            .Add(x => x.Commands, Commands(("/general", "General channel"), ("/rules", "Rules channel"))));
 
         var items = cut.FindAll(".autocomplete-item");
         Assert.AreEqual(2, items.Count);
-        Assert.AreEqual("/general", items[0].TextContent.Trim());
-        Assert.AreEqual("/rules", items[1].TextContent.Trim());
+        Assert.AreEqual("/general", items[0].QuerySelector(".command-name")!.TextContent.Trim());
+        Assert.AreEqual("/rules", items[1].QuerySelector(".command-name")!.TextContent.Trim());
+    }
+
+    [TestMethod]
+    public void RendersCommandDescriptions_WhenVisibleWithCommands()
+    {
+        var cut = RenderComponent<AutocompleteDropdown>(p => p
+            .Add(x => x.IsVisible, true)
+            .Add(x => x.Commands, Commands(("/general", "General channel"))));
+
+        var item = cut.Find(".autocomplete-item");
+        Assert.AreEqual("General channel", item.QuerySelector(".command-description")!.TextContent.Trim());
     }
 
     [TestMethod]
@@ -46,7 +61,7 @@ public class AutocompleteDropdownTests : Bunit.TestContext
     {
         var cut = RenderComponent<AutocompleteDropdown>(p => p
             .Add(x => x.IsVisible, true)
-            .Add(x => x.Commands, new List<string> { "/general", "/rules" })
+            .Add(x => x.Commands, Commands(("/general", "General channel"), ("/rules", "Rules channel")))
             .Add(x => x.SelectedIndex, 0));
 
         var items = cut.FindAll(".autocomplete-item");
@@ -57,14 +72,15 @@ public class AutocompleteDropdownTests : Bunit.TestContext
     [TestMethod]
     public void InvokesCallback_WhenItemClicked()
     {
-        string? selected = null;
+        CommandSuggestion? selected = null;
         var cut = RenderComponent<AutocompleteDropdown>(p => p
             .Add(x => x.IsVisible, true)
-            .Add(x => x.Commands, new List<string> { "/general", "/rules" })
-            .Add(x => x.OnCommandSelected, EventCallback.Factory.Create<string>(this, cmd => selected = cmd)));
+            .Add(x => x.Commands, Commands(("/general", "General channel"), ("/rules", "Rules channel")))
+            .Add(x => x.OnCommandSelected, EventCallback.Factory.Create<CommandSuggestion>(this, cmd => selected = cmd)));
 
         cut.FindAll(".autocomplete-item")[1].Click();
 
-        Assert.AreEqual("/rules", selected);
+        Assert.IsNotNull(selected);
+        Assert.AreEqual("/rules", selected.Name);
     }
 }

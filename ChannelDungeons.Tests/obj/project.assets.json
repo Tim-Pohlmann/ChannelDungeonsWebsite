@@ -304,7 +304,7 @@
           "build/netstandard2.0/Microsoft.CodeCoverage.targets": {}
         }
       },
-      "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.102": {
+      "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.104": {
         "type": "package",
         "compile": {
           "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll": {}
@@ -1434,7 +1434,7 @@
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
           "Microsoft.AspNetCore.Components.WebAssembly": "10.0.0",
-          "Microsoft.DotNet.HotReload.WebAssembly.Browser": "10.0.102"
+          "Microsoft.DotNet.HotReload.WebAssembly.Browser": "10.0.104"
         },
         "compile": {
           "bin/placeholder/ChannelDungeons.BlazorWasm.dll": {}
@@ -1910,10 +1910,10 @@
         "microsoft.codecoverage.nuspec"
       ]
     },
-    "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.102": {
-      "sha512": "Y8Xq5gLe6l3bW82uGJODzom5Z7pn+Y71BHObnmWF0LqbKFqfOOVDg76a2vyJnRLHn0X1LmsXSec/QdCWFOPl4A==",
+    "Microsoft.DotNet.HotReload.WebAssembly.Browser/10.0.104": {
+      "sha512": "OkWFygvFdm9emwxRW5ahcsU6saKO9EOYCFVNEXWl+23A4ssZy40VCQuqPhyurU7IyaPEhgA4iXh0/o7fhyNngA==",
       "type": "package",
-      "path": "microsoft.dotnet.hotreload.webassembly.browser/10.0.102",
+      "path": "microsoft.dotnet.hotreload.webassembly.browser/10.0.104",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -1924,7 +1924,7 @@
         "buildMultiTargeting/Microsoft.DotNet.HotReload.WebAssembly.Browser.props",
         "buildTransitive/Microsoft.DotNet.HotReload.WebAssembly.Browser.props",
         "lib/net10.0/Microsoft.DotNet.HotReload.WebAssembly.Browser.dll",
-        "microsoft.dotnet.hotreload.webassembly.browser.10.0.102.nupkg.sha512",
+        "microsoft.dotnet.hotreload.webassembly.browser.10.0.104.nupkg.sha512",
         "microsoft.dotnet.hotreload.webassembly.browser.nuspec",
         "staticwebassets/Microsoft.DotNet.HotReload.WebAssembly.Browser.99zm1jdh75.lib.module.js"
       ]
@@ -3647,46 +3647,40 @@
       "MSTest.TestAdapter >= 3.7.3",
       "MSTest.TestFramework >= 3.7.3",
       "Microsoft.NET.Test.Sdk >= 17.12.0",
-      "NSubstitute >= 5.2.0",
+      "NSubstitute >= 5.3.0",
       "RichardSzalay.MockHttp >= 7.0.0",
       "bunit >= 1.40.0",
       "coverlet.collector >= 6.0.4"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\pohlm\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "/root/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.Tests\\ChannelDungeons.Tests.csproj",
+      "projectUniqueName": "/root/ChannelDungeonsWebsite/ChannelDungeons.Tests/ChannelDungeons.Tests.csproj",
       "projectName": "ChannelDungeons.Tests",
-      "projectPath": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.Tests\\ChannelDungeons.Tests.csproj",
-      "packagesPath": "C:\\Users\\pohlm\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.Tests\\obj\\",
+      "projectPath": "/root/ChannelDungeonsWebsite/ChannelDungeons.Tests/ChannelDungeons.Tests.csproj",
+      "packagesPath": "/root/.nuget/packages/",
+      "outputPath": "/root/ChannelDungeonsWebsite/ChannelDungeons.Tests/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\pohlm\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/root/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "/usr/lib/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.BlazorWasm\\ChannelDungeons.BlazorWasm.csproj": {
-              "projectPath": "C:\\Users\\pohlm\\Dropbox\\Tim\\Daten\\Dokumente\\Programmierung\\ChannelDungeonsWebsite\\ChannelDungeons.BlazorWasm\\ChannelDungeons.BlazorWasm.csproj"
+            "/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj": {
+              "projectPath": "/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj"
             }
           }
         }
@@ -3721,7 +3715,7 @@
           },
           "NSubstitute": {
             "target": "Package",
-            "version": "[5.2.0, )"
+            "version": "[5.3.0, )"
           },
           "RichardSzalay.MockHttp": {
             "target": "Package",
@@ -3754,7 +3748,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/10.0.104/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -4031,17 +4025,5 @@
         }
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1603",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "ChannelDungeons.Tests depends on NSubstitute (>= 5.2.0) but NSubstitute 5.2.0 was not found. NSubstitute 5.3.0 was resolved instead.",
-      "libraryId": "NSubstitute",
-      "targetGraphs": [
-        "net10.0"
-      ]
-    }
-  ]
+  }
 }
