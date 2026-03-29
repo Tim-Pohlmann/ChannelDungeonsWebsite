@@ -295,6 +295,7 @@
         {
             ChannelService.CacheMessages(currentChannel.Id, displayedMessages.ToList());
         }
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private static string GetCurrentTime()
