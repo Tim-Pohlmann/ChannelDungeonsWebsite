@@ -67,7 +67,7 @@
     private CancellationTokenSource? animationCts;
     private AppConfig? config;
     private bool _isMobile = false;
-    private bool _sidebarRevealDone = false;
+    private bool _welcomeIntroDone = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,7 +93,7 @@
                 !string.Equals(initialChannelId, SidebarAnimationService.WelcomeChannelId, StringComparison.OrdinalIgnoreCase))
             {
                 isSidebarVisible = true;
-                _sidebarRevealDone = true;
+                _welcomeIntroDone = true;
             }
 
             await LoadChannelAsync(initialChannelId);
@@ -133,7 +133,7 @@
         // Show input immediately unless this is the welcome channel on its first visit (intro not yet played).
         // On mobile, sidebar stays hidden but input visibility follows the same rules as desktop.
         var isWelcomeChannel = string.Equals(channelId, SidebarAnimationService.WelcomeChannelId, StringComparison.OrdinalIgnoreCase);
-        inputVisible = !isWelcomeChannel || _sidebarRevealDone;
+        inputVisible = !isWelcomeChannel || _welcomeIntroDone;
 
         try
         {
@@ -191,7 +191,7 @@
                 displayedMessages.Add(messagesToAnimate[messageIndex]);
                 await InvokeAsync(StateHasChanged);
 
-                if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count, channel.Id, _sidebarRevealDone))
+                if (SidebarAnimationService.ShouldShowSidebar(messageIndex, messagesToAnimate.Count, channel.Id, _welcomeIntroDone))
                 {
                     await ShowSidebarAfterDelayAsync(config, token);
                 }
@@ -221,7 +221,7 @@
             {
                 isSidebarVisible = true;
             }
-            _sidebarRevealDone = true;
+            _welcomeIntroDone = true;
             inputVisible = true;
             await InvokeAsync(StateHasChanged);
         }
