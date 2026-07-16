@@ -8,5 +8,6 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped<BrowserInterop>();
+builder.Services.AddSingleton<IDelayProvider, DelayProvider>();
 
 await builder.Build().RunAsync();

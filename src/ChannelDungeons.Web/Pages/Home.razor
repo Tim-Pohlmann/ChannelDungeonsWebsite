@@ -1,5 +1,6 @@
 @page "/"
 @inject BrowserInterop Interop
+@inject IDelayProvider Delay
 @implements IAsyncDisposable
 
 <div class="discord-app">
@@ -103,13 +104,13 @@
                 var message = messages[i];
 
                 if (message.DelayMs > 0)
-                    await Task.Delay(message.DelayMs, token);
+                    await Delay.Delay(message.DelayMs, token);
 
                 _typingIndicatorVisible = true;
                 StateHasChanged();
                 await Interop.ScrollToBottomAsync("message-area");
 
-                await Task.Delay(message.TypingDurationMs, token);
+                await Delay.Delay(message.TypingDurationMs, token);
 
                 _typingIndicatorVisible = false;
                 var displayed = new DisplayedMessage(message, GetCurrentTime());
@@ -121,13 +122,13 @@
                 var isLastMessage = i == messages.Count - 1;
                 if (channelId == ChannelCatalog.DefaultChannel && !_hasChannelInUrl && isLastMessage)
                 {
-                    await Task.Delay(UiShowDelayMs, token);
+                    await Delay.Delay(UiShowDelayMs, token);
                     if (!_isMobileView) _sidebarShown = true;
                     await ShowCommandInputAsync();
                 }
 
                 if (!isLastMessage)
-                    await Task.Delay(MessageBetweenDelayMs, token);
+                    await Delay.Delay(MessageBetweenDelayMs, token);
             }
 
             _channelCache[channelId] = rendered;
@@ -143,7 +144,7 @@
         if (_inputShown) return;
         _inputShown = true;
         StateHasChanged();
-        await Task.Delay(300);
+        await Delay.Delay(300);
         await Interop.FocusAsync("command-input");
     }
 
