@@ -78,13 +78,13 @@ public class HomeTests : Bunit.TestContext
     }
 
     [TestMethod]
-    public void SelectingChannelFromSidebar_OnMobile_ClosesSidebarImmediately()
+    public async Task SelectingChannelFromSidebar_OnMobile_ClosesSidebarImmediately()
     {
         SetUpModule(hash: "features", isMobile: true);
         var cut = RenderComponent<Home>();
         cut.WaitForState(() => cut.FindAll(".message").Count == 4, timeout: TimeSpan.FromSeconds(5));
 
-        cut.InvokeAsync(() => cut.Instance.OnWindowResized(true));
+        await cut.InvokeAsync(() => cut.Instance.OnWindowResized(true));
         cut.Find(".sidebar-toggle").Click();
         Assert.IsTrue(cut.Find(".sidebar").ClassList.Contains("visible"));
 
@@ -124,28 +124,28 @@ public class HomeTests : Bunit.TestContext
     }
 
     [TestMethod]
-    public void OnSwipe_PastThreshold_ShowsSidebar()
+    public async Task OnSwipe_PastThreshold_ShowsSidebar()
     {
         SetUpModule(hash: "features", isMobile: true);
         var cut = RenderComponent<Home>();
         cut.WaitForState(() => cut.FindAll(".message").Count == 4, timeout: TimeSpan.FromSeconds(5));
-        cut.InvokeAsync(() => cut.Instance.OnWindowResized(true));
+        await cut.InvokeAsync(() => cut.Instance.OnWindowResized(true));
         Assert.IsFalse(cut.Find(".sidebar").ClassList.Contains("visible"));
 
-        cut.InvokeAsync(() => cut.Instance.OnSwipe(100));
+        await cut.InvokeAsync(() => cut.Instance.OnSwipe(100));
 
         Assert.IsTrue(cut.Find(".sidebar").ClassList.Contains("visible"));
     }
 
     [TestMethod]
-    public void OnSwipe_BelowThreshold_DoesNotShowSidebar()
+    public async Task OnSwipe_BelowThreshold_DoesNotShowSidebar()
     {
         SetUpModule(hash: "features", isMobile: true);
         var cut = RenderComponent<Home>();
         cut.WaitForState(() => cut.FindAll(".message").Count == 4, timeout: TimeSpan.FromSeconds(5));
-        cut.InvokeAsync(() => cut.Instance.OnWindowResized(true));
+        await cut.InvokeAsync(() => cut.Instance.OnWindowResized(true));
 
-        cut.InvokeAsync(() => cut.Instance.OnSwipe(10));
+        await cut.InvokeAsync(() => cut.Instance.OnSwipe(10));
 
         Assert.IsFalse(cut.Find(".sidebar").ClassList.Contains("visible"));
     }
