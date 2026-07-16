@@ -1,0 +1,33 @@
+@using ChannelDungeons.Web.Models
+
+<nav class="sidebar @(Visible ? "visible" : "")" aria-label="Server channels">
+    <header class="server-info">
+        <h2>Channel Dungeons</h2>
+    </header>
+
+    <div class="channels-container">
+        <ul class="channels-list" aria-labelledby="info-category">
+            @foreach (var channel in Channels)
+            {
+                <li class="channel @(channel.Name == CurrentChannel ? "active" : "")"
+                    @onclick="() => OnSelect.InvokeAsync(channel.Name)">
+                    <span class="channel-hash" aria-hidden="true">#</span> @channel.Name
+                </li>
+            }
+        </ul>
+    </div>
+</nav>
+
+@code {
+    [Parameter, EditorRequired]
+    public IEnumerable<ChannelInfo> Channels { get; set; } = Array.Empty<ChannelInfo>();
+
+    [Parameter]
+    public string CurrentChannel { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSelect { get; set; }
+}
