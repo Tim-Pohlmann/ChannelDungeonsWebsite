@@ -48,17 +48,22 @@ public class BrowserInteropTests : Bunit.TestContext
         var interop = new BrowserInterop(JSInterop.JSRuntime);
 
         await interop.DisposeAsync();
+
+        JSInterop.VerifyNotInvoke("unregisterAppListeners");
     }
 
     [TestMethod]
     public async Task DisposeAsync_UnregistersListeners_WhenModuleWasImported()
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
-        JSInterop.SetupModule("./js/app.js");
+        var module = JSInterop.SetupModule("./js/app.js");
+        var unregisterInvocation = module.SetupVoid("unregisterAppListeners").SetVoidResult();
 
         var interop = new BrowserInterop(JSInterop.JSRuntime);
         await interop.GetHashAsync();
 
         await interop.DisposeAsync();
+
+        unregisterInvocation.VerifyInvoke("unregisterAppListeners");
     }
 }

@@ -10,7 +10,11 @@ public class DelayProviderTests
     public async Task Delay_Completes()
     {
         var provider = new DelayProvider();
-        await provider.Delay(1);
+        var task = provider.Delay(1);
+
+        await task;
+
+        Assert.IsTrue(task.IsCompletedSuccessfully);
     }
 
     [TestMethod]

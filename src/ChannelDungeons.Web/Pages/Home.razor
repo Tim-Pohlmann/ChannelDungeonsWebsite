@@ -86,7 +86,8 @@
 
     private async Task AnimateChannelAsync(string channelId, IReadOnlyList<ChannelMessage> messages)
     {
-        _animationCts?.Cancel();
+        if (_animationCts is not null)
+            await _animationCts.CancelAsync();
         var cts = new CancellationTokenSource();
         _animationCts = cts;
         var token = cts.Token;
@@ -152,7 +153,8 @@
     {
         if (!ChannelCatalog.IsValidChannel(channelId)) return;
 
-        _animationCts?.Cancel();
+        if (_animationCts is not null)
+            await _animationCts.CancelAsync();
         _hasChannelInUrl = false;
         _currentChannel = channelId;
 

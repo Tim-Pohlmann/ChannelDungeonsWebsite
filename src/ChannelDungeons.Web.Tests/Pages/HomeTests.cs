@@ -57,7 +57,8 @@ public class HomeTests : Bunit.TestContext
     {
         SetUpModule(hash: "features");
         var cut = RenderComponent<Home>();
-        cut.WaitForState(() => cut.Find(".sidebar").ClassList.Contains("visible"), timeout: TimeSpan.FromSeconds(5));
+        cut.WaitForState(() => cut.FindAll(".message").Count == 4, timeout: TimeSpan.FromSeconds(5));
+        Assert.IsTrue(cut.Find(".sidebar").ClassList.Contains("visible"));
 
         cut.Find(".sidebar-toggle").Click();
 
@@ -75,6 +76,7 @@ public class HomeTests : Bunit.TestContext
 
         cut.WaitForState(() => cut.Find(".channel-name span:last-child").TextContent != "features",
             timeout: TimeSpan.FromSeconds(5));
+        Assert.AreNotEqual("features", cut.Find(".channel-name span:last-child").TextContent);
     }
 
     [TestMethod]
@@ -121,6 +123,7 @@ public class HomeTests : Bunit.TestContext
 
         cut.WaitForState(() => cut.Find(".channel-name span:last-child").TextContent == "about",
             timeout: TimeSpan.FromSeconds(5));
+        Assert.AreEqual("about", cut.Find(".channel-name span:last-child").TextContent);
     }
 
     [TestMethod]
