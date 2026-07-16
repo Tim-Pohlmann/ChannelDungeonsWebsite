@@ -1,0 +1,38 @@
+@using ChannelDungeons.Web.Models
+
+<section class="message-area" id="message-area" aria-label="Channel messages">
+    <div class="messages-container" id="messages" aria-live="polite">
+        @foreach (var displayed in Messages)
+        {
+            <div class="message">
+                <div class="message-avatar" aria-hidden="true"></div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-username">@displayed.Message.Username</span>
+                        <span class="message-timestamp">@displayed.Timestamp</span>
+                    </div>
+                    <div class="message-text">@((MarkupString)displayed.Message.ContentHtml)</div>
+                </div>
+            </div>
+        }
+
+        <div class="typing-indicator @(TypingIndicatorVisible ? "active" : "")" aria-hidden="true">
+            <div class="text">
+                <span class="typing-dots">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </span>
+                <span class="username">Channel Dungeons</span> is typing...
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<DisplayedMessage> Messages { get; set; } = Array.Empty<DisplayedMessage>();
+
+    [Parameter]
+    public bool TypingIndicatorVisible { get; set; }
+}

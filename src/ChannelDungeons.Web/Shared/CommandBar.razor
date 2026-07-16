@@ -1,0 +1,134 @@
+@using ChannelDungeons.Web.Models
+@inject Services.BrowserInterop Interop
+
+<footer>
+    <div class="autocomplete-container">
+        <div class="autocomplete-dropdown @(_dropdownVisible ? "visible" : "")" role="listbox" aria-label="Command suggestions">
+            @for (var i = 0; i < _matches.Count; i++)
+            {
+                var index = i;
+                var match = _matches[i];
+                <div class="autocomplete-item @(index == _selectedIndex ? "selected" : "")"
+                     id="autocomplete-item-@index"
+                     @onmousedown="@(() => SelectCommand(match.Name))" @onmousedown:preventDefault="true">
+                    <span class="command-name">/@match.Name</span><span class="command-description">@match.Description</span>
+                </div>
+            }
+        </div>
+        <div class="command-input-container @(Visible ? "visible" : "")">
+            <input type="text"
+                   id="command-input"
+                   placeholder="Type a command (try /about)"
+                   aria-label="Command input"
+                   autocomplete="off"
+                   spellcheck="false"
+                   value="@_inputValue"
+                   @oninput="HandleInput"
+                   @onkeydown="HandleKeyDown"
+                   @onfocusout="HideAutocomplete" />
+        </div>
+    </div>
+</footer>
+
+@code {
+    [Parameter, EditorRequired]
+    public IEnumerable<ChannelInfo> Channels { get; set; } = Array.Empty<ChannelInfo>();
+
+    [Parameter]
+    public bool Visible { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSubmit { get; set; }
+
+    private string _inputValue = string.Empty;
+    private List<ChannelInfo> _matches = new();
+    private int _selectedIndex = -1;
+    private bool _dropdownVisible;
+
+    private void HandleInput(ChangeEventArgs e)
+    {
+        _inputValue = e.Value?.ToString() ?? string.Empty;
+        UpdateAutocomplete();
+    }
+
+    private void UpdateAutocomplete()
+    {
+        if (!_inputValue.StartsWith('/'))
+        {
+            HideAutocomplete();
+            return;
+        }
+
+        var term = _inputValue[1..];
+        _matches = Channels.Where(c => c.Name.StartsWith(term, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        if (_matches.Count == 0)
+        {
+            HideAutocomplete();
+            return;
+        }
+
+        _dropdownVisible = true;
+        _selectedIndex = 0;
+    }
+
+    private void HideAutocomplete()
+    {
+        _dropdownVisible = false;
+        _selectedIndex = -1;
+        _matches = new();
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (_dropdownVisible)
+        {
+            switch (e.Key)
+            {
+                case "ArrowDown":
+                    _selectedIndex = Math.Min(_selectedIndex + 1, _matches.Count - 1);
+                    await Interop.ScrollIntoViewAsync($"autocomplete-item-{_selectedIndex}");
+                    return;
+                case "ArrowUp":
+                    _selectedIndex = Math.Max(_selectedIndex - 1, 0);
+                    await Interop.ScrollIntoViewAsync($"autocomplete-item-{_selectedIndex}");
+                    return;
+                case "Tab":
+                case "Enter":
+                    if (_selectedIndex >= 0 && _selectedIndex < _matches.Count)
+                    {
+                        await SelectCommand(_matches[_selectedIndex].Name);
+                        return;
+                    }
+                    break;
+                case "Escape":
+                    HideAutocomplete();
+                    return;
+            }
+        }
+
+        if (e.Key == "Enter")
+        {
+            await Submit();
+        }
+    }
+
+    private async Task SelectCommand(string commandName)
+    {
+        _inputValue = "/" + commandName;
+        HideAutocomplete();
+        await Interop.FocusAsync("command-input");
+    }
+
+    private async Task Submit()
+    {
+        var command = _inputValue.Trim();
+        if (command.Length == 0) return;
+
+        HideAutocomplete();
+        _inputValue = string.Empty;
+
+        await OnSubmit.InvokeAsync(command);
+        await Interop.FocusAsync("command-input");
+    }
+}

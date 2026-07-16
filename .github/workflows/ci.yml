@@ -43,14 +43,15 @@ jobs:
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.cs.opencover.reportsPaths="TestResults/**/coverage.opencover.xml" \
             /d:sonar.coverage.exclusions="**/*.razor,**/Program.cs,**/wwwroot/js/**" \
-            /d:sonar.exclusions="**/wwwroot/_framework/**,**/obj/**,**/bin/**"
+            /d:sonar.exclusions="**/wwwroot/_framework/**,**/obj/**,**/bin/**" \
+            /d:sonar.cpd.exclusions="**/Data/ChannelCatalog.cs"
 
       - name: Build solution
         run: dotnet build ChannelDungeons.sln --configuration Release
 
       - name: Run tests with coverage
         run: |
-          dotnet test ChannelDungeons.Tests/ChannelDungeons.Tests.csproj \
+          dotnet test src/ChannelDungeons.Web.Tests/ChannelDungeons.Web.Tests.csproj \
             --configuration Release \
             --no-build \
             --collect:"XPlat Code Coverage" \

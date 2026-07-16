@@ -1,0 +1,260 @@
+@page "/"
+@inject BrowserInterop Interop
+@inject IDelayProvider Delay
+@implements IAsyncDisposable
+
+<div class="discord-app">
+    <Sidebar Channels="ChannelCatalog.InSidebarOrder()" CurrentChannel="@_currentChannel" Visible="_sidebarShown" OnSelect="SelectChannelFromSidebarAsync" />
+
+    <main class="content-area @(!_isMobileView && _sidebarShown ? "sidebar-visible" : "")">
+        <ChannelHeaderBar CurrentChannel="@_currentChannel" Description="@_currentDescription" SidebarVisible="_sidebarShown" OnToggleSidebar="ToggleSidebarAsync" />
+
+        <MessagesPanel Messages="_displayedMessages" TypingIndicatorVisible="_typingIndicatorVisible" />
+
+        <CommandBar Channels="ChannelCatalog.Channels" Visible="_inputShown" OnSubmit="HandleCommandAsync" />
+    </main>
+</div>
+
+@code {
+    private const int MobileBreakpointPx = 768;
+    private const int UiShowDelayMs = 500;
+    private const int MessageBetweenDelayMs = 200;
+
+    private string _currentChannel = ChannelCatalog.DefaultChannel;
+    private string _currentDescription = ChannelCatalog.Find(ChannelCatalog.DefaultChannel)!.Description;
+    private bool _sidebarShown;
+    private bool _inputShown;
+    private bool _isMobileView;
+    private bool _hasChannelInUrl;
+
+    private List<DisplayedMessage> _displayedMessages = new();
+    private bool _typingIndicatorVisible;
+
+    private readonly Dictionary<string, List<DisplayedMessage>> _channelCache = new();
+    private CancellationTokenSource? _animationCts;
+    private DotNetObjectReference<Home>? _dotNetRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        _dotNetRef = DotNetObjectReference.Create(this);
+        _isMobileView = await Interop.IsMobileViewportAsync(MobileBreakpointPx);
+        await Interop.RegisterAppListenersAsync(_dotNetRef, MobileBreakpointPx);
+
+        var hash = await Interop.GetHashAsync();
+        _hasChannelInUrl = !string.IsNullOrEmpty(hash);
+        _currentChannel = ChannelCatalog.IsValidChannel(hash) ? hash : ChannelCatalog.DefaultChannel;
+        _currentDescription = ChannelCatalog.Find(_currentChannel)!.Description;
+
+        if (_hasChannelInUrl)
+        {
+            if (!_isMobileView) _sidebarShown = true;
+            await ShowCommandInputAsync();
+        }
+
+        await LoadChannelAsync(_currentChannel, immediate: _hasChannelInUrl);
+    }
+
+    private async Task LoadChannelAsync(string channelId, bool immediate)
+    {
+        var channel = ChannelCatalog.Find(channelId)!;
+        _currentDescription = channel.Description;
+
+        if (_channelCache.TryGetValue(channelId, out var cached))
+        {
+            _typingIndicatorVisible = false;
+            _displayedMessages = cached;
+            StateHasChanged();
+            await Interop.ScrollToBottomAsync("message-area");
+            return;
+        }
+
+        if (immediate)
+        {
+            var now = GetCurrentTime();
+            var list = channel.Messages.Select(m => new DisplayedMessage(m, now)).ToList();
+            _channelCache[channelId] = list;
+            _displayedMessages = list;
+            StateHasChanged();
+            await Interop.ScrollToBottomAsync("message-area");
+            return;
+        }
+
+        await AnimateChannelAsync(channelId, channel.Messages);
+    }
+
+    private async Task AnimateChannelAsync(string channelId, IReadOnlyList<ChannelMessage> messages)
+    {
+        if (_animationCts is not null)
+            await _animationCts.CancelAsync();
+        var cts = new CancellationTokenSource();
+        _animationCts = cts;
+        var token = cts.Token;
+
+        _displayedMessages = new();
+        _typingIndicatorVisible = false;
+        StateHasChanged();
+
+        var rendered = new List<DisplayedMessage>();
+
+        try
+        {
+            for (var i = 0; i < messages.Count; i++)
+            {
+                var message = messages[i];
+
+                if (message.DelayMs > 0)
+                    await Delay.Delay(message.DelayMs, token);
+
+                _typingIndicatorVisible = true;
+                StateHasChanged();
+                await Interop.ScrollToBottomAsync("message-area");
+
+                await Delay.Delay(message.TypingDurationMs, token);
+
+                _typingIndicatorVisible = false;
+                var displayed = new DisplayedMessage(message, GetCurrentTime());
+                rendered.Add(displayed);
+                _displayedMessages = rendered.ToList();
+                StateHasChanged();
+                await Interop.ScrollToBottomAsync("message-area");
+
+                var isLastMessage = i == messages.Count - 1;
+                if (channelId == ChannelCatalog.DefaultChannel && !_hasChannelInUrl && isLastMessage)
+                {
+                    await Delay.Delay(UiShowDelayMs, token);
+                    if (!_isMobileView) _sidebarShown = true;
+                    await ShowCommandInputAsync();
+                }
+
+                if (!isLastMessage)
+                    await Delay.Delay(MessageBetweenDelayMs, token);
+            }
+
+            _channelCache[channelId] = rendered;
+        }
+        catch (TaskCanceledException)
+        {
+            // Channel was switched away from mid-animation; leave it uncached so it replays next time.
+        }
+    }
+
+    private async Task ShowCommandInputAsync()
+    {
+        if (_inputShown) return;
+        _inputShown = true;
+        StateHasChanged();
+        await Delay.Delay(300);
+        await Interop.FocusAsync("command-input");
+    }
+
+    private async Task SwitchChannelAsync(string channelId, bool updateUrl)
+    {
+        if (!ChannelCatalog.IsValidChannel(channelId)) return;
+
+        if (_animationCts is not null)
+            await _animationCts.CancelAsync();
+        _hasChannelInUrl = false;
+        _currentChannel = channelId;
+
+        if (updateUrl)
+            await Interop.SetHashAsync(channelId);
+
+        await LoadChannelAsync(channelId, immediate: false);
+    }
+
+    private Task SelectChannelFromSidebarAsync(string channelId)
+    {
+        if (_isMobileView) _sidebarShown = false;
+        return SwitchChannelAsync(channelId, updateUrl: true);
+    }
+
+    private Task ToggleSidebarAsync()
+    {
+        _sidebarShown = !_sidebarShown;
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleCommandAsync(string rawCommand)
+    {
+        if (rawCommand.StartsWith('/'))
+        {
+            var name = rawCommand[1..].ToLowerInvariant();
+            if (ChannelCatalog.IsValidChannel(name))
+            {
+                await SwitchChannelAsync(name, updateUrl: true);
+            }
+            else
+            {
+                var available = string.Join(", ", ChannelCatalog.Channels.Select(c => $"<span class='discord-command'>/{c.Name}</span>"));
+                AppendBotMessage($"Unknown command: /{name}. Available commands are: {available}");
+            }
+        }
+        else
+        {
+            AppendBotMessage("This is a demonstration of a Discord-like interface. Try using commands like <span class='discord-command'>about</span> to navigate.");
+        }
+    }
+
+    private void AppendBotMessage(string html)
+    {
+        var message = new ChannelMessage { ContentHtml = html };
+        var displayed = new DisplayedMessage(message, GetCurrentTime());
+        _displayedMessages = new List<DisplayedMessage>(_displayedMessages) { displayed };
+        _channelCache[_currentChannel] = _displayedMessages;
+        StateHasChanged();
+        _ = Interop.ScrollToBottomAsync("message-area");
+    }
+
+    private static string GetCurrentTime() =>
+        DateTime.Now.ToString("h:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+
+    [JSInvokable]
+    public async Task OnHashChanged(string hash)
+    {
+        var channelId = ChannelCatalog.IsValidChannel(hash) ? hash : ChannelCatalog.DefaultChannel;
+        if (channelId != _currentChannel)
+        {
+            await SwitchChannelAsync(channelId, updateUrl: false);
+        }
+    }
+
+    [JSInvokable]
+    public void OnWindowResized(bool isMobile)
+    {
+        var wasMobile = _isMobileView;
+        _isMobileView = isMobile;
+
+        if (!wasMobile && isMobile)
+        {
+            _sidebarShown = false;
+        }
+
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnSwipe(double distance)
+    {
+        const int minSwipeDistance = 50;
+
+        if (distance > minSwipeDistance && !_sidebarShown)
+        {
+            _sidebarShown = true;
+            StateHasChanged();
+        }
+        else if (distance < -minSwipeDistance && _sidebarShown)
+        {
+            _sidebarShown = false;
+            StateHasChanged();
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _animationCts?.Cancel();
+        _dotNetRef?.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}
