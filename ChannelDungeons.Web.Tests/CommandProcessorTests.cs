@@ -65,7 +65,18 @@ public sealed class CommandProcessorTests
 
         Assert.AreEqual(CommandResultKind.BotReply, result.Kind);
         StringAssert.Contains(result.ReplyHtml, "Unknown command: /dance");
-        StringAssert.Contains(result.ReplyHtml, "/welcome");
-        StringAssert.Contains(result.ReplyHtml, "/about");
+        // No literal slash inside the spans: .discord-command adds it via CSS.
+        StringAssert.Contains(result.ReplyHtml, "<span class='discord-command'>welcome</span>");
+        StringAssert.Contains(result.ReplyHtml, "<span class='discord-command'>about</span>");
+    }
+
+    [TestMethod]
+    public void UnknownCommand_HtmlEncodesEchoedInput()
+    {
+        var result = CommandProcessor.Process("/<img onerror=x>", Commands);
+
+        Assert.AreEqual(CommandResultKind.BotReply, result.Kind);
+        StringAssert.Contains(result.ReplyHtml, "&lt;img onerror=x&gt;");
+        Assert.DoesNotContain("<img", result.ReplyHtml);
     }
 }

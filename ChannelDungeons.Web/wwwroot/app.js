@@ -8,6 +8,8 @@ window.channelDungeons = (function () {
   const MOBILE_BREAKPOINT = 768;
   const MIN_SWIPE_DISTANCE = 50;
 
+  let listeners = [];
+
   function isMobileView() {
     return window.innerWidth <= MOBILE_BREAKPOINT;
   }
@@ -23,23 +25,44 @@ window.channelDungeons = (function () {
     }
   }
 
+  function addListener(target, type, handler, options) {
+    target.addEventListener(type, handler, options);
+    listeners.push({ target, type, handler });
+  }
+
+  function removeListeners() {
+    for (const { target, type, handler } of listeners) {
+      target.removeEventListener(type, handler);
+    }
+    listeners = [];
+  }
+
+  const dismissButton = document.querySelector('#blazor-error-ui .dismiss');
+  if (dismissButton) {
+    dismissButton.addEventListener('click', function () {
+      document.getElementById('blazor-error-ui').style.display = 'none';
+    });
+  }
+
   return {
     /**
      * Registers viewport and swipe listeners that call back into .NET.
      * Returns whether the viewport is currently mobile-sized.
      */
     init: function (dotNetRef) {
-      window.addEventListener('resize', function () {
+      removeListeners();
+
+      addListener(window, 'resize', function () {
         dotNetRef.invokeMethodAsync('OnViewportResized', isMobileView());
         recalcMobileHeight();
       });
 
       let touchStartX = 0;
-      document.addEventListener('touchstart', function (e) {
+      addListener(document, 'touchstart', function (e) {
         touchStartX = e.changedTouches[0].screenX;
       }, { passive: true });
 
-      document.addEventListener('touchend', function (e) {
+      addListener(document, 'touchend', function (e) {
         const distance = e.changedTouches[0].screenX - touchStartX;
         if (Math.abs(distance) > MIN_SWIPE_DISTANCE) {
           dotNetRef.invokeMethodAsync('OnSwipe', distance > 0);
@@ -48,6 +71,11 @@ window.channelDungeons = (function () {
 
       recalcMobileHeight();
       return isMobileView();
+    },
+
+    /** Detaches the listeners registered by init. */
+    dispose: function () {
+      removeListeners();
     },
 
     scrollToBottom: function (element) {
