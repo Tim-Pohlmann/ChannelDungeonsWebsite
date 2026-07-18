@@ -6,14 +6,15 @@ namespace ChannelDungeons.Web.Tests;
 public sealed class ChannelCatalogTests
 {
     private static readonly ChannelCatalog Catalog = new();
+    private static readonly string[] ExpectedChannelOrder =
+        ["welcome", "about", "features", "gameplay-demo"];
 
     [TestMethod]
     public void Channels_ListWelcomeFirstThenAlphabetical()
     {
         var ids = Catalog.Channels.Select(c => c.Id).ToArray();
 
-        CollectionAssert.AreEqual(
-            new[] { "welcome", "about", "features", "gameplay-demo" }, ids);
+        CollectionAssert.AreEqual(ExpectedChannelOrder, ids);
     }
 
     [TestMethod]
