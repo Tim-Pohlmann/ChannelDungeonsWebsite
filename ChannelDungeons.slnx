@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ChannelDungeons.Web.Tests/ChannelDungeons.Web.Tests.csproj" />
+  <Project Path="ChannelDungeons.Web/ChannelDungeons.Web.csproj" />
+</Solution>

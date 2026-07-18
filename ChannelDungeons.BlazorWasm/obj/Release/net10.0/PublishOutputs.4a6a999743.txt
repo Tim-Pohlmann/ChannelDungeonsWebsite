@@ -1,3 +1,0 @@
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Release/net10.0/publish/ChannelDungeons.BlazorWasm.runtimeconfig.json
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Release/net10.0/publish/dotnet.js
-/root/ChannelDungeonsWebsite/ChannelDungeons.BlazorWasm/bin/Release/net10.0/publish/web.config

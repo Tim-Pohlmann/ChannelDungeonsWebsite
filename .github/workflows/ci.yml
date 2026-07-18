@@ -7,9 +7,14 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+# Exposed as env because the secrets context cannot be used in step-level
+# `if` conditions.
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 jobs:
   sonarqube:
-    name: Analyze with SonarQube Cloud
+    name: Build, test and analyze with SonarQube Cloud
     runs-on: ubuntu-latest
 
     steps:
@@ -29,12 +34,14 @@ jobs:
         with:
           dotnet-version: '10.x'
 
+      # Sonar steps are skipped when the token is unavailable (e.g. fork PRs)
+      # so the build and tests still run.
       - name: Install dotnet-sonarscanner
+        if: env.SONAR_TOKEN != ''
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Begin SonarQube analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
         run: |
           dotnet sonarscanner begin \
             /k:"Tim-Pohlmann_ChannelDungeonsWebsite" \
@@ -42,15 +49,15 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.cs.opencover.reportsPaths="TestResults/**/coverage.opencover.xml" \
-            /d:sonar.coverage.exclusions="**/*.razor,**/Program.cs,**/wwwroot/js/**" \
+            /d:sonar.coverage.exclusions="**/Program.cs,**/App.razor,**/wwwroot/**" \
             /d:sonar.exclusions="**/wwwroot/_framework/**,**/obj/**,**/bin/**"
 
       - name: Build solution
-        run: dotnet build ChannelDungeons.sln --configuration Release
+        run: dotnet build ChannelDungeons.slnx --configuration Release
 
       - name: Run tests with coverage
         run: |
-          dotnet test ChannelDungeons.Tests/ChannelDungeons.Tests.csproj \
+          dotnet test ChannelDungeons.Web.Tests/ChannelDungeons.Web.Tests.csproj \
             --configuration Release \
             --no-build \
             --collect:"XPlat Code Coverage" \
@@ -58,6 +65,5 @@ jobs:
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: End SonarQube analysis
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
         run: dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
