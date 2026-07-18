@@ -29,10 +29,14 @@ jobs:
         with:
           dotnet-version: '10.x'
 
+      # Sonar steps are skipped when the token is unavailable (e.g. fork PRs)
+      # so the build and tests still run.
       - name: Install dotnet-sonarscanner
+        if: ${{ secrets.SONAR_TOKEN != '' }}
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Begin SonarQube analysis
+        if: ${{ secrets.SONAR_TOKEN != '' }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
@@ -58,6 +62,7 @@ jobs:
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: End SonarQube analysis
+        if: ${{ secrets.SONAR_TOKEN != '' }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
