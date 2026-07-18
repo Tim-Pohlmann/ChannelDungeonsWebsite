@@ -8,13 +8,42 @@
     <title>Channel Dungeons - MMORPG in Discord</title>
     <base href="/" />
     <link rel="preload" id="webassembly" />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="dungeon-gate.svg" type="image/svg+xml" />
+    <style>
+        .loading-progress-text {
+            display: flex;
+            height: 100vh;
+            align-items: center;
+            justify-content: center;
+            color: #dcddde;
+        }
+
+        #blazor-error-ui {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 0.6rem 1.25rem;
+            background: #ed4245;
+            color: #ffffff;
+            z-index: 1000;
+        }
+
+        #blazor-error-ui .dismiss {
+            cursor: pointer;
+            position: absolute;
+            right: 0.75rem;
+            top: 0.5rem;
+        }
+    </style>
     <script type="importmap"></script>
 </head>
 
 <body>
     <div id="app">
-        <div class="loading-progress-text">Loading Channel Dungeons...</div>
+        <div class="loading-progress-text">Loading Channel Dungeons&hellip;</div>
     </div>
 
     <div id="blazor-error-ui">
@@ -22,6 +51,7 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+    <script src="app.js"></script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
 </body>
 

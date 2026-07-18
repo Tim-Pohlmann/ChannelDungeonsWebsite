@@ -1,0 +1,26 @@
+<nav class="sidebar @(Visible ? "visible" : null)" aria-label="Server channels">
+    <header class="server-info">
+        <h2>Channel Dungeons</h2>
+    </header>
+
+    <div class="channels-container">
+        <ul class="channels-list" id="dynamic-channels-list">
+            @foreach (var channel in Channels)
+            {
+                <li class="channel @(channel.Id == CurrentChannelId ? "active" : null)"
+                    data-channel="@channel.Id"
+                    @key="channel.Id"
+                    @onclick="() => OnChannelSelected.InvokeAsync(channel.Id)">
+                    <span class="channel-hash" aria-hidden="true">#</span> @channel.Id
+                </li>
+            }
+        </ul>
+    </div>
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<Channel> Channels { get; set; } = [];
+    [Parameter] public string CurrentChannelId { get; set; } = string.Empty;
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<string> OnChannelSelected { get; set; }
+}

@@ -1,0 +1,14 @@
+<div class="typing-indicator @(Active ? "active" : null)" id="typing-indicator" aria-hidden="@(!Active)">
+    <div class="text">
+        <span class="typing-dots">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+        </span>
+        <span class="username">Channel Dungeons</span> is typing...
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool Active { get; set; }
+}
