@@ -7,6 +7,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+# Exposed as env because the secrets context cannot be used in step-level
+# `if` conditions.
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
 jobs:
   sonarqube:
     name: Build, test and analyze with SonarQube Cloud
@@ -32,13 +37,11 @@ jobs:
       # Sonar steps are skipped when the token is unavailable (e.g. fork PRs)
       # so the build and tests still run.
       - name: Install dotnet-sonarscanner
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: env.SONAR_TOKEN != ''
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Begin SonarQube analysis
-        if: ${{ secrets.SONAR_TOKEN != '' }}
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
         run: |
           dotnet sonarscanner begin \
             /k:"Tim-Pohlmann_ChannelDungeonsWebsite" \
@@ -62,7 +65,5 @@ jobs:
             -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: End SonarQube analysis
-        if: ${{ secrets.SONAR_TOKEN != '' }}
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        if: env.SONAR_TOKEN != ''
         run: dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
