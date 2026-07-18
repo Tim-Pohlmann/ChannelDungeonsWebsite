@@ -13,7 +13,7 @@ The site is a .NET 10 Blazor WebAssembly app presenting a Discord-like interface
 
 ```bash
 dotnet run --project ChannelDungeons.Web    # run locally
-dotnet test                                 # run the test suite
+dotnet test ChannelDungeons.slnx            # run the test suite
 ```
 
 Pushes to `main` are deployed to [channel-dungeons.com](https://channel-dungeons.com) via GitHub Actions (`.github/workflows/deploy.yml`). CI (`.github/workflows/ci.yml`) builds, tests, and runs SonarQube Cloud analysis on every PR.
