@@ -11,7 +11,7 @@
                     data-channel="@channel.Id"
                     @key="channel.Id"
                     @onclick="() => OnChannelSelected.InvokeAsync(channel.Id)">
-                    <span class="channel-hash" aria-hidden="true">#</span> @channel.Id
+                    <a href="#@channel.Id"><span class="channel-hash" aria-hidden="true">#</span> @channel.Id</a>
                 </li>
             }
         </ul>

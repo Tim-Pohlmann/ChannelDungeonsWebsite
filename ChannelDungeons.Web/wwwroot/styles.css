@@ -797,3 +797,21 @@ code {
     }
   }
 }
+
+/* ==========================================================================
+   11. Blazor Migration Additions
+   ========================================================================== */
+
+/* Channel entries are real links (keyboard focusable) styled like the
+   original list items */
+.channel a {
+  color: inherit;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.channel a:hover {
+  text-decoration: none;
+}

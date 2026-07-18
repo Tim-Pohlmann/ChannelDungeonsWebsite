@@ -19,7 +19,7 @@ public sealed class HomePageTests : AppTestContext
         cut.WaitForAssertion(() =>
         {
             Assert.HasCount(4, cut.FindAll(".message"));
-            StringAssert.Contains(cut.Find(".message h1").TextContent, "Welcome to Channel Dungeons!");
+            Assert.Contains("Welcome to Channel Dungeons!", cut.Find(".message h1").TextContent);
         });
     }
 
@@ -46,7 +46,7 @@ public sealed class HomePageTests : AppTestContext
         cut.WaitForAssertion(() =>
         {
             Assert.AreEqual("features", cut.Find("#current-channel").TextContent);
-            StringAssert.Contains(cut.Find(".channel-description").TextContent, "Gameplay Features");
+            Assert.Contains("Gameplay Features", cut.Find(".channel-description").TextContent);
             Assert.HasCount(4, cut.FindAll(".message .feature"));
         });
     }
@@ -92,7 +92,7 @@ public sealed class HomePageTests : AppTestContext
         cut.WaitForAssertion(() =>
         {
             Assert.HasCount(5, cut.FindAll(".message"));
-            StringAssert.Contains(cut.FindAll(".message-text")[^1].TextContent, "demonstration of a Discord-like interface");
+            Assert.Contains("demonstration of a Discord-like interface", cut.FindAll(".message-text")[^1].TextContent);
         });
     }
 
@@ -106,7 +106,7 @@ public sealed class HomePageTests : AppTestContext
         cut.Find("#command-input").KeyDown(new KeyboardEventArgs { Key = "Enter" });
 
         cut.WaitForAssertion(() =>
-            StringAssert.Contains(cut.FindAll(".message-text")[^1].TextContent, "Unknown command: /dance"));
+            Assert.Contains("Unknown command: /dance", cut.FindAll(".message-text")[^1].TextContent));
     }
 
     [TestMethod]

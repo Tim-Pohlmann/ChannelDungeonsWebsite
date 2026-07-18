@@ -28,7 +28,8 @@ public sealed class CommandProcessorTests
         var result = CommandProcessor.Process("hello there", Commands);
 
         Assert.AreEqual(CommandResultKind.BotReply, result.Kind);
-        StringAssert.Contains(result.ReplyHtml, "demonstration of a Discord-like interface");
+        Assert.IsNotNull(result.ReplyHtml);
+        Assert.Contains("demonstration of a Discord-like interface", result.ReplyHtml);
     }
 
     [TestMethod]
@@ -64,10 +65,11 @@ public sealed class CommandProcessorTests
         var result = CommandProcessor.Process("/dance", Commands);
 
         Assert.AreEqual(CommandResultKind.BotReply, result.Kind);
-        StringAssert.Contains(result.ReplyHtml, "Unknown command: /dance");
+        Assert.IsNotNull(result.ReplyHtml);
+        Assert.Contains("Unknown command: /dance", result.ReplyHtml);
         // No literal slash inside the spans: .discord-command adds it via CSS.
-        StringAssert.Contains(result.ReplyHtml, "<span class='discord-command'>welcome</span>");
-        StringAssert.Contains(result.ReplyHtml, "<span class='discord-command'>about</span>");
+        Assert.Contains("<span class='discord-command'>welcome</span>", result.ReplyHtml);
+        Assert.Contains("<span class='discord-command'>about</span>", result.ReplyHtml);
     }
 
     [TestMethod]
@@ -76,7 +78,8 @@ public sealed class CommandProcessorTests
         var result = CommandProcessor.Process("/<img onerror=x>", Commands);
 
         Assert.AreEqual(CommandResultKind.BotReply, result.Kind);
-        StringAssert.Contains(result.ReplyHtml, "&lt;img onerror=x&gt;");
+        Assert.IsNotNull(result.ReplyHtml);
+        Assert.Contains("&lt;img onerror=x&gt;", result.ReplyHtml);
         Assert.DoesNotContain("<img", result.ReplyHtml);
     }
 }
