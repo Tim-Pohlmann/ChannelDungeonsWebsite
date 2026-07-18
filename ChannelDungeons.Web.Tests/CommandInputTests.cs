@@ -43,7 +43,7 @@ public sealed class CommandInputTests : AppTestContext
 
         var items = cut.FindAll(".autocomplete-item");
         Assert.HasCount(1, items);
-        StringAssert.Contains(items[0].TextContent, "/about");
+        Assert.Contains("/about", items[0].TextContent);
     }
 
     [TestMethod]
