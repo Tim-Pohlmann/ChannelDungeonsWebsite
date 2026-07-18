@@ -1,5 +1,5 @@
 @page "/"
-@implements IDisposable
+@implements IAsyncDisposable
 @inject IChannelCatalog Catalog
 @inject IDelayProvider Delays
 @inject NavigationManager Navigation
@@ -334,10 +334,15 @@
         _animationCts = null;
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         Navigation.LocationChanged -= HandleLocationChanged;
         CancelAnimation();
-        _selfReference?.Dispose();
+        if (_selfReference is not null)
+        {
+            await Js.InvokeVoidAsync("channelDungeons.dispose");
+            _selfReference.Dispose();
+            _selfReference = null;
+        }
     }
 }

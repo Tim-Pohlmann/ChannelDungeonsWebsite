@@ -1,3 +1,4 @@
+using System.Net;
 using ChannelDungeons.Web.Models;
 
 namespace ChannelDungeons.Web.Services;
@@ -49,8 +50,12 @@ public static class CommandProcessor
             return CommandResult.Switch(name);
         }
 
+        // The reply is rendered as raw HTML, so the echoed input must be
+        // encoded. The command list omits the leading slash because the
+        // .discord-command style already prepends one via CSS.
         var commandList = string.Join(", ",
-            commands.Select(c => $"<span class='discord-command'>/{c.Name}</span>"));
-        return CommandResult.Reply($"Unknown command: /{name}. Available commands are: {commandList}");
+            commands.Select(c => $"<span class='discord-command'>{c.Name}</span>"));
+        return CommandResult.Reply(
+            $"Unknown command: /{WebUtility.HtmlEncode(name)}. Available commands are: {commandList}");
     }
 }
