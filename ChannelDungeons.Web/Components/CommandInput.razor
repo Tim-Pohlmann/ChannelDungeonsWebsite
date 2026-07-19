@@ -106,12 +106,14 @@
         switch (key)
         {
             case "ArrowDown":
-                _selectedIndex = Math.Min(_selectedIndex + 1, _suggestions.Count - 1);
-                selectionMoved = true;
+                var next = Math.Min(_selectedIndex + 1, _suggestions.Count - 1);
+                selectionMoved = next != _selectedIndex;
+                _selectedIndex = next;
                 break;
             case "ArrowUp":
-                _selectedIndex = Math.Max(_selectedIndex - 1, 0);
-                selectionMoved = true;
+                var previous = Math.Max(_selectedIndex - 1, 0);
+                selectionMoved = previous != _selectedIndex;
+                _selectedIndex = previous;
                 break;
             case "Tab":
             case "Enter":
