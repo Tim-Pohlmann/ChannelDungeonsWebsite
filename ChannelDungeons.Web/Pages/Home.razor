@@ -14,7 +14,7 @@
              Visible="_sidebarVisible"
              OnChannelSelected="HandleChannelSelected" />
 
-    <main class="content-area @(_sidebarVisible && !_isMobileView ? "sidebar-visible" : null)">
+    <main class="content-area">
         <ChannelHeader ChannelId="@_currentChannelId"
                        Description="@_currentDescription"
                        SidebarVisible="_sidebarVisible"

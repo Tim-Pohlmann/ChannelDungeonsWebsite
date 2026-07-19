@@ -103,17 +103,6 @@ public sealed class HomePageTests : AppTestContext
     }
 
     [TestMethod]
-    public async Task ContentArea_ReservesSidebarWidthOnlyWhileSidebarVisible()
-    {
-        var cut = Render<Home>();
-        cut.WaitForAssertion(() => Assert.Contains("sidebar-visible", cut.Find("main").ClassList));
-
-        await cut.Instance.OnSwipe(isRightSwipe: false);
-
-        cut.WaitForAssertion(() => Assert.DoesNotContain("sidebar-visible", cut.Find("main").ClassList));
-    }
-
-    [TestMethod]
     public void PlainTextInput_GetsBotReply()
     {
         var cut = Render<Home>();
