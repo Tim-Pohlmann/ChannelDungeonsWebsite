@@ -206,16 +206,23 @@ a:hover {
   overflow: hidden;
 }
 
-/* Content area */
+/* Content area: only reserves room for the sidebar while it is visible;
+   the transition matches the sidebar slide */
 .content-area {
   display: flex;
   flex-direction: column;
-  width: calc(100% - var(--sidebar-width));
-  margin-left: var(--sidebar-width);
+  width: 100%;
+  margin-left: 0;
   height: 100vh;
   max-height: 100vh;
   overflow: hidden;
-  }
+  transition: margin-left var(--transition-sidebar), width var(--transition-sidebar);
+}
+
+.content-area.sidebar-visible {
+  margin-left: var(--sidebar-width);
+  width: calc(100% - var(--sidebar-width));
+}
 
 /* ==========================================================================
    4. Sidebar Components
@@ -814,18 +821,4 @@ code {
 
 .channel a:hover {
   text-decoration: none;
-}
-
-/* The content area only reserves room for the sidebar while it is
-   visible (the original layout kept a permanent empty gutter); the
-   transition matches the sidebar slide */
-.content-area {
-  margin-left: 0;
-  width: 100%;
-  transition: margin-left var(--transition-sidebar), width var(--transition-sidebar);
-}
-
-.content-area.sidebar-visible {
-  margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
 }
