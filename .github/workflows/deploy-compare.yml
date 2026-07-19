@@ -1,0 +1,95 @@
+name: Deploy comparison site to GitHub Pages
+
+# Deploys the production site (rebuilt from main) at the root, plus a
+# migration comparison under /compare:
+#   /compare/original — the pre-migration static site (7b65e27)
+#   /compare/new      — the fresh migration (blazor/03-deploy)
+#   /compare/other    — the other-branch migration attempt (41d898d)
+#
+# Note: a regular push to main redeploys production without /compare;
+# re-run this workflow to bring the comparison back.
+
+on:
+  push:
+    branches: [ compare ]
+  workflow_dispatch:
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build all versions
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Root = current production (built from main)
+        run: |
+          git worktree add /tmp/prod origin/main
+          dotnet publish /tmp/prod/ChannelDungeons.BlazorWasm/ChannelDungeons.BlazorWasm.csproj \
+            --configuration Release --output /tmp/prod-out
+          mkdir -p site
+          cp -r /tmp/prod-out/wwwroot/. site/
+
+      - name: /compare/original = pre-migration static site
+        run: |
+          mkdir -p site/compare/original
+          git archive 7b65e27 | tar -x -C site/compare/original
+
+      - name: /compare/new = fresh migration (blazor/03-deploy)
+        run: |
+          git worktree add /tmp/new origin/blazor/03-deploy
+          dotnet publish /tmp/new/ChannelDungeons.Web/ChannelDungeons.Web.csproj \
+            --configuration Release --output /tmp/new-out
+          mkdir -p site/compare/new
+          cp -r /tmp/new-out/wwwroot/. site/compare/new/
+          sed -i 's|<base href="/" />|<base href="/compare/new/" />|' site/compare/new/index.html
+          grep -q 'base href="/compare/new/"' site/compare/new/index.html
+
+      - name: /compare/other = other-branch migration (41d898d)
+        run: |
+          git worktree add /tmp/other 41d898d
+          dotnet publish /tmp/other/src/ChannelDungeons.Web/ChannelDungeons.Web.csproj \
+            --configuration Release --output /tmp/other-out
+          mkdir -p site/compare/other
+          cp -r /tmp/other-out/wwwroot/. site/compare/other/
+          sed -i 's|<base href="/" />|<base href="/compare/other/" />|' site/compare/other/index.html
+          grep -q 'base href="/compare/other/"' site/compare/other/index.html
+
+      - name: Landing page and Pages plumbing
+        run: |
+          cp compare-landing.html site/compare/index.html
+          cp site/index.html site/404.html
+          touch site/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Channel Dungeons — Migration Comparison</title>
+    <style>
+        :root { color-scheme: dark; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+            background: #202225; color: #dcddde;
+            display: flex; flex-direction: column; height: 100vh;
+        }
+        header {
+            padding: 10px 16px; background: #2f3136;
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        }
+        h1 { font-size: 1rem; margin-right: 8px; }
+        .versions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .version { display: flex; align-items: center; gap: 4px; }
+        .version span {
+            font-size: 0.8rem; padding: 5px 10px; border-radius: 4px 0 0 4px;
+            background: #40444b;
+        }
+        .version a, .version button {
+            font-size: 0.8rem; padding: 5px 10px; border: none; cursor: pointer;
+            background: #4f545c; color: #fff; text-decoration: none;
+        }
+        .version button { border-radius: 0 4px 4px 0; }
+        .version a:hover, .version button:hover { background: #5865F2; }
+        main { flex: 1; display: flex; gap: 2px; background: #000; }
+        .pane { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .pane h2 {
+            font-size: 0.75rem; font-weight: 600; text-align: center;
+            padding: 4px; background: #2f3136; color: #9c9ca3;
+        }
+        .pane iframe { flex: 1; border: 0; width: 100%; background: #36393f; }
+        .hint { font-size: 0.75rem; color: #9c9ca3; margin-left: auto; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Channel Dungeons — Migration Comparison</h1>
+        <div class="versions">
+            <div class="version">
+                <span>1 · Original (pre-migration)</span>
+                <a href="original/" target="_blank">open</a>
+                <button onclick="solo('original/')">solo</button>
+            </div>
+            <div class="version">
+                <span>2 · New migration (PRs 26–28)</span>
+                <a href="new/" target="_blank">open</a>
+                <button onclick="solo('new/')">solo</button>
+            </div>
+            <div class="version">
+                <span>3 · Other-branch migration</span>
+                <a href="other/" target="_blank">open</a>
+                <button onclick="solo('other/')">solo</button>
+            </div>
+            <div class="version">
+                <span>View</span>
+                <button onclick="sideBySide()">side-by-side</button>
+            </div>
+        </div>
+        <div class="hint">Each pane is an independent copy — interact with them separately. Iframes reload on view change.</div>
+    </header>
+    <main id="panes">
+        <div class="pane"><h2>1 · Original</h2><iframe src="original/" title="Original site"></iframe></div>
+        <div class="pane"><h2>2 · New migration</h2><iframe src="new/" title="New migration"></iframe></div>
+        <div class="pane"><h2>3 · Other migration</h2><iframe src="other/" title="Other migration"></iframe></div>
+    </main>
+    <script>
+        const panes = document.getElementById('panes');
+        const titles = { 'original/': '1 · Original', 'new/': '2 · New migration', 'other/': '3 · Other migration' };
+        function render(sources) {
+            panes.innerHTML = sources.map(src =>
+                `<div class="pane"><h2>${titles[src]}</h2><iframe src="${src}" title="${titles[src]}"></iframe></div>`
+            ).join('');
+        }
+        function solo(src) { render([src]); }
+        function sideBySide() { render(['original/', 'new/', 'other/']); }
+    </script>
+</body>
+</html>
