@@ -70,8 +70,9 @@
     protected override void OnInitialized()
     {
         Navigation.LocationChanged += HandleLocationChanged;
-        _hasChannelInUrl = new Uri(Navigation.Uri).Fragment.Length > 1;
-        _currentChannelId = GetChannelIdFromUrl() ?? ChannelCatalog.DefaultChannelId;
+        var channelFromUrl = GetChannelIdFromUrl();
+        _hasChannelInUrl = channelFromUrl is not null;
+        _currentChannelId = channelFromUrl ?? ChannelCatalog.DefaultChannelId;
         _currentDescription = DescribeChannel(_currentChannelId);
     }
 
