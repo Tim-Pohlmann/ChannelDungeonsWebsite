@@ -1,4 +1,4 @@
-@inject IJSRuntime Js
+@inject IBrowserInterop Interop
 
 <footer>
     <div class="autocomplete-container">
@@ -58,7 +58,7 @@
             // Native keydown listener that suppresses the browser defaults for
             // navigation keys while the dropdown is open (caret moves, focus
             // loss on Tab); the Blazor handler below does the actual work.
-            await Js.InvokeVoidAsync("channelDungeons.registerInputKeys", _inputElement, _dropdownElement);
+            await Interop.RegisterInputKeysAsync(_inputElement, _dropdownElement);
         }
     }
 
@@ -81,10 +81,14 @@
     {
         if (_dropdownVisible)
         {
-            HandleDropdownKey(e.Key, out var selectedCommand);
+            HandleDropdownKey(e.Key, out var selectedCommand, out var selectionMoved);
             if (selectedCommand is not null)
             {
                 await SelectSuggestionAsync(selectedCommand);
+            }
+            else if (selectionMoved)
+            {
+                await Interop.ScrollItemIntoViewAsync(_dropdownElement, _selectedIndex);
             }
             return;
         }
@@ -95,16 +99,19 @@
         }
     }
 
-    private void HandleDropdownKey(string key, out string? selectedCommand)
+    private void HandleDropdownKey(string key, out string? selectedCommand, out bool selectionMoved)
     {
         selectedCommand = null;
+        selectionMoved = false;
         switch (key)
         {
             case "ArrowDown":
                 _selectedIndex = Math.Min(_selectedIndex + 1, _suggestions.Count - 1);
+                selectionMoved = true;
                 break;
             case "ArrowUp":
                 _selectedIndex = Math.Max(_selectedIndex - 1, 0);
+                selectionMoved = true;
                 break;
             case "Tab":
             case "Enter":

@@ -10,5 +10,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddSingleton<IChannelCatalog, ChannelCatalog>();
 builder.Services.AddSingleton<IDelayProvider, TaskDelayProvider>();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<IBrowserInterop, BrowserInterop>();
 
 await builder.Build().RunAsync();

@@ -3,7 +3,7 @@
 @inject IChannelCatalog Catalog
 @inject IDelayProvider Delays
 @inject NavigationManager Navigation
-@inject IJSRuntime Js
+@inject IBrowserInterop Interop
 @inject TimeProvider Time
 
 <PageTitle>Channel Dungeons - MMORPG in Discord</PageTitle>
@@ -81,14 +81,14 @@
         if (firstRender)
         {
             _selfReference = DotNetObjectReference.Create(this);
-            _isMobileView = await Js.InvokeAsync<bool>("channelDungeons.init", _selfReference);
+            _isMobileView = await Interop.InitAsync(_selfReference);
             await LoadInitialChannelAsync();
         }
 
         if (_scrollPending)
         {
             _scrollPending = false;
-            await Js.InvokeVoidAsync("channelDungeons.scrollToBottom", _messageArea);
+            await Interop.ScrollToBottomAsync(_messageArea);
         }
     }
 
@@ -341,7 +341,7 @@
         CancelAnimation();
         if (_selfReference is not null)
         {
-            await Js.InvokeVoidAsync("channelDungeons.dispose");
+            await Interop.DisposeListenersAsync();
             _selfReference.Dispose();
             _selfReference = null;
         }
