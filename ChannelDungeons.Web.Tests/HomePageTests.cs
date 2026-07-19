@@ -1,5 +1,6 @@
 using Bunit;
 using ChannelDungeons.Web.Pages;
+using ChannelDungeons.Web.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,12 @@ namespace ChannelDungeons.Web.Tests;
 public sealed class HomePageTests : AppTestContext
 {
     private NavigationManager Navigation => Services.GetRequiredService<NavigationManager>();
+
+    private sealed class PendingDelayProvider : IDelayProvider
+    {
+        public Task DelayAsync(int milliseconds, CancellationToken cancellationToken) =>
+            Task.Delay(Timeout.Infinite, cancellationToken);
+    }
 
     [TestMethod]
     public void InitialLoad_AnimatesAllWelcomeMessages()
@@ -78,6 +85,32 @@ public sealed class HomePageTests : AppTestContext
             Assert.AreEqual("welcome", cut.Find("#current-channel").TextContent);
             Assert.HasCount(4, cut.FindAll(".message"));
         });
+    }
+
+    [TestMethod]
+    public void UnknownChannelUrl_TakesTheAnimatedWelcomePath()
+    {
+        // A delay that never completes freezes the animation at its first
+        // step: the animated path shows no messages yet, while the
+        // direct-link path would have shown all of them instantly.
+        Services.AddSingleton<IDelayProvider>(new PendingDelayProvider());
+        Navigation.NavigateTo(Navigation.BaseUri + "#no-such-channel");
+
+        var cut = Render<Home>();
+
+        Assert.IsEmpty(cut.FindAll(".message"));
+        Assert.DoesNotContain("visible", cut.Find(".command-input-container").ClassList);
+    }
+
+    [TestMethod]
+    public async Task ContentArea_ReservesSidebarWidthOnlyWhileSidebarVisible()
+    {
+        var cut = Render<Home>();
+        cut.WaitForAssertion(() => Assert.Contains("sidebar-visible", cut.Find("main").ClassList));
+
+        await cut.Instance.OnSwipe(isRightSwipe: false);
+
+        cut.WaitForAssertion(() => Assert.DoesNotContain("sidebar-visible", cut.Find("main").ClassList));
     }
 
     [TestMethod]
