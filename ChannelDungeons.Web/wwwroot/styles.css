@@ -802,6 +802,12 @@ code {
    11. Blazor Migration Additions
    ========================================================================== */
 
+/* Blazor's root mount point sits between body and .discord-app; it needs an
+   explicit height so percentage-height rules resolve against the viewport */
+#app {
+  height: 100%;
+}
+
 /* Channel entries are real links (keyboard focusable) styled like the
    original list items */
 .channel a {
