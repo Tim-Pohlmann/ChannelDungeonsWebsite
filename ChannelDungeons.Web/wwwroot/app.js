@@ -38,7 +38,7 @@ function removeListeners() {
 
 function wireErrorUiDismiss() {
   const errorUi = document.getElementById('blazor-error-ui');
-  const dismiss = errorUi && errorUi.querySelector('.dismiss');
+  const dismiss = errorUi?.querySelector('.dismiss');
   if (dismiss && !dismiss.dataset.wired) {
     dismiss.dataset.wired = 'true';
     dismiss.addEventListener('click', function () {
@@ -91,7 +91,7 @@ export function scrollToBottom(element) {
 
 /** Scrolls the container's child at the given index into view. */
 export function scrollItemIntoView(container, index) {
-  const item = container && container.children[index];
+  const item = container?.children[index];
   if (item) {
     item.scrollIntoView({ block: 'nearest' });
   }
