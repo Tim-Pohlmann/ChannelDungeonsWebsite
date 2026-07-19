@@ -206,22 +206,15 @@ a:hover {
   overflow: hidden;
 }
 
-/* Content area: only reserves room for the sidebar while it is visible;
-   the transition matches the sidebar slide */
+/* Content area */
 .content-area {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  margin-left: 0;
+  width: calc(100% - var(--sidebar-width));
+  margin-left: var(--sidebar-width);
   height: 100vh;
   max-height: 100vh;
   overflow: hidden;
-  transition: margin-left var(--transition-sidebar), width var(--transition-sidebar);
-}
-
-.content-area.sidebar-visible {
-  margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
 }
 
 /* ==========================================================================
