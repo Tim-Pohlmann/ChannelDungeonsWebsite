@@ -1,0 +1,150 @@
+@inject IJSRuntime Js
+
+<footer>
+    <div class="autocomplete-container">
+        <div class="autocomplete-dropdown @(_dropdownVisible ? "visible" : null)"
+             id="autocomplete-dropdown"
+             @ref="_dropdownElement"
+             role="listbox"
+             aria-label="Command suggestions">
+            @for (var i = 0; i < _suggestions.Count; i++)
+            {
+                var suggestion = _suggestions[i];
+                var index = i;
+                <div class="autocomplete-item @(index == _selectedIndex ? "selected" : null)"
+                     role="option"
+                     aria-selected="@(index == _selectedIndex)"
+                     @key="suggestion.Name"
+                     @onmousedown="() => SelectSuggestionAsync(suggestion.Name)"
+                     @onmousedown:preventDefault>
+                    <span class="command-name">/@suggestion.Name</span><span class="command-description">@suggestion.Description</span>
+                </div>
+            }
+        </div>
+        <div class="command-input-container @(Visible ? "visible" : null)">
+            <input type="text"
+                   id="command-input"
+                   @ref="_inputElement"
+                   placeholder="Type a command (try /about)"
+                   aria-label="Command input"
+                   autocomplete="off"
+                   spellcheck="false"
+                   value="@_text"
+                   @oninput="HandleInput"
+                   @onkeydown="HandleKeyDownAsync"
+                   @onfocusout="HideDropdown" />
+        </div>
+    </div>
+</footer>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter, EditorRequired] public IReadOnlyList<CommandSuggestion> Commands { get; set; } = [];
+    [Parameter] public EventCallback<string> OnSubmit { get; set; }
+
+    private ElementReference _inputElement;
+    private ElementReference _dropdownElement;
+    private string _text = string.Empty;
+    private IReadOnlyList<CommandSuggestion> _suggestions = [];
+    private bool _dropdownVisible;
+    private int _selectedIndex = -1;
+
+    public ValueTask FocusAsync() => _inputElement.FocusAsync();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Native keydown listener that suppresses the browser defaults for
+            // navigation keys while the dropdown is open (caret moves, focus
+            // loss on Tab); the Blazor handler below does the actual work.
+            await Js.InvokeVoidAsync("channelDungeons.registerInputKeys", _inputElement, _dropdownElement);
+        }
+    }
+
+    private void HandleInput(ChangeEventArgs e)
+    {
+        _text = e.Value?.ToString() ?? string.Empty;
+        _suggestions = AutocompleteFilter.Filter(Commands, _text);
+        if (_suggestions.Count > 0)
+        {
+            _dropdownVisible = true;
+            _selectedIndex = 0;
+        }
+        else
+        {
+            HideDropdown();
+        }
+    }
+
+    private async Task HandleKeyDownAsync(KeyboardEventArgs e)
+    {
+        if (_dropdownVisible)
+        {
+            HandleDropdownKey(e.Key, out var selectedCommand);
+            if (selectedCommand is not null)
+            {
+                await SelectSuggestionAsync(selectedCommand);
+            }
+            return;
+        }
+
+        if (e.Key == "Enter")
+        {
+            await SubmitAsync();
+        }
+    }
+
+    private void HandleDropdownKey(string key, out string? selectedCommand)
+    {
+        selectedCommand = null;
+        switch (key)
+        {
+            case "ArrowDown":
+                _selectedIndex = Math.Min(_selectedIndex + 1, _suggestions.Count - 1);
+                break;
+            case "ArrowUp":
+                _selectedIndex = Math.Max(_selectedIndex - 1, 0);
+                break;
+            case "Tab":
+            case "Enter":
+                if (_selectedIndex >= 0 && _selectedIndex < _suggestions.Count)
+                {
+                    selectedCommand = _suggestions[_selectedIndex].Name;
+                }
+                break;
+            case "Escape":
+                HideDropdown();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private async Task SelectSuggestionAsync(string commandName)
+    {
+        _text = "/" + commandName;
+        HideDropdown();
+        await FocusAsync();
+    }
+
+    private async Task SubmitAsync()
+    {
+        HideDropdown();
+        if (_text.Trim().Length == 0)
+        {
+            return;
+        }
+
+        var input = _text;
+        _text = string.Empty;
+        await OnSubmit.InvokeAsync(input);
+        await FocusAsync();
+    }
+
+    private void HideDropdown()
+    {
+        _dropdownVisible = false;
+        _selectedIndex = -1;
+    }
+}

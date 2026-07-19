@@ -6,22 +6,20 @@ using Microsoft.Extensions.DependencyInjection;
 namespace ChannelDungeons.Web.Tests;
 
 [TestClass]
-public sealed class AppRouterTests : BunitContext
+public sealed class AppRouterTests : AppTestContext
 {
     [TestMethod]
     public void RootRoute_RendersHomeInsideMainLayout()
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
-
         var cut = Render<App>();
 
-        Assert.Contains("Channel Dungeons", cut.Find("h1").TextContent);
+        cut.WaitForAssertion(() =>
+            Assert.Contains("Welcome to Channel Dungeons!", cut.Find(".message h1").TextContent));
     }
 
     [TestMethod]
     public void UnknownRoute_RendersNotFoundMessage()
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
         Services.GetRequiredService<NavigationManager>().NavigateTo("does-not-exist");
 
         var cut = Render<App>();
