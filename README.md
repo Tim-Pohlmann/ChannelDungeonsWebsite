@@ -6,3 +6,14 @@ This is the official website for Channel Dungeons, an MMORPG played entirely in 
 
 - [Join the official Channel Dungeons discord server](https://discord.gg/channeldungeons)
 - [Add the bot to your own server](https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=YOUR_PERMISSIONS)
+
+## Development
+
+The site is a .NET 10 Blazor WebAssembly app presenting a Discord-like interface. Channel content lives in `ChannelDungeons.Web/Services/ChannelCatalog.cs`.
+
+```bash
+dotnet run --project ChannelDungeons.Web    # run locally
+dotnet test ChannelDungeons.slnx            # run the test suite
+```
+
+Pushes to `main` are deployed to [channel-dungeons.com](https://channel-dungeons.com) via GitHub Actions (`.github/workflows/deploy.yml`). CI (`.github/workflows/ci.yml`) builds, tests, and runs SonarQube Cloud analysis on every PR.
